@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowRight,
   Film,
@@ -15,6 +16,7 @@ import {
   Briefcase,
   Code
 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 import { CONCEPTUAL_CLASSIFIEDS } from '../data/opportunitiesData';
 
 // Discipline Icon Map for Modules (Unified Red/Black/Green Theme)
@@ -374,14 +376,107 @@ const OPPORTUNITY_MODULES = [
 ];
 
 export default function OpportunityDispatchSection({ onExploreClick }) {
+  const navigate = useNavigate();
   // Single active card state for smooth vertical expansion
   const [activeCardId, setActiveCardId] = useState(null);
+  const [realGigs, setRealGigs] = useState([]);
 
-  const leftColumnCards = OPPORTUNITY_MODULES.filter(c => c.column === 'left');
-  const rightColumnCards = OPPORTUNITY_MODULES.filter(c => c.column === 'right');
+  useEffect(() => {
+    async function loadPublicGigs() {
+      try {
+        const { data, error } = await supabase
+          .from('gigs')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          setRealGigs(data);
+        }
+      } catch (err) {
+        console.warn('[OpportunityDispatch] Error loading public gigs:', err);
+      }
+    }
+    loadPublicGigs();
+  }, []);
+
+  const courseIdMap = {
+    'M1': 'reelrush-ai',
+    'M2': 'visualforge-ai',
+    'M3': 'deepannotator',
+    'M4': 'vibe-coder',
+    'M5': 'brandbuzz-ai',
+    'M6': 'agenthandlers',
+  };
+
+  const processedCards = OPPORTUNITY_MODULES.map(mod => {
+    const targetCourseId = courseIdMap[mod.code];
+    const matchingGigs = realGigs.filter(g => 
+      g.course_id === targetCourseId || 
+      (targetCourseId === 'agenthandlers' && g.course_id === 'agent-handlers')
+    );
+    const primaryGig = matchingGigs[0];
+
+    if (primaryGig) {
+      return {
+        ...mod,
+        id: primaryGig.id,
+        role: primaryGig.title,
+        organization: primaryGig.organization || primaryGig.origin_site || mod.organization,
+        location: primaryGig.location || mod.location,
+        engagement: primaryGig.engagement_type || mod.engagement,
+        payment_amount: primaryGig.payment_amount || mod.payment_amount,
+        originPlatform: primaryGig.origin_site || mod.originPlatform,
+        briefSnippet: primaryGig.short_description || mod.briefSnippet,
+        statusBadge: 'Active Ecosystem Need',
+        isRealGig: true,
+        rawGig: primaryGig
+      };
+    } else if (realGigs.length > 0) {
+      return {
+        ...mod,
+        role: 'NO ACTIVE OPPORTUNITY FOR THIS TRACK YET',
+        organization: 'UpShift Partner Network',
+        location: 'Remote',
+        engagement: 'Awaiting Upload',
+        payment_amount: 'Payment Specified on Match',
+        originPlatform: 'UpShift Dispatch',
+        briefSnippet: `Uploads from partner startups and growth agencies are dispatched regularly. Enroll in ${mod.name} to build proof and unlock upcoming gigs.`,
+        statusBadge: 'Awaiting Dispatch',
+        isRealGig: false,
+        rawGig: null
+      };
+    } else {
+      return {
+        ...mod,
+        isRealGig: false,
+        rawGig: null
+      };
+    }
+  });
+
+  const leftColumnCards = processedCards.filter(c => c.column === 'left');
+  const rightColumnCards = processedCards.filter(c => c.column === 'right');
 
   const handleCardClick = (cardId) => {
     setActiveCardId(prev => prev === cardId ? null : cardId);
+  };
+
+  const handleApplyClick = (card, e) => {
+    if (e) e.stopPropagation();
+    if (card.rawGig) {
+      navigate(`/enroll?gig=${card.id}`, { state: { gig: card.rawGig } });
+    } else {
+      const courseIdMap = {
+        'M1': 'reelrush-ai',
+        'M2': 'visualforge-ai',
+        'M3': 'deepannotator',
+        'M4': 'vibe-coder',
+        'M5': 'brandbuzz-ai',
+        'M6': 'agenthandlers',
+      };
+      const trackId = courseIdMap[card.code] || 'reelrush-ai';
+      navigate(`/enroll?track=${trackId}`);
+    }
   };
 
   const renderCard = (card) => {
@@ -563,10 +658,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                 </span>
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onExploreClick) onExploreClick();
-                  }}
+                  onClick={(e) => handleApplyClick(card, e)}
                   style={{
                     backgroundColor: card.accentColor,
                     borderColor: card.accentColor,
@@ -584,7 +676,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                     boxShadow: `0 4px 14px ${card.accentColor}35`
                   }}
                 >
-                  <span>View Opportunities</span>
+                  <span>APPLY FOR THIS GIG</span>
                   <ArrowRight size={14} />
                 </button>
               </div>

@@ -170,15 +170,15 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
             <div className="hero-left-content">
 
               {/* Editorial Headline with Forced Line Breaks */}
-              <h1 className="hero-title text-white font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] mb-4">
-                YOU KNOW AI.<br />
-                NOW SHOW WHAT YOU<br />
-                <span className="text-[#E31B23]">CAN DO WITH IT.</span>
+              <h1 className="hero-title font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] mb-4">
+                <span style={{ color: '#FFFFFF' }}>YOU KNOW AI.</span><br />
+                <span style={{ color: '#FFFFFF' }}>NOW SHOW WHAT YOU</span><br />
+                <span style={{ color: '#E31B23' }}>CAN DO WITH IT.</span>
               </h1>
 
               {/* Supporting Paragraph */}
               <p className="hero-desc text-white/70">
-                Upshift helps you build real AI skills, create proof of work, and unlock opportunities to earn.
+                AI-UpShift helps you build real AI skills, create proof of work, and unlock opportunities to earn.
               </p>
 
               {/* Action CTAs (Exactly 2 Buttons) */}
@@ -326,58 +326,69 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* ============================================================ */}
       {/* 6. WHAT IS AN UPSHIFTER? — EDITORIAL PHILOSOPHY CLOSER       */}
       {/* ============================================================ */}
-      <section id="upshifter" className="section bg-[#111111] text-white relative scroll-mt-28 md:scroll-mt-32 pt-24 pb-20 md:pt-28 md:pb-24 overflow-hidden">
-        {/* Subtle Ambient Red Glow on Dark Canvas */}
+      <section id="upshifter" className="section bg-[#0D0D0D] text-white relative scroll-mt-28 md:scroll-mt-32 pt-24 pb-20 md:pt-28 md:pb-24 overflow-hidden select-none">
+        {/* Deep Burgundy & Red Ambient Gradients */}
         <div 
-          className="absolute -top-32 right-0 w-[500px] h-[500px] pointer-events-none opacity-20"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at 60% 40%, rgba(233, 29, 43, 0.4) 0%, transparent 70%)'
+            background: 'radial-gradient(circle at 80% 50%, rgba(227, 27, 35, 0.22) 0%, rgba(130, 15, 20, 0.1) 45%, transparent 75%), radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%), #0D0D0D'
           }}
         />
 
-        <div className="container relative z-10" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        {/* Subtle Matrix / Mesh Grid */}
+        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:24px_24px]" />
+
+        <div className="container relative z-10" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left Brand Narrative */}
             <div className="lg:col-span-7">
-              <span className="eyebrow mb-3 inline-flex items-center gap-2 border border-white/10 bg-white/5 text-white">
-                <span className="eyebrow-dot" style={{ backgroundColor: '#E91D2B' }} />
-                <span>The Upshifter Standard</span>
+              <span className="eyebrow mb-3 inline-flex items-center gap-2 border border-[#E31B23]/30 bg-[#E31B23]/10 text-[#E31B23]">
+                <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#E31B23]">The UpShifter Standard</span>
               </span>
               <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-5">
                 WHAT IS AN UPSHIFTER?
               </h2>
 
               <p className="font-display text-xl sm:text-2xl lg:text-3xl text-white font-medium leading-snug mb-6">
-                “An Upshifter doesn't just know AI.<br />
-                <span className="text-[#FF4D5A] font-semibold">They know what to do with it.”</span>
+                “An UpShifter doesn't just know AI.<br />
+                <span className="text-[#E31B23] font-bold">They know what to do with it.”</span>
               </p>
 
-              {/* Compact Editorial Discipline Line */}
-              <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs text-white/60 tracking-widest uppercase mb-6 select-none">
+              {/* Compact Editorial Discipline Line with Red Separators */}
+              <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs text-[#D1D5DB] tracking-widest uppercase mb-6 select-none font-semibold">
                 <span>CREATOR</span>
-                <span className="text-[#E91D2B] font-bold">·</span>
+                <span className="text-[#E31B23] font-bold">·</span>
                 <span>BUILDER</span>
-                <span className="text-[#E91D2B] font-bold">·</span>
+                <span className="text-[#E31B23] font-bold">·</span>
                 <span>RESEARCHER</span>
-                <span className="text-[#E91D2B] font-bold">·</span>
+                <span className="text-[#E31B23] font-bold">·</span>
                 <span>OPERATOR</span>
-                <span className="text-[#E91D2B] font-bold">·</span>
+                <span className="text-[#E31B23] font-bold">·</span>
                 <span>AUTOMATOR</span>
-                <span className="text-[#E91D2B] font-bold">·</span>
+                <span className="text-[#E31B23] font-bold">·</span>
                 <span>GENERALIST</span>
               </div>
 
-              <p className="text-sm sm:text-base text-[#A5A29A] font-display leading-relaxed max-w-xl">
+              <p className="text-sm sm:text-base text-[#9CA3AF] font-display leading-relaxed max-w-xl">
                 The modern economy doesn't reward passive prompt typing. It rewards versatile operators who can translate messy real-world challenges into concrete digital assets, automated workflows, and verified commercial results.
               </p>
             </div>
 
-            {/* Right Mascot Presence: Balanced Upward Arrow */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center">
+            {/* Right Mascot Presence with Atmospheric Glow */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
+              {/* Fox Atmospheric Radial Glow */}
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-70"
+                style={{
+                  background: 'radial-gradient(circle at 50% 45%, rgba(227, 27, 35, 0.3) 0%, rgba(255, 255, 255, 0.05) 45%, transparent 70%)',
+                  filter: 'blur(35px)'
+                }}
+              />
               <MascotBadge 
                 pose="arrow" 
                 size="lg" 
-                caption="UPSHIFT ↑ CONFIDENT BUILDER"
+                caption="UpShift CONFIDENT BUILDER"
                 showBadge={true}
               />
             </div>

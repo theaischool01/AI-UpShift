@@ -130,7 +130,7 @@ export default function LoginPage() {
         {/* Brand Lockup */}
         <div style={{ textAlign: 'center', marginBottom: '4px' }}>
           <span style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.02em', color: '#111827' }}>
-            UPSHIFT<span style={{ color: '#E31B23' }}>↑</span>
+            UpShift
           </span>
         </div>
 

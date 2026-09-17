@@ -179,7 +179,7 @@ export default function UpShiftRegistrationModal({ isOpen, onClose }) {
             subject: `UpShift Registration — ${formData.fullName} (Complete Program)`,
             from_name: 'UpShift Admissions',
             program: 'UpShift Complete Applied AI Program',
-            pricing: '₹4,999 (One-Time Enrollment · All 6 Tracks)',
+            pricing: 'UpShift Complete Enrollment (All 6 Tracks)',
             name: formData.fullName,
             date_of_birth: formData.dobChoice === 'dob' ? formData.dob : `Age: ${formData.age}`,
             age: formData.dobChoice === 'age' ? formData.age : undefined,
@@ -348,11 +348,8 @@ export default function UpShiftRegistrationModal({ isOpen, onClose }) {
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontFamily: 'var(--font-display, "Space Grotesk", sans-serif)', fontSize: '20px', fontWeight: '800', color: '#E31B23' }}>
-                      ₹4,999
-                    </span>
                     <span style={{ fontSize: '11px', fontWeight: '600', color: '#666666', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      One-time
+                      All 6 Tracks Included
                     </span>
                   </div>
                 </div>
@@ -811,7 +808,7 @@ export default function UpShiftRegistrationModal({ isOpen, onClose }) {
               {/* Form Action Footer */}
               <div className="upshift-reg-footer">
                 <span className="upshift-reg-footer-note">
-                  Next Step: Secure Razorpay Checkout · ₹4,999 One-Time
+                  Next Step: Secure Razorpay Checkout
                 </span>
                 <button
                   type="button"
@@ -833,7 +830,7 @@ export default function UpShiftRegistrationModal({ isOpen, onClose }) {
                     </>
                   ) : (
                     <>
-                      <span>Proceed to Payment (₹4,999)</span>
+                      <span>Proceed to Payment</span>
                       <ArrowRight size={15} />
                     </>
                   )}

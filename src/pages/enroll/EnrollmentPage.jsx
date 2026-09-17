@@ -1,54 +1,25 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { 
-  Sparkles, 
   ArrowRight, 
   AlertCircle, 
   Loader2, 
   Eye, 
   EyeOff, 
   Lock, 
-  Mail, 
   User, 
-  Phone, 
-  MapPin, 
   GraduationCap, 
-  Layers,
-  CheckCircle2, 
   ArrowLeft,
-  ShieldCheck
+  Briefcase
 } from 'lucide-react';
-import { PROGRAMS_DATA } from '../../data/programsData';
+import { supabase } from '../../lib/supabaseClient';
 import './enroll.css';
 
 const STATUS_OPTIONS = [
-  'Undergraduate Student',
-  'Graduate / Post-Graduate Student',
-  'Fresher (Looking for Opportunities)',
-  'Working Professional',
-  'Founder / Freelancer / Creator',
-  'Other',
-];
-
-const YEAR_OPTIONS = [
-  '1st Year',
-  '2nd Year',
-  '3rd Year',
-  '4th Year',
-  'Final Year',
-  'Graduated / Working',
-];
-
-const HEARD_FROM_OPTIONS = [
-  'Instagram',
-  'LinkedIn',
-  'YouTube',
-  'Google Search',
-  'WhatsApp Community',
-  'Friend / Peer Referral',
-  'College / University Workshop',
-  'The AI School Network',
-  'Other',
+  'Currently Studying',
+  'Graduated',
+  'Freelance',
+  'Others',
 ];
 
 const GENDER_OPTIONS = [
@@ -60,23 +31,25 @@ const GENDER_OPTIONS = [
 
 export default function EnrollmentPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const gigParam = searchParams.get('gig');
+  const courseParam = searchParams.get('course') || searchParams.get('track');
+
+  const [selectedGig, setSelectedGig] = useState(location.state?.gig || null);
 
   const [formData, setFormData] = useState({
     fullName: '',
+    email: '',
+    mobile: '',
     dobAge: '',
     gender: '',
-    mobile: '',
-    email: '',
     city: '',
     state: '',
     currentStatus: '',
     college: '',
     courseDegree: '',
     branch: '',
-    currentYear: '',
-    graduationYear: '',
-    heardFrom: '',
-    courseId: 'reelrush-ai',
     password: '',
     confirmPassword: '',
   });
@@ -87,6 +60,28 @@ export default function EnrollmentPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
+  useEffect(() => {
+    if (location.state?.gig) {
+      setSelectedGig(location.state.gig);
+    } else if (gigParam) {
+      const fetchSelectedGig = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('gigs')
+            .select('*')
+            .eq('id', gigParam)
+            .single();
+          if (data && !error) {
+            setSelectedGig(data);
+          }
+        } catch (err) {
+          console.warn('[EnrollmentPage] Error loading selected gig:', err);
+        }
+      };
+      fetchSelectedGig();
+    }
+  }, [gigParam, location.state]);
+
   const validate = () => {
     const errs = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,7 +89,7 @@ export default function EnrollmentPage() {
 
     if (!formData.fullName.trim()) errs.fullName = 'Full Name is required.';
     if (!formData.email.trim()) {
-      errs.email = 'Email address is required.';
+      errs.email = 'Email is required.';
     } else if (!emailRegex.test(formData.email.trim())) {
       errs.email = 'Please enter a valid email address.';
     }
@@ -113,11 +108,9 @@ export default function EnrollmentPage() {
     if (!formData.college.trim()) errs.college = 'College / University name is required.';
     if (!formData.courseDegree.trim()) errs.courseDegree = 'Course / Degree is required.';
     if (!formData.branch.trim()) errs.branch = 'Branch / Specialization is required.';
-    if (!formData.currentYear) errs.currentYear = 'Please select your current year.';
-    if (!formData.graduationYear.trim()) errs.graduationYear = 'Graduation year is required.';
 
     if (!formData.password) {
-      errs.password = 'Password is required to create your learner portal account.';
+      errs.password = 'Password is required to create your UpShift account.';
     } else if (formData.password.length < 6) {
       errs.password = 'Password must be at least 6 characters.';
     }
@@ -164,7 +157,7 @@ export default function EnrollmentPage() {
       if (accessKey && accessKey !== 'YOUR_ACCESS_KEY_HERE') {
         const payload = {
           access_key: accessKey,
-          subject: `New UpShift Complete Program Enrollment: ${formData.fullName.trim()}`,
+          subject: `New UpShift Enrollment: ${formData.fullName.trim()}`,
           from_name: 'UpShift Enrollment Engine',
           full_name: formData.fullName.trim(),
           email: formData.email.trim().toLowerCase(),
@@ -177,12 +170,9 @@ export default function EnrollmentPage() {
           college: formData.college.trim(),
           course_degree: formData.courseDegree.trim(),
           branch: formData.branch.trim(),
-          current_year: formData.currentYear,
-          graduation_year: formData.graduationYear.trim(),
-          heard_from: formData.heardFrom || 'Not specified',
-          primary_track: formData.courseId,
+          primary_track: selectedGig?.course_id || courseParam || 'reelrush-ai',
           program_enrolled: 'UpShift Complete Applied AI Program',
-          price: '₹4,999 (One-Time Enrollment · 6 Tracks)',
+          price: 'UpShift Enrollment',
           submitted_at: new Date().toISOString(),
         };
 
@@ -213,14 +203,13 @@ export default function EnrollmentPage() {
         college: formData.college.trim(),
         courseDegree: formData.courseDegree.trim(),
         branch: formData.branch.trim(),
-        currentYear: formData.currentYear,
-        graduationYear: formData.graduationYear.trim(),
-        heardFrom: formData.heardFrom || null,
-        courseId: formData.courseId || 'reelrush-ai',
+        courseId: selectedGig?.course_id || courseParam || 'reelrush-ai',
         password: formData.password,
         programId: 'upshift-complete-program',
         programName: 'UpShift Complete Applied AI Program',
         price: 4999,
+        gigId: selectedGig?.id || null,
+        gigTitle: selectedGig?.title || null
       };
 
       // 3. Persist session and route directly to /enroll/payment
@@ -235,7 +224,7 @@ export default function EnrollmentPage() {
 
   return (
     <div className="enroll-page">
-      {/* Editorial Sticky Top Navigation */}
+      {/* Header */}
       <header className="enroll-header">
         <div className="enroll-header-inner">
           <Link to="/" className="enroll-brand-link">
@@ -245,7 +234,7 @@ export default function EnrollmentPage() {
             <div className="enroll-brand-text">
               <span className="enroll-brand-school">THE AI SCHOOL</span>
               <span className="enroll-brand-divider">/</span>
-              <span className="enroll-brand-name">UPSHIFT<span className="enroll-brand-arrow">↑</span></span>
+              <span className="enroll-brand-name">UpShift</span>
             </div>
           </Link>
 
@@ -255,76 +244,45 @@ export default function EnrollmentPage() {
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Container */}
       <main className="enroll-main">
-        
         {/* Back Link */}
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '14px' }}>
           <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '600', color: '#6B7280' }}>
             <ArrowLeft size={14} />
-            <span>Back to UpShift Overview</span>
+            <span>Back to UpShift</span>
           </Link>
         </div>
 
-        {/* Eyebrow & Main Headings */}
-        <div style={{ marginBottom: '24px' }}>
+        {/* Compact Introduction */}
+        <div style={{ marginBottom: '20px' }}>
           <div className="enroll-eyebrow">
             <span className="enroll-eyebrow-dot" />
-            <span className="enroll-eyebrow-text">UPSHIFT · REGISTRATION</span>
+            <span className="enroll-eyebrow-text">UpShift · REGISTRATION</span>
           </div>
           <h1 className="enroll-title">
-            START YOUR UPSHIFT JOURNEY
+            START YOUR UpShift JOURNEY
           </h1>
           <p className="enroll-subtitle">
-            Tell us a little about yourself and we'll use these details to understand your background, tailor your cohort experience, and activate your learner workspace.
+            Tell us a little about yourself to activate your UpShift learner portal.
           </p>
         </div>
 
-        {/* Pricing / Program Summary Box */}
-        <div className="enroll-summary-card">
-          <div className="enroll-summary-top">
-            <div>
-              <div className="enroll-summary-tag">
-                COMPREHENSIVE ALL-IN-ONE ENROLLMENT
-              </div>
-              <h2 className="enroll-summary-title">
-                UPSHIFT COMPLETE APPLIED AI PROGRAM
-              </h2>
-              <p className="enroll-summary-desc">
-                All 6 applied AI capability tracks included with real client gigs & proof-of-work portfolio.
-              </p>
+        {/* Selected Gig Compact Indicator */}
+        {selectedGig && (
+          <div className="enroll-gig-banner">
+            <div className="enroll-gig-banner-label">
+              <Briefcase size={13} />
+              <span>APPLYING FOR</span>
             </div>
-            
-            <div className="enroll-price-badge">
-              <div className="enroll-price-amount">₹4,999</div>
-              <span className="enroll-price-label">ONE-TIME ENROLLMENT</span>
+            <div className="enroll-gig-banner-title">
+              {selectedGig.title}
+            </div>
+            <div className="enroll-gig-banner-meta">
+              {selectedGig.organization || selectedGig.origin_site || 'UpShift Partner'} • {selectedGig.location || 'Remote'} • <span className="enroll-gig-banner-pay">{selectedGig.payment_amount || selectedGig.engagement_type || 'Paid Gig'}</span>
             </div>
           </div>
-
-          {/* Included 6 Programs Grid */}
-          <div>
-            <div className="enroll-tracks-title">
-              <Layers size={13} style={{ color: '#E31B23' }} />
-              <span>All 6 Flagship Tracks Included with Your Enrollment:</span>
-            </div>
-            <div className="enroll-tracks-grid">
-              {PROGRAMS_DATA.map((prog) => (
-                <div key={prog.id} className="enroll-track-item">
-                  <span 
-                    className="enroll-track-code"
-                    style={{ backgroundColor: prog.themeColor || '#E31B23' }}
-                  >
-                    {prog.code}
-                  </span>
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <span className="enroll-track-name">{prog.name}</span>
-                    <span className="enroll-track-focus">{prog.focus}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Error Alert if any */}
         {submitError && (
@@ -334,18 +292,16 @@ export default function EnrollmentPage() {
           </div>
         )}
 
-        {/* Main Form Card */}
+        {/* Form Container */}
         <div className="enroll-form-card">
           <form onSubmit={handleSubmit} noValidate>
             
-            {/* ======================================================== */}
-            {/* Section 1: Personal Information                          */}
-            {/* ======================================================== */}
+            {/* SECTION 1: PERSONAL INFORMATION */}
             <div className="enroll-form-section">
               <div className="enroll-section-header">
-                <User size={16} style={{ color: '#E31B23' }} />
+                <User size={15} style={{ color: '#E31B23' }} />
                 <h3 className="enroll-section-header-title">
-                  1. Personal Information
+                  01  PERSONAL INFORMATION
                 </h3>
               </div>
 
@@ -366,10 +322,10 @@ export default function EnrollmentPage() {
                   {errors.fullName && <p className="enroll-error-msg">{errors.fullName}</p>}
                 </div>
 
-                {/* Account Email */}
+                {/* Email */}
                 <div className="enroll-field">
                   <label htmlFor="email" className="enroll-label">
-                    Account Email <span className="enroll-req">*</span>
+                    Email <span className="enroll-req">*</span>
                   </label>
                   <input
                     id="email"
@@ -417,7 +373,7 @@ export default function EnrollmentPage() {
                 {/* Gender */}
                 <div className="enroll-field">
                   <label htmlFor="gender" className="enroll-label">
-                    Gender
+                    Gender <span className="enroll-optional">Optional</span>
                   </label>
                   <select
                     id="gender"
@@ -425,57 +381,53 @@ export default function EnrollmentPage() {
                     onChange={(e) => handleInputChange('gender', e.target.value)}
                     className="enroll-select"
                   >
-                    <option value="">Select Gender (Optional)</option>
+                    <option value="">Select Gender</option>
                     {GENDER_OPTIONS.map((g) => (
                       <option key={g} value={g}>{g}</option>
                     ))}
                   </select>
                 </div>
 
-                {/* City & State in 2 cols */}
+                {/* City */}
                 <div className="enroll-field">
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    <div>
-                      <label htmlFor="city" className="enroll-label">
-                        City <span className="enroll-req">*</span>
-                      </label>
-                      <input
-                        id="city"
-                        type="text"
-                        value={formData.city}
-                        onChange={(e) => handleInputChange('city', e.target.value)}
-                        placeholder="e.g. Bengaluru"
-                        className={`enroll-input ${errors.city ? 'enroll-input-error' : ''}`}
-                      />
-                      {errors.city && <p className="enroll-error-msg">{errors.city}</p>}
-                    </div>
-                    <div>
-                      <label htmlFor="state" className="enroll-label">
-                        State <span className="enroll-req">*</span>
-                      </label>
-                      <input
-                        id="state"
-                        type="text"
-                        value={formData.state}
-                        onChange={(e) => handleInputChange('state', e.target.value)}
-                        placeholder="e.g. Karnataka"
-                        className={`enroll-input ${errors.state ? 'enroll-input-error' : ''}`}
-                      />
-                      {errors.state && <p className="enroll-error-msg">{errors.state}</p>}
-                    </div>
-                  </div>
+                  <label htmlFor="city" className="enroll-label">
+                    City <span className="enroll-req">*</span>
+                  </label>
+                  <input
+                    id="city"
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    placeholder="e.g. Bengaluru"
+                    className={`enroll-input ${errors.city ? 'enroll-input-error' : ''}`}
+                  />
+                  {errors.city && <p className="enroll-error-msg">{errors.city}</p>}
+                </div>
+
+                {/* State */}
+                <div className="enroll-field enroll-field-span-2">
+                  <label htmlFor="state" className="enroll-label">
+                    State <span className="enroll-req">*</span>
+                  </label>
+                  <input
+                    id="state"
+                    type="text"
+                    value={formData.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    placeholder="e.g. Karnataka"
+                    className={`enroll-input ${errors.state ? 'enroll-input-error' : ''}`}
+                  />
+                  {errors.state && <p className="enroll-error-msg">{errors.state}</p>}
                 </div>
               </div>
             </div>
 
-            {/* ======================================================== */}
-            {/* Section 2: Academic Background                           */}
-            {/* ======================================================== */}
+            {/* SECTION 2: ACADEMIC & BACKGROUND */}
             <div className="enroll-form-section">
               <div className="enroll-section-header">
-                <GraduationCap size={16} style={{ color: '#E31B23' }} />
+                <GraduationCap size={15} style={{ color: '#E31B23' }} />
                 <h3 className="enroll-section-header-title">
-                  2. Academic & Background
+                  02  ACADEMIC & BACKGROUND
                 </h3>
               </div>
 
@@ -491,7 +443,7 @@ export default function EnrollmentPage() {
                     onChange={(e) => handleInputChange('currentStatus', e.target.value)}
                     className={`enroll-select ${errors.currentStatus ? 'enroll-input-error' : ''}`}
                   >
-                    <option value="">Select your status</option>
+                    <option value="">Select current status</option>
                     {STATUS_OPTIONS.map((st) => (
                       <option key={st} value={st}>{st}</option>
                     ))}
@@ -509,7 +461,7 @@ export default function EnrollmentPage() {
                     type="text"
                     value={formData.college}
                     onChange={(e) => handleInputChange('college', e.target.value)}
-                    placeholder="e.g. RV College of Engineering / Delhi University / Working"
+                    placeholder="e.g. RV College of Engineering / Delhi University"
                     className={`enroll-input ${errors.college ? 'enroll-input-error' : ''}`}
                   />
                   {errors.college && <p className="enroll-error-msg">{errors.college}</p>}
@@ -525,7 +477,7 @@ export default function EnrollmentPage() {
                     type="text"
                     value={formData.courseDegree}
                     onChange={(e) => handleInputChange('courseDegree', e.target.value)}
-                    placeholder="e.g. B.Tech / B.E. / BCA / B.Com"
+                    placeholder="e.g. B.Tech / BCA / B.Com"
                     className={`enroll-input ${errors.courseDegree ? 'enroll-input-error' : ''}`}
                   />
                   {errors.courseDegree && <p className="enroll-error-msg">{errors.courseDegree}</p>}
@@ -541,123 +493,32 @@ export default function EnrollmentPage() {
                     type="text"
                     value={formData.branch}
                     onChange={(e) => handleInputChange('branch', e.target.value)}
-                    placeholder="e.g. Computer Science / AI / Electronics"
+                    placeholder="e.g. Computer Science / AI"
                     className={`enroll-input ${errors.branch ? 'enroll-input-error' : ''}`}
                   />
                   {errors.branch && <p className="enroll-error-msg">{errors.branch}</p>}
                 </div>
-
-                {/* Current Year */}
-                <div className="enroll-field">
-                  <label htmlFor="currentYear" className="enroll-label">
-                    Current Year <span className="enroll-req">*</span>
-                  </label>
-                  <select
-                    id="currentYear"
-                    value={formData.currentYear}
-                    onChange={(e) => handleInputChange('currentYear', e.target.value)}
-                    className={`enroll-select ${errors.currentYear ? 'enroll-input-error' : ''}`}
-                  >
-                    <option value="">Select current year</option>
-                    {YEAR_OPTIONS.map((yr) => (
-                      <option key={yr} value={yr}>{yr}</option>
-                    ))}
-                  </select>
-                  {errors.currentYear && <p className="enroll-error-msg">{errors.currentYear}</p>}
-                </div>
-
-                {/* Expected Graduation Year */}
-                <div className="enroll-field">
-                  <label htmlFor="graduationYear" className="enroll-label">
-                    Expected Graduation Year <span className="enroll-req">*</span>
-                  </label>
-                  <input
-                    id="graduationYear"
-                    type="text"
-                    value={formData.graduationYear}
-                    onChange={(e) => handleInputChange('graduationYear', e.target.value)}
-                    placeholder="e.g. 2026 or Graduated"
-                    className={`enroll-input enroll-input-mono ${errors.graduationYear ? 'enroll-input-error' : ''}`}
-                  />
-                  {errors.graduationYear && <p className="enroll-error-msg">{errors.graduationYear}</p>}
-                </div>
               </div>
             </div>
 
-            {/* ======================================================== */}
-            {/* Section 3: Primary Track Interest & Referral             */}
-            {/* ======================================================== */}
+            {/* SECTION 3: UPSHIFT PASSWORD */}
             <div className="enroll-form-section">
               <div className="enroll-section-header">
-                <Sparkles size={16} style={{ color: '#E31B23' }} />
+                <Lock size={15} style={{ color: '#E31B23' }} />
                 <h3 className="enroll-section-header-title">
-                  3. Primary Track Interest & Referral
+                  03  UPSHIFT PASSWORD
                 </h3>
               </div>
 
-              <div className="enroll-field-group enroll-field-group-2">
-                {/* Primary Focus Track */}
-                <div className="enroll-field">
-                  <label htmlFor="courseId" className="enroll-label">
-                    Primary Track to Start With
-                  </label>
-                  <select
-                    id="courseId"
-                    value={formData.courseId}
-                    onChange={(e) => handleInputChange('courseId', e.target.value)}
-                    className="enroll-select"
-                  >
-                    {PROGRAMS_DATA.map((prog) => (
-                      <option key={prog.id} value={prog.id}>
-                        {prog.code} — {prog.name} ({prog.focus})
-                      </option>
-                    ))}
-                  </select>
-                  <p className="enroll-note">
-                    Note: Your ₹4,999 enrollment includes full access to all 6 tracks.
-                  </p>
-                </div>
-
-                {/* Where did you hear about UpShift */}
-                <div className="enroll-field">
-                  <label htmlFor="heardFrom" className="enroll-label">
-                    Where did you hear about UpShift?
-                  </label>
-                  <select
-                    id="heardFrom"
-                    value={formData.heardFrom}
-                    onChange={(e) => handleInputChange('heardFrom', e.target.value)}
-                    className="enroll-select"
-                  >
-                    <option value="">Select source (Optional)</option>
-                    {HEARD_FROM_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* ======================================================== */}
-            {/* Section 4: Create Your Learner Password                  */}
-            {/* ======================================================== */}
-            <div className="enroll-form-section">
-              <div className="enroll-section-header">
-                <Lock size={16} style={{ color: '#E31B23' }} />
-                <h3 className="enroll-section-header-title">
-                  4. Create Your Learner Password
-                </h3>
-              </div>
-
-              <p style={{ fontSize: '13px', color: '#4B5563', marginBottom: '16px', lineHeight: 1.5 }}>
-                Set a secure password for your UpShift learner portal. You will use this password together with your registered email to log in after checkout.
+              <p className="enroll-section-desc">
+                Set a password for your UpShift account. You’ll use it with your email to sign in.
               </p>
 
               <div className="enroll-field-group enroll-field-group-2">
                 {/* Password */}
                 <div className="enroll-field">
                   <label htmlFor="password" className="enroll-label">
-                    Portal Password <span className="enroll-req">*</span>
+                    UpShift Password <span className="enroll-req">*</span>
                   </label>
                   <div className="enroll-pw-wrapper">
                     <input
@@ -691,7 +552,7 @@ export default function EnrollmentPage() {
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      placeholder="Re-enter your password"
+                      placeholder="Re-enter password"
                       className={`enroll-input enroll-input-mono ${errors.confirmPassword ? 'enroll-input-error' : ''}`}
                     />
                     <button
@@ -708,10 +569,12 @@ export default function EnrollmentPage() {
               </div>
             </div>
 
-            {/* ======================================================== */}
-            {/* Submit Action Area                                       */}
-            {/* ======================================================== */}
-            <div style={{ paddingTop: '8px' }}>
+            {/* Price Indicator & Final CTA */}
+            <div className="enroll-footer-cta">
+              <div className="enroll-price-info">
+                <span>UpShift Enrollment</span>
+              </div>
+
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -720,39 +583,20 @@ export default function EnrollmentPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    <span>Preparing Your Secure Checkout...</span>
+                    <span>Preparing Secure Checkout...</span>
                   </>
                 ) : (
                   <>
-                    <span>PROCEED TO PAYMENT (₹4,999)</span>
-                    <ArrowRight size={18} />
+                    <span>CONTINUE TO PAYMENT →</span>
                   </>
                 )}
               </button>
-
-              <div className="enroll-trust-bar">
-                <span className="enroll-trust-item">
-                  <ShieldCheck size={14} style={{ color: '#059669' }} />
-                  256-Bit SSL Encrypted
-                </span>
-                <span className="enroll-trust-item">
-                  <CheckCircle2 size={14} style={{ color: '#059669' }} />
-                  Razorpay Verified Gateway
-                </span>
-                <span className="enroll-trust-item">
-                  <Sparkles size={14} style={{ color: '#E31B23' }} />
-                  Instant Workspace Activation
-                </span>
-              </div>
             </div>
+
           </form>
         </div>
       </main>
-
-      {/* Minimal Footer */}
-      <footer style={{ padding: '24px', borderTop: '1px solid #E5E7EB', textAlign: 'center', fontSize: '12px', color: '#6B7280', fontFamily: 'var(--font-mono), monospace' }}>
-        <p>© {new Date().getFullYear()} THE AI SCHOOL · UPSHIFT APPLIED AI PROGRAM · ALL RIGHTS RESERVED</p>
-      </footer>
     </div>
   );
 }
+

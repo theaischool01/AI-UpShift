@@ -108,7 +108,7 @@ export default function Navbar({ onOpenRegistration }) {
               </span>
               <span style={{ color: isHero ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)', fontSize: '12px' }}>/</span>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: '800', letterSpacing: '-0.02em', color: isHero ? '#FFFFFF' : '#111111', transition: 'color 300ms ease' }}>
-                UPSHIFT<span style={{ color: '#E31B23' }}>↑</span>
+                UpShift
               </span>
             </div>
             <span style={{ fontSize: '9px', fontWeight: '700', color: isHero ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)', letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: '2px', transition: 'color 300ms ease' }}>

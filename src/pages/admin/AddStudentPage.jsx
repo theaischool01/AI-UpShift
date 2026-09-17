@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  UserPlus, 
-  ArrowLeft, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2, 
-  Users, 
-  Lock, 
-  Mail, 
-  GraduationCap, 
-  BookOpen, 
-  User 
+import {
+  UserPlus,
+  ArrowLeft,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Users,
+  Lock,
+  Mail,
+  GraduationCap,
+  BookOpen,
+  User
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -207,7 +207,7 @@ export default function AddStudentPage() {
         </div>
 
         <div className="admin-page-actions">
-          <Link 
+          <Link
             to="/admin/students"
             className="admin-btn-secondary"
           >
@@ -279,8 +279,8 @@ export default function AddStudentPage() {
         /* Student Registration Form */
         <div className="admin-card p-6 sm:p-8">
           {submitError && (
-            <div 
-              role="alert" 
+            <div
+              role="alert"
               className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3 text-left"
             >
               <AlertCircle size={17} className="text-[#E31B23] flex-shrink-0" />
@@ -320,7 +320,7 @@ export default function AddStudentPage() {
               {/* Account Email */}
               <div className="admin-form-group">
                 <label htmlFor="email" className="admin-form-label">
-                  Account Email <span className="text-[#E31B23]">*</span>
+                  Email <span className="text-[#E31B23]">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 z-10">

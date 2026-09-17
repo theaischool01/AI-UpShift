@@ -46,7 +46,7 @@
 
 /* Header */
 .enroll-header {
-  padding: 16px 24px;
+  padding: 14px 24px;
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -73,8 +73,8 @@
 }
 
 .enroll-brand-avatar {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid #E5E7EB;
@@ -137,37 +137,37 @@
   font-weight: 800;
 }
 
-/* Main Container */
+/* Main Container - Compact Width */
 .enroll-main {
   flex-grow: 1;
-  max-width: 860px;
+  max-width: 720px;
   width: 100%;
   margin: 0 auto;
-  padding: 32px 20px 64px;
+  padding: 24px 16px 48px;
 }
 
 /* Eyebrow & Page Heading */
 .enroll-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
+  gap: 6px;
+  padding: 4px 10px;
   border-radius: 9999px;
   background-color: #FFF1F1;
   border: 1px solid #FEE2E2;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .enroll-eyebrow-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: #E31B23;
 }
 
 .enroll-eyebrow-text {
   font-family: var(--font-mono), monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #E31B23;
@@ -175,200 +175,74 @@
 }
 
 .enroll-title {
-  font-size: clamp(28px, 4.5vw, 42px) !important;
+  font-size: clamp(24px, 3.5vw, 32px) !important;
   font-weight: 800 !important;
   color: #111827 !important;
-  line-height: 1.1;
-  margin-bottom: 10px;
-  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 6px;
+  letter-spacing: -0.025em;
 }
 
 .enroll-subtitle {
-  font-size: 15px;
+  font-size: 14px;
   color: #4B5563;
-  line-height: 1.6;
-  max-width: 680px;
-  margin-bottom: 28px;
-}
-
-/* Program Summary Box */
-.enroll-summary-card {
-  background-color: #FFFFFF !important;
-  border: 1px solid #E5E7EB;
-  border-radius: 18px;
-  padding: 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  margin-bottom: 28px;
-}
-
-.enroll-summary-top {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #F3F4F6;
-}
-
-@media (min-width: 640px) {
-  .enroll-summary-top {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.enroll-summary-tag {
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #E31B23;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.enroll-summary-title {
-  font-size: 20px !important;
-  font-weight: 800 !important;
-  color: #111827 !important;
-  letter-spacing: -0.02em;
-  margin: 0 0 4px;
-}
-
-.enroll-summary-desc {
-  font-size: 12px;
-  color: #6B7280;
-  margin: 0;
   line-height: 1.5;
+  max-width: 620px;
+  margin-bottom: 18px;
 }
 
-.enroll-price-badge {
-  background-color: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  padding: 12px 18px;
-  text-align: left;
-}
-
-@media (min-width: 640px) {
-  .enroll-price-badge {
-    text-align: right;
-    background: transparent;
-    border: none;
-    padding: 0;
-  }
-}
-
-.enroll-price-amount {
-  font-size: 32px;
-  font-weight: 800;
-  color: #111827;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.enroll-price-label {
-  display: inline-block;
-  margin-top: 6px;
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #065F46;
-  background-color: #ECFDF5;
-  border: 1px solid #A7F3D0;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  text-transform: uppercase;
-}
-
-/* 6 Track Inclusions Grid */
-.enroll-tracks-title {
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #6B7280;
-  text-transform: uppercase;
-  margin: 16px 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.enroll-tracks-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 8px;
-}
-
-@media (min-width: 480px) {
-  .enroll-tracks-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 768px) {
-  .enroll-tracks-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.enroll-track-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+/* Gig Banner */
+.enroll-gig-banner {
+  background-color: #FFF1F1;
+  border: 1px solid #FEE2E2;
   border-radius: 10px;
-  background-color: #F9FAFB;
-  border: 1px solid #E5E7EB;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(227, 27, 35, 0.05);
 }
 
-.enroll-track-code {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+.enroll-gig-banner-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 800;
+  color: #E31B23;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono), monospace;
+  gap: 5px;
+}
+
+.enroll-gig-banner-title {
+  font-size: 14px;
   font-weight: 800;
-  font-size: 10px;
-  color: #FFFFFF;
-  flex-shrink: 0;
-}
-
-.enroll-track-name {
-  font-size: 12px;
-  font-weight: 700;
   color: #111827;
-  display: block;
-  line-height: 1.2;
+  margin-top: 2px;
 }
 
-.enroll-track-focus {
-  font-size: 10px;
-  color: #6B7280;
-  display: block;
-  line-height: 1.2;
+.enroll-gig-banner-meta {
+  font-size: 12px;
+  color: #4B5563;
   margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.enroll-gig-banner-pay {
+  color: #E31B23;
+  font-weight: 700;
 }
 
 /* Main Form Card */
 .enroll-form-card {
   background-color: #FFFFFF !important;
   border: 1px solid #E5E7EB;
-  border-radius: 20px;
-  padding: clamp(20px, 4vw, 36px);
-  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
 }
 
 .enroll-form-section {
-  padding-bottom: 28px;
-  margin-bottom: 28px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
   border-bottom: 1px solid #F3F4F6;
 }
 
@@ -382,14 +256,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-bottom: 12px;
-  margin-bottom: 18px;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
   border-bottom: 1px solid #E5E7EB;
 }
 
 .enroll-section-header-title {
   font-family: var(--font-display), sans-serif;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 800 !important;
   letter-spacing: 0.06em;
   color: #111827 !important;
@@ -397,13 +271,20 @@
   margin: 0;
 }
 
+.enroll-section-desc {
+  font-size: 13px;
+  color: #4B5563;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
 .enroll-field-group {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px 16px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 580px) {
   .enroll-field-group-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -412,7 +293,7 @@
 .enroll-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .enroll-field-span-2 {
@@ -420,10 +301,17 @@
 }
 
 .enroll-label {
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   color: #374151 !important;
   display: block;
+}
+
+.enroll-optional {
+  font-size: 11px;
+  color: #9CA3AF;
+  font-weight: 400;
+  margin-left: 4px;
 }
 
 .enroll-req {
@@ -431,7 +319,7 @@
   font-weight: 700;
 }
 
-/* Explicit Form Inputs & Selects */
+/* Form Inputs & Selects */
 .enroll-input,
 .enroll-select {
   width: 100%;
@@ -439,9 +327,10 @@
   background-color: #FFFFFF !important;
   color: #111827 !important;
   border: 1px solid #D0D5DD !important;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 14px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  height: 38px;
+  font-size: 13px;
   font-family: inherit;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   line-height: 1.4;
@@ -473,16 +362,9 @@
 
 .enroll-error-msg {
   color: #DC2626 !important;
-  font-size: 12px;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-.enroll-note {
   font-size: 11px;
-  color: #6B7280;
-  margin-top: 2px;
-  line-height: 1.4;
+  font-weight: 500;
+  margin-top: 1px;
 }
 
 /* Password eye button */
@@ -492,12 +374,12 @@
 }
 
 .enroll-pw-wrapper .enroll-input {
-  padding-right: 40px;
+  padding-right: 36px;
 }
 
 .enroll-pw-toggle {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -514,31 +396,67 @@
   color: #111827;
 }
 
-/* Submit Action Button */
+/* Footer CTA & Price Bar */
+.enroll-footer-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #F3F4F6;
+}
+
+@media (min-width: 520px) {
+  .enroll-footer-cta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.enroll-price-info {
+  font-size: 13px;
+  color: #4B5563;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.enroll-price-dot {
+  color: #D1D5DB;
+}
+
+.enroll-price-val {
+  font-weight: 800;
+  color: #111827;
+}
+
+/* Submit Button */
 .enroll-submit-btn {
-  width: 100%;
-  padding: 15px 28px;
+  height: 44px;
+  padding: 0 24px;
   border-radius: 9999px;
   font-family: var(--font-display), sans-serif;
   font-weight: 800;
-  font-size: 15px;
-  letter-spacing: 0.02em;
+  font-size: 13px;
+  letter-spacing: 0.04em;
   color: #FFFFFF !important;
   background-color: #E31B23 !important;
   border: none;
-  box-shadow: 0 4px 18px rgba(227, 27, 35, 0.35);
+  box-shadow: 0 3px 12px rgba(227, 27, 35, 0.28);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
 }
 
 .enroll-submit-btn:hover:not(:disabled) {
   background-color: #C8141B !important;
   transform: translateY(-1px);
-  box-shadow: 0 6px 22px rgba(227, 27, 35, 0.42);
+  box-shadow: 0 5px 16px rgba(227, 27, 35, 0.35);
 }
 
 .enroll-submit-btn:disabled {
@@ -546,30 +464,10 @@
   cursor: not-allowed;
 }
 
-.enroll-trust-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding-top: 14px;
-  font-family: var(--font-mono), monospace;
-  font-size: 11px;
-  color: #6B7280 !important;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.enroll-trust-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
 /* Alert Banner */
 .enroll-alert {
-  padding: 14px 18px;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
   background-color: #FEF2F2;
   border: 1px solid #FEE2E2;
   color: #991B1B !important;
@@ -577,5 +475,5 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }

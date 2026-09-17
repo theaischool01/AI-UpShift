@@ -223,25 +223,30 @@ export default function ExploringProgramsSection() {
       {/* ============================================================ */}
       <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 relative z-10">
         {/* Flanking Sidebar Elements — Aligned to the Section Container Grid */}
-        {/* Top Left Vertical Steps */}
+        {/* Top Left Vertical Steps: LEARN (black), PRACTICE (red), BUILD (black), EARN (red), GROW (black) */}
         <div className="editorial-top-left">
-          <span className="text-[#111111] font-bold">LEARN</span>
-          <span className="text-[#666666]">PRACTICE</span>
-          <span className="text-[#666666]">BUILD</span>
-          <span className="text-[#666666]">EARN</span>
-          <span className="text-[#E31B23] font-bold">GROW</span>
-          <div className="mt-2 pt-2 border-t border-black/10 text-[9px] text-[#888888] tracking-wider leading-relaxed font-sans">
-            SAME<br />PEOPLE.<br />A BRIGHTER<br />TOMORROW.
+          <span className="font-bold" style={{ color: '#111111' }}>LEARN</span>
+          <span className="font-bold" style={{ color: '#E31B23' }}>PRACTICE</span>
+          <span className="font-bold" style={{ color: '#111111' }}>BUILD</span>
+          <span className="font-bold" style={{ color: '#E31B23' }}>EARN</span>
+          <span className="font-bold" style={{ color: '#111111' }}>GROW</span>
+          <div className="mt-2 pt-2 border-t border-black/10 text-[9px] tracking-wider leading-relaxed font-sans font-bold">
+            <span className="block" style={{ color: '#71757A' }}>SAME</span>
+            <span className="block" style={{ color: '#111111' }}>PEOPLE.</span>
+            <span className="block" style={{ color: '#71757A' }}>A BRIGHTER</span>
+            <span className="block" style={{ color: '#111111' }}>TOMORROW.</span>
           </div>
         </div>
 
-        {/* Top Right Expressive Script Text: "A Bigger You" */}
+        {/* Top Right Expressive Script Text: BUILD (black), PROVE (black), EARN (red) */}
         <div className="editorial-top-right">
           <span 
-            className="text-4xl sm:text-5xl text-[#111111] font-bold leading-none tracking-normal"
-            style={{ fontFamily: 'Caveat, cursive', transform: 'rotate(-7deg)' }}
+            className="text-3xl sm:text-4xl font-bold leading-tight tracking-normal text-right"
+            style={{ fontFamily: 'Caveat, cursive', transform: 'rotate(-5deg)' }}
           >
-            A Bigger<br />You
+            <span className="block" style={{ color: '#111111' }}>BUILD.</span>
+            <span className="block" style={{ color: '#111111' }}>PROVE.</span>
+            <span className="block" style={{ color: '#E31B23' }}>EARN.</span>
           </span>
           <svg className="w-16 sm:w-20 h-3.5 mt-1" viewBox="0 0 80 16" fill="none">
             <path d="M 5 8 Q 40 14, 75 4" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" />
@@ -251,39 +256,39 @@ export default function ExploringProgramsSection() {
         {/* Bottom Left Expressive Script Text: "Higher Skills Bigger Opportunities" */}
         <div className="editorial-bottom-left">
           <span 
-            className="text-3xl sm:text-4xl text-[#555555] font-bold leading-tight tracking-normal"
-            style={{ fontFamily: 'Caveat, cursive', transform: 'rotate(-4deg)' }}
+            className="text-3xl sm:text-4xl font-bold leading-tight tracking-normal"
+            style={{ fontFamily: 'Caveat, cursive', transform: 'rotate(-4deg)', color: '#71757A' }}
           >
-            Higher<br />Skills
+            Higher<br /><span style={{ color: '#111111' }}>Skills</span>
           </span>
           <span 
-            className="text-4xl sm:text-5xl font-bold text-[#111111] leading-tight tracking-normal -mt-1"
-            style={{ fontFamily: 'Caveat, cursive', transform: 'rotate(-4deg)' }}
+            className="text-4xl sm:text-5xl font-bold leading-tight tracking-normal -mt-1"
+            style={{ fontFamily: 'Caveat, cursive', transform: 'rotate(-4deg)', color: '#111111' }}
           >
-            Bigger<br />Opportunities
+            Bigger<br /><span style={{ color: '#E31B23' }}>Opportunities</span>
           </span>
           <svg className="w-24 sm:w-28 h-3.5 mt-1" viewBox="0 0 110 16" fill="none">
             <path d="M 6 8 Q 55 14, 105 4" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
         </div>
 
-        {/* Bottom Right Vertical Micro-Focus */}
+        {/* Bottom Right Vertical Micro-Focus: SILVER, BLACK, SILVER, RED */}
         <div className="editorial-bottom-right">
-          <span className="text-[#666666]">CAREERS</span>
-          <span className="text-[#666666]">VENTURES</span>
-          <span className="text-[#666666]">BUSINESSES</span>
-          <span className="text-[#E31B23] font-bold">IMPACT</span>
+          <span className="font-semibold" style={{ color: '#71757A' }}>CAREERS</span>
+          <span className="font-semibold" style={{ color: '#111111' }}>VENTURES</span>
+          <span className="font-semibold" style={{ color: '#71757A' }}>BUSINESSES</span>
+          <span className="font-bold" style={{ color: '#E31B23' }}>IMPACT</span>
           <div className="w-6 h-0.5 bg-[#E31B23] mt-1" />
         </div>
 
         {/* Main Heading Area */}
         <div className="max-w-3xl mx-auto text-center mb-6 md:mb-8 lg:mb-10">
           <h2 className="font-heading text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#111111] tracking-tight leading-tight mb-2.5">
-            Exploring the <span className="text-[#E31B23]">Upshift</span> Programs
+            Exploring the <span style={{ color: '#E31B23' }}>UpShift</span> Programs
           </h2>
 
-          <p className="font-display text-xs sm:text-sm text-[#555555] max-w-2xl mx-auto leading-relaxed">
-            Six applied AI tracks. One proof-first learning system. Explore how each path turns AI knowledge into something real you can build and show.
+          <p className="font-display text-xs sm:text-sm text-[#222222] max-w-2xl mx-auto leading-relaxed font-medium">
+            Six applied AI tracks. One <span className="text-[#71757A]">proof-first learning system</span>. Explore how each path turns AI knowledge into something real you can build and show.
           </p>
         </div>
 

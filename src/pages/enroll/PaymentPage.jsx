@@ -183,7 +183,7 @@ export default function PaymentPage() {
               WELCOME TO UPSHIFT
             </h1>
             <p style={{ fontSize: '14px', color: '#4B5563', lineHeight: 1.5, margin: 0 }}>
-              Your payment of <strong style={{ color: '#111827' }}>₹4,999</strong> has been verified. Your learner account is now active with full access to all 6 applied AI programs.
+              Your enrollment has been verified. Your learner account is now active with full access to all 6 applied AI programs.
             </p>
           </div>
 
@@ -233,7 +233,7 @@ export default function PaymentPage() {
             <div className="enroll-brand-text">
               <span className="enroll-brand-school">THE AI SCHOOL</span>
               <span className="enroll-brand-divider">/</span>
-              <span className="enroll-brand-name">UPSHIFT<span className="enroll-brand-arrow">↑</span></span>
+              <span className="enroll-brand-name">UpShift</span>
             </div>
           </Link>
 
@@ -314,7 +314,7 @@ export default function PaymentPage() {
             {/* Inclusions List */}
             <div style={{ padding: '20px', borderRadius: '16px', backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
               <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono), monospace', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#374151' }}>
-                What's Included in Your ₹4,999 Enrollment:
+                What's Included in Your UpShift Enrollment:
               </span>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#4B5563' }}>
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
@@ -343,18 +343,18 @@ export default function PaymentPage() {
               {/* Pricing Header */}
               <div style={{ paddingBottom: '20px', borderBottom: '1px solid #E5E7EB', marginBottom: '20px' }}>
                 <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono), monospace', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: '6px' }}>
-                  Total One-Time Fee
+                  Program Enrollment
                 </span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-                  <span style={{ fontSize: '42px', fontWeight: 800, color: '#111827', letterSpacing: '-0.03em' }}>
-                    ₹4,999
+                  <span style={{ fontSize: '24px', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em' }}>
+                    UpShift Complete
                   </span>
                   <span className="enroll-price-label">
                     All 6 Tracks Included
                   </span>
                 </div>
                 <p style={{ fontSize: '12px', color: '#6B7280', margin: '6px 0 0' }}>
-                  Single one-time enrollment fee. No recurring charges or hidden subscription fees.
+                  Complete program enrollment. Full access to all 6 capability tracks.
                 </p>
               </div>
 
@@ -395,7 +395,7 @@ export default function PaymentPage() {
                   ) : (
                     <>
                       <Lock size={15} />
-                      <span>PAY ₹4,999 →</span>
+                      <span>PROCEED TO PAYMENT →</span>
                     </>
                   )}
                 </button>

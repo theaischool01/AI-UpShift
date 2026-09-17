@@ -42,7 +42,7 @@ export default function LearnerHeader({ enrolledCourses = [] }) {
           </div>
           <div className="flex flex-col">
             <span className="text-[15px] font-extrabold tracking-tight text-[#111827] leading-none">
-              UPSHIFT
+              UpShift
             </span>
             <span className="text-[10px] font-mono font-bold tracking-[0.14em] text-[#6B7280] uppercase mt-1">
               Opportunities
