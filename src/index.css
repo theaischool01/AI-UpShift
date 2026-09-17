@@ -742,7 +742,7 @@ h1, h2, h3, h4, .font-heading {
   position: relative;
   width: 100%;
   max-width: clamp(1020px, 86vw, 1220px);
-  height: clamp(560px, 50vw, 650px);
+  height: clamp(620px, 55vw, 710px);
   margin: 0 auto;
   display: block;
 }
@@ -766,10 +766,10 @@ h1, h2, h3, h4, .font-heading {
 .fox-stage {
   position: absolute;
   left: 50%;
-  top: clamp(15%, 14vw, 19%);
+  top: clamp(14%, 13vw, 17.5%);
   transform: translateX(-50%);
   width: 100%;
-  max-width: clamp(600px, 62vw, 840px);
+  max-width: clamp(680px, 72vw, 920px);
   z-index: 5;
   display: flex;
   flex-direction: column;
@@ -778,8 +778,8 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .fox-frame {
-  width: clamp(290px, 26vw, 370px);
-  height: clamp(330px, 29vw, 425px);
+  width: clamp(380px, 34vw, 500px);
+  height: clamp(430px, 38vw, 560px);
   position: relative;
   flex-shrink: 0;
 }
@@ -922,7 +922,7 @@ h1, h2, h3, h4, .font-heading {
 .editorial-top-left {
   position: absolute;
   left: clamp(36px, 4.5vw, 80px);
-  top: clamp(24px, 3vh, 48px);
+  top: clamp(24px, 2.5vw, 44px);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -939,7 +939,7 @@ h1, h2, h3, h4, .font-heading {
 .editorial-top-right {
   position: absolute;
   right: clamp(36px, 4.5vw, 80px);
-  top: clamp(24px, 3vh, 48px);
+  top: clamp(24px, 2.5vw, 44px);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -2058,6 +2058,9 @@ h1, h2, h3, h4, .font-heading {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  flex: 1 1 auto;
 }
 
 .proof-card:hover {

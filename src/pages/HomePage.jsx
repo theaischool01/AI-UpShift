@@ -122,7 +122,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
           <span 
             style={{
               fontFamily: 'Caveat, cursive',
-              fontSize: 'clamp(36px, 4.5vw, 56px)',
+              fontSize: 'clamp(24px, 2.8vw, 36px)',
               fontWeight: 700,
               color: '#FFFFFF',
               lineHeight: 1,
@@ -132,7 +132,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
           >
             A Bigger<br />You
           </span>
-          <svg style={{ width: '90px', height: '16px', marginTop: '4px' }} viewBox="0 0 80 16" fill="none">
+          <svg style={{ width: '60px', height: '12px', marginTop: '3px' }} viewBox="0 0 80 16" fill="none">
             <path d="M 5 8 Q 40 14, 75 4" stroke="#E31B23" strokeWidth="2.8" strokeLinecap="round" />
           </svg>
         </div>
@@ -178,10 +178,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
 
               {/* Supporting Paragraph */}
               <p className="hero-desc text-white/70">
-                Upshift helps ambitious learners build applied AI capabilities and turn them
-                <span className="hero-desc-line2">
-                  into <strong className="text-white font-bold">work they can actually show</strong>.
-                </span>
+                Upshift helps you build real AI skills, create proof of work, and unlock opportunities to earn.
               </p>
 
               {/* Action CTAs (Exactly 2 Buttons) */}
@@ -228,12 +225,6 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                 </button>
               </div>
 
-              {/* Supporting Anchor Micro-Line */}
-              <div className="mt-6 flex items-center gap-2 text-[11px] font-mono text-white/50 tracking-wider uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#E31B23]" />
-                <span>FOR UNDERGRADUATES, GRADUATES & FRESHERS</span>
-              </div>
-
               {/* Decorative Element 2 (Bottom Left of Hero): SAME PEOPLE. A BRIGHTER TOMORROW. */}
               <div className="mt-8 text-[11px] font-mono text-white/40 tracking-[0.2em] leading-relaxed uppercase select-none">
                 SAME PEOPLE.<br />A BRIGHTER TOMORROW.
@@ -258,14 +249,14 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
           </div>
         </div>
 
-        {/* Soft Organic Bleed into Programs Section */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none bg-gradient-to-b from-transparent to-[#FAF8F5]" />
       </section>
 
       {/* ============================================================ */}
       {/* 2. PROGRAMS CIRCLE SECTION (Fox + Circular Badges)          */}
       {/* ============================================================ */}
       <div id="programs" className="relative scroll-mt-28 md:scroll-mt-32 bg-[#FAF8F5]">
+        {/* Dedicated 96px-128px clean empty breathing space between Hero and Programs */}
+        <div className="w-full h-24 sm:h-28 md:h-32 lg:h-36 bg-[#FAF8F5]" aria-hidden="true" />
         <ExploringProgramsSection />
       </div>
 

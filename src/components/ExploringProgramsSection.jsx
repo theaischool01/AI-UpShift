@@ -172,7 +172,7 @@ export default function ExploringProgramsSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[clamp(760px,92vh,980px)] flex flex-col justify-center pt-24 pb-14 md:pt-28 md:pb-16 lg:pt-32 lg:pb-20 bg-[#FAF8F5] text-[#111111] overflow-hidden select-none scroll-mt-20 md:scroll-mt-24"
+      className="relative min-h-[clamp(840px,96vh,1080px)] flex flex-col justify-start pt-6 sm:pt-8 md:pt-10 pb-16 md:pb-20 lg:pb-24 bg-[#FAF8F5] text-[#111111] overflow-hidden select-none scroll-mt-20 md:scroll-mt-24"
       id="exploring-programs"
     >
       {/* Subtle Dot Matrix */}
@@ -411,7 +411,7 @@ export default function ExploringProgramsSection() {
         <div className="mobile-program-stage">
           {/* Mobile Mascot */}
           <div className="flex flex-col items-center justify-center mb-5">
-            <div className="relative w-44 h-56 flex items-end justify-center">
+            <div className="relative w-56 sm:w-64 h-72 sm:h-80 flex items-end justify-center">
               <img
                 src={DEFAULT_FOX}
                 alt="Upshift Mascot Main"

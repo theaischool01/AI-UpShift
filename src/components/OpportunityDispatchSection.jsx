@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { CONCEPTUAL_CLASSIFIEDS } from '../data/opportunitiesData';
 
-// Original Discipline Icon Map for Modules
+// Discipline Icon Map for Modules (Unified Red/Black/Green Theme)
 const TRACK_ICONS = {
   'M1': Film,
   'M2': Palette,
@@ -27,125 +27,116 @@ const TRACK_ICONS = {
   'M6': Cpu,
 };
 
-// ==========================================================================
-// ORIGINAL COLLAPSED COMPACT GRAPHIC SYSTEMS (Module Specific Visual Assets)
-// ==========================================================================
-
-function CollapsedReelRush({ accentColor }) {
+// Custom Graphic Systems (Enforcing UpShift Palette: Red, Black, White, Green)
+function GraphicReelRush({ accentColor }) {
   return (
-    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', maxHeight: '120px' }} aria-hidden="true">
-      <rect x="22" y="10" width="56" height="120" rx="9" stroke={accentColor} strokeWidth="1.8" fill="rgba(233, 59, 59, 0.12)" />
-      <rect x="27" y="16" width="46" height="108" rx="6" stroke="rgba(255,255,255,0.18)" strokeWidth="1" strokeDasharray="3 3" />
-      <circle cx="50" cy="62" r="17" stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="rgba(233, 59, 59, 0.2)" />
-      <polygon points="47,54 58,62 47,70" fill={accentColor} />
-      <circle cx="34" cy="24" r="2.5" fill={accentColor} />
-      <text x="41" y="27" fill="#FFFFFF" fontSize="7" fontFamily="monospace" fontWeight="bold" opacity="0.85">REC</text>
-      <text x="50" y="114" fill={accentColor} fontSize="7.5" fontFamily="monospace" fontWeight="bold" textAnchor="middle" letterSpacing="0.08em">9:16</text>
-    </svg>
+    <div style={{ width: '100%', height: '110px', background: '#FFF5F5', border: '1px solid #FEE2E2', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
+        <rect x="15" y="10" width="40" height="60" rx="6" stroke="#E31B23" strokeWidth="1.5" fill="rgba(227,27,35,0.08)" />
+        <circle cx="35" cy="40" r="10" stroke="#E31B23" strokeWidth="1" />
+        <polygon points="32,35 41,40 32,45" fill="#E31B23" />
+        <line x1="70" y1="20" x2="225" y2="20" stroke="#D1D5DB" strokeWidth="2" strokeLinecap="round" />
+        <line x1="70" y1="35" x2="190" y2="35" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="70" y1="50" x2="215" y2="50" stroke="#D1D5DB" strokeWidth="2" strokeLinecap="round" />
+        <line x1="70" y1="65" x2="160" y2="65" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="190" cy="35" r="4" fill="#E31B23" />
+        <text x="70" y="12" fill="#E31B23" fontSize="8" fontFamily="monospace" fontWeight="bold">AUDIO TIMELINE • 9:16 HOOK</text>
+      </svg>
+    </div>
   );
 }
 
-function CollapsedVisualForge({ accentColor }) {
+function GraphicVisualForge({ accentColor }) {
   return (
-    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', maxHeight: '120px' }} aria-hidden="true">
-      <rect x="15" y="15" width="70" height="110" rx="6" stroke="#3B82F6" strokeWidth="1.4" fill="rgba(37, 99, 235, 0.1)" />
-      <line x1="12" y1="70" x2="88" y2="70" stroke="#93C5FD" strokeWidth="0.8" strokeDasharray="3 2" />
-      <line x1="50" y1="12" x2="50" y2="128" stroke="#93C5FD" strokeWidth="0.8" strokeDasharray="3 2" />
-      <circle cx="44" cy="62" r="20" stroke={accentColor} strokeWidth="1.5" fill="rgba(37, 99, 235, 0.15)" />
-      <rect x="40" y="58" width="28" height="28" rx="6" transform="rotate(22 40 58)" stroke="#A855F7" strokeWidth="1.5" fill="rgba(168, 85, 247, 0.15)" />
-      <line x1="30" y1="62" x2="60" y2="62" stroke={accentColor} strokeWidth="1" />
-      <circle cx="60" cy="62" r="2.5" fill={accentColor} />
-      <text x="50" y="116" fill={accentColor} fontSize="7" fontFamily="monospace" fontWeight="bold" textAnchor="middle" letterSpacing="0.08em">300 DPI</text>
-    </svg>
+    <div style={{ width: '100%', height: '110px', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
+        <rect x="20" y="12" width="55" height="56" rx="6" stroke="#111111" strokeWidth="1.4" fill="rgba(17,17,17,0.05)" />
+        <circle cx="47" cy="40" r="14" stroke="#E31B23" strokeWidth="1.2" strokeDasharray="2 2" />
+        <rect x="95" y="15" width="130" height="22" rx="4" fill="#111111" stroke="#333333" strokeWidth="1" />
+        <text x="105" y="29" fill="#FFFFFF" fontSize="8.5" fontFamily="monospace" fontWeight="bold">BRAND SEED: #E31B23</text>
+        <rect x="95" y="44" width="130" height="22" rx="4" fill="#111111" stroke="#333333" strokeWidth="1" />
+        <text x="105" y="58" fill="#10B981" fontSize="8.5" fontFamily="monospace" fontWeight="bold">VECTOR LAYERS: 300 DPI</text>
+      </svg>
+    </div>
   );
 }
 
-function CollapsedDeepAnnotator({ accentColor }) {
+function GraphicDeepAnnotator({ accentColor }) {
   return (
-    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', maxHeight: '120px' }} aria-hidden="true">
-      <circle cx="50" cy="70" r="42" fill="rgba(16, 185, 129, 0.08)" />
-      <line x1="30" y1="42" x2="50" y2="55" stroke={accentColor} strokeWidth="1.2" strokeOpacity="0.8" />
-      <line x1="70" y1="42" x2="50" y2="55" stroke={accentColor} strokeWidth="1.2" strokeOpacity="0.8" />
-      <line x1="50" y1="55" x2="32" y2="82" stroke={accentColor} strokeWidth="1.2" strokeOpacity="0.8" />
-      <line x1="50" y1="55" x2="68" y2="82" stroke={accentColor} strokeWidth="1.2" strokeOpacity="0.8" />
-      <line x1="32" y1="82" x2="50" y2="100" stroke={accentColor} strokeWidth="1.4" />
-      <line x1="68" y1="82" x2="50" y2="100" stroke={accentColor} strokeWidth="1.4" />
-      <circle cx="30" cy="42" r="3.5" fill="#071A15" stroke={accentColor} strokeWidth="1.4" />
-      <circle cx="70" cy="42" r="3.5" fill="#071A15" stroke={accentColor} strokeWidth="1.4" />
-      <circle cx="50" cy="55" r="5" fill={accentColor} />
-      <circle cx="32" cy="82" r="4" fill="#071A15" stroke={accentColor} strokeWidth="1.4" />
-      <circle cx="68" cy="82" r="4" fill="#071A15" stroke={accentColor} strokeWidth="1.4" />
-      <circle cx="50" cy="100" r="5.5" fill={accentColor} />
-      <rect x="25" y="112" width="50" height="15" rx="3.5" fill="rgba(16, 185, 129, 0.16)" stroke={accentColor} strokeWidth="1" />
-      <text x="50" y="122.5" fill={accentColor} fontSize="7" fontFamily="monospace" fontWeight="bold" textAnchor="middle">RLHF 99%</text>
-    </svg>
+    <div style={{ width: '100%', height: '110px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
+        <circle cx="35" cy="40" r="22" stroke="#059669" strokeWidth="1.5" fill="rgba(5,150,105,0.12)" />
+        <text x="35" y="44" fill="#059669" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">RLHF</text>
+        <line x1="75" y1="25" x2="225" y2="25" stroke="#A7F3D0" strokeWidth="3" strokeLinecap="round" />
+        <line x1="75" y1="25" x2="195" y2="25" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
+        <line x1="75" y1="52" x2="225" y2="52" stroke="#A7F3D0" strokeWidth="3" strokeLinecap="round" />
+        <line x1="75" y1="52" x2="210" y2="52" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
+        <text x="75" y="15" fill="#065F46" fontSize="7.5" fontFamily="monospace" fontWeight="bold">PRECISION: 99.4%</text>
+        <text x="75" y="44" fill="#065F46" fontSize="7.5" fontFamily="monospace" fontWeight="bold">RED-TEAM RESILIENCE: 98.1%</text>
+      </svg>
+    </div>
   );
 }
 
-function CollapsedVibeCoder({ accentColor }) {
+function GraphicVibeCoder({ accentColor }) {
   return (
-    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', maxHeight: '120px' }} aria-hidden="true">
-      <rect x="15" y="15" width="70" height="110" rx="7" stroke="#6366F1" strokeWidth="1.4" fill="#12122B" />
-      <path d="M 15 30 L 85 30" stroke="#312E81" strokeWidth="1" />
-      <circle cx="23" cy="22.5" r="2" fill="#EF4444" />
-      <circle cx="29" cy="22.5" r="2" fill="#F59E0B" />
-      <circle cx="35" cy="22.5" r="2" fill="#10B981" />
-      <line x1="23" y1="42" x2="52" y2="42" stroke={accentColor} strokeWidth="2" strokeLinecap="round" />
-      <line x1="56" y1="42" x2="72" y2="42" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" />
-      <line x1="28" y1="54" x2="62" y2="54" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" />
-      <line x1="28" y1="66" x2="48" y2="66" stroke="#10B981" strokeWidth="2" strokeLinecap="round" />
-      <line x1="28" y1="78" x2="68" y2="78" stroke={accentColor} strokeWidth="2" strokeLinecap="round" />
-      <rect x="22" y="94" width="56" height="18" rx="4" fill="#0A0A18" />
-      <text x="27" y="106" fill="#10B981" fontSize="7" fontFamily="monospace" fontWeight="bold">&gt;_ ready</text>
-    </svg>
+    <div style={{ width: '100%', height: '110px', background: '#0A0A0A', border: '1px solid #222222', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
+        <rect x="15" y="12" width="210" height="56" rx="6" fill="#141414" stroke="#333333" strokeWidth="1" />
+        <circle cx="28" cy="22" r="2.5" fill="#E31B23" />
+        <circle cx="36" cy="22" r="2.5" fill="#F59E0B" />
+        <circle cx="44" cy="22" r="2.5" fill="#10B981" />
+        <text x="24" y="38" fill="#E31B23" fontSize="8" fontFamily="monospace">&gt; const app = await vibe.build(prompt);</text>
+        <text x="24" y="50" fill="#10B981" fontSize="8" fontFamily="monospace">&gt; Ready on https://app.vercel.app [200 OK]</text>
+        <text x="24" y="62" fill="#FFFFFF" fontSize="7.5" fontFamily="monospace">&gt; Lighthouse Performance: 100/100</text>
+      </svg>
+    </div>
   );
 }
 
-function CollapsedBrandBuzz({ accentColor }) {
+function GraphicBrandBuzz({ accentColor }) {
   return (
-    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', maxHeight: '120px' }} aria-hidden="true">
-      <circle cx="50" cy="65" r="32" stroke="rgba(249, 115, 22, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
-      <circle cx="50" cy="65" r="18" stroke="rgba(249, 115, 22, 0.4)" strokeWidth="1.2" />
-      <circle cx="50" cy="65" r="4" fill={accentColor} />
-      <path d="M 22 96 Q 38 90 50 65 T 78 36" stroke={accentColor} strokeWidth="2.2" strokeLinecap="round" />
-      <circle cx="22" cy="96" r="3" fill="#FFFFFF" />
-      <circle cx="50" cy="65" r="3.5" fill={accentColor} stroke="#FFFFFF" strokeWidth="1.2" />
-      <circle cx="78" cy="36" r="3" fill="#FFFFFF" />
-      <rect x="23" y="112" width="54" height="16" rx="3.5" fill="rgba(249, 115, 22, 0.18)" stroke={accentColor} strokeWidth="1" />
-      <text x="50" y="123" fill={accentColor} fontSize="7" fontFamily="monospace" fontWeight="bold" textAnchor="middle">CTR +340%</text>
-    </svg>
+    <div style={{ width: '100%', height: '110px', background: '#FFF5F5', border: '1px solid #FEE2E2', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
+        <circle cx="35" cy="40" r="18" stroke="#E31B23" strokeWidth="1.2" strokeDasharray="2 2" />
+        <circle cx="35" cy="40" r="6" fill="#E31B23" />
+        <path d="M 75 58 Q 110 50 145 28 T 215 15" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="215" cy="15" r="4" fill="#059669" />
+        <text x="75" y="72" fill="#111111" fontSize="8.5" fontFamily="monospace" fontWeight="bold">CONVERSION MATRIX: +340% HOOK CTR</text>
+      </svg>
+    </div>
   );
 }
 
-function CollapsedAgentHandlers({ accentColor }) {
+function GraphicAgentHandlers({ accentColor }) {
   return (
-    <svg viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', maxHeight: '120px' }} aria-hidden="true">
-      <rect x="30" y="18" width="40" height="14" rx="4" stroke={accentColor} strokeWidth="1.2" fill="#0A2222" />
-      <text x="50" y="28" fill={accentColor} fontSize="6" fontFamily="monospace" fontWeight="bold" textAnchor="middle">TRIGGER</text>
-      <line x1="50" y1="32" x2="50" y2="46" stroke={accentColor} strokeWidth="1.2" strokeDasharray="2 2" />
-      <polygon points="50,49 47,45 53,45" fill={accentColor} />
-      <polygon points="50,51 68,66 50,81 32,66" stroke={accentColor} strokeWidth="1.4" fill="#071817" />
-      <circle cx="50" cy="66" r="3" fill={accentColor} />
-      <path d="M 32 66 L 22 66 L 22 88 L 30 88" stroke={accentColor} strokeWidth="1" />
-      <path d="M 68 66 L 78 66 L 78 88 L 70 88" stroke={accentColor} strokeWidth="1" />
-      <rect x="30" y="102" width="40" height="14" rx="4" stroke={accentColor} strokeWidth="1.2" fill="#0A2222" />
-      <text x="50" y="112" fill={accentColor} fontSize="6" fontFamily="monospace" fontWeight="bold" textAnchor="middle">CRM_SYNC</text>
-      <line x1="50" y1="94" x2="50" y2="102" stroke={accentColor} strokeWidth="1" />
-    </svg>
+    <div style={{ width: '100%', height: '110px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+      <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
+        <rect x="15" y="26" width="55" height="28" rx="4" fill="#059669" stroke="#047857" strokeWidth="1" />
+        <text x="42" y="43" fill="#FFFFFF" fontSize="8" fontFamily="monospace" fontWeight="bold" textAnchor="middle">TRIGGER</text>
+        <line x1="70" y1="40" x2="95" y2="40" stroke="#059669" strokeWidth="1.5" strokeDasharray="3 2" />
+        <rect x="95" y="20" width="58" height="40" rx="4" fill="#111111" stroke="#333333" strokeWidth="1.2" />
+        <text x="124" y="38" fill="#FFFFFF" fontSize="7.5" fontFamily="monospace" fontWeight="bold" textAnchor="middle">AI AGENT</text>
+        <text x="124" y="48" fill="#10B981" fontSize="6.5" fontFamily="monospace" textAnchor="middle">WEBHOOK/CRM</text>
+        <line x1="153" y1="40" x2="178" y2="40" stroke="#059669" strokeWidth="1.5" strokeDasharray="3 2" />
+        <rect x="178" y="26" width="50" height="28" rx="4" fill="#059669" stroke="#047857" strokeWidth="1" />
+        <text x="203" y="43" fill="#FFFFFF" fontSize="8" fontFamily="monospace" fontWeight="bold" textAnchor="middle">EXECUTE</text>
+      </svg>
+    </div>
   );
 }
 
 const COLLAPSED_GRAPHICS = {
-  'M1': CollapsedReelRush,
-  'M2': CollapsedVisualForge,
-  'M3': CollapsedDeepAnnotator,
-  'M4': CollapsedVibeCoder,
-  'M5': CollapsedBrandBuzz,
-  'M6': CollapsedAgentHandlers,
+  'M1': GraphicReelRush,
+  'M2': GraphicVisualForge,
+  'M3': GraphicDeepAnnotator,
+  'M4': GraphicVibeCoder,
+  'M5': GraphicBrandBuzz,
+  'M6': GraphicAgentHandlers,
 };
 
 // ==========================================================================
-// ORIGINAL DARK MODULE VISUAL IDENTITIES & DATA (Restored Exact Colors)
+// UNIFIED UPSHIFT PALETTE: RED + BLACK + WHITE + TECH GREEN
 // ==========================================================================
 
 const OPPORTUNITY_MODULES = [
@@ -168,24 +159,25 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Provide 3 sample video reels demonstrating pacing and AI B-roll sync.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
-    // Original Red Visual Identity
-    accentColor: '#E93B3B',
-    cardBg: '#0F0606',
-    cardBgHover: '#180A0A',
-    cardBorder: 'rgba(233, 59, 59, 0.3)',
-    cardBorderHover: '#E93B3B',
-    badgeBg: '#E93B3B',
+    // White Base + UpShift Red Accent
+    isWhiteBase: true,
+    accentColor: '#E31B23',
+    cardBg: '#FFFFFF',
+    cardBgHover: '#FFFFFF',
+    cardBorder: '#E7E4DF',
+    cardBorderHover: '#E31B23',
+    badgeBg: '#E31B23',
     badgeText: '#FFFFFF',
-    chipBg: 'rgba(233, 59, 59, 0.15)',
-    chipBorder: 'rgba(233, 59, 59, 0.35)',
-    chipText: '#FFA4A4',
-    boxBg: '#1A0B0B',
-    boxBorder: '#3D1414',
-    boxText: '#E5E7EB',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
-    shadow: '0 8px 30px rgba(233, 59, 59, 0.2)'
+    chipBg: '#FFF1F1',
+    chipBorder: '#FEE2E2',
+    chipText: '#991B1B',
+    boxBg: '#FFF8F8',
+    boxBorder: '#FEE2E2',
+    boxText: '#111111',
+    textPrimary: '#111111',
+    textSecondary: '#4B5563',
+    textMuted: '#6B7280',
+    shadow: '0 12px 32px -4px rgba(227, 27, 35, 0.12)'
   },
   {
     id: 'c-2',
@@ -205,24 +197,25 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Show portfolio of consistent product mockups with lighting control.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
-    // Original Blue/Purple Visual Identity
-    accentColor: '#2563EB',
-    cardBg: '#060B18',
-    cardBgHover: '#0B1328',
-    cardBorder: 'rgba(37, 99, 235, 0.3)',
-    cardBorderHover: '#2563EB',
-    badgeBg: '#2563EB',
+    // White Base + Black/Red Accent
+    isWhiteBase: true,
+    accentColor: '#111111',
+    cardBg: '#FFFFFF',
+    cardBgHover: '#FFFFFF',
+    cardBorder: '#E7E4DF',
+    cardBorderHover: '#111111',
+    badgeBg: '#111111',
     badgeText: '#FFFFFF',
-    chipBg: 'rgba(37, 99, 235, 0.15)',
-    chipBorder: 'rgba(37, 99, 235, 0.35)',
-    chipText: '#93C5FD',
-    boxBg: '#0D1730',
-    boxBorder: '#1E3A8A',
-    boxText: '#E5E7EB',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
-    shadow: '0 8px 30px rgba(37, 99, 235, 0.2)'
+    chipBg: '#F4F1EA',
+    chipBorder: '#E5E0D6',
+    chipText: '#111111',
+    boxBg: '#FAF8F5',
+    boxBorder: '#EAE6DF',
+    boxText: '#111111',
+    textPrimary: '#111111',
+    textSecondary: '#4B5563',
+    textMuted: '#6B7280',
+    shadow: '0 12px 32px -4px rgba(17, 17, 17, 0.12)'
   },
   {
     id: 'c-3',
@@ -242,24 +235,25 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Submit an annotated dataset sample or evaluation breakdown report.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
-    // Original Green Visual Identity
+    // White Base + Tech Green Accent
+    isWhiteBase: true,
     accentColor: '#059669',
-    cardBg: '#04140E',
-    cardBgHover: '#072418',
-    cardBorder: 'rgba(5, 150, 105, 0.3)',
+    cardBg: '#FFFFFF',
+    cardBgHover: '#FFFFFF',
+    cardBorder: '#E7E4DF',
     cardBorderHover: '#059669',
     badgeBg: '#059669',
     badgeText: '#FFFFFF',
-    chipBg: 'rgba(5, 150, 105, 0.15)',
-    chipBorder: 'rgba(5, 150, 105, 0.35)',
-    chipText: '#6EE7B7',
-    boxBg: '#08291E',
-    boxBorder: '#065F46',
-    boxText: '#E5E7EB',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
-    shadow: '0 8px 30px rgba(5, 150, 105, 0.2)'
+    chipBg: '#ECFDF5',
+    chipBorder: '#A7F3D0',
+    chipText: '#065F46',
+    boxBg: '#F0FDF4',
+    boxBorder: '#BBF7D0',
+    boxText: '#111111',
+    textPrimary: '#111111',
+    textSecondary: '#4B5563',
+    textMuted: '#6B7280',
+    shadow: '0 12px 32px -4px rgba(5, 150, 105, 0.12)'
   },
 
   // RIGHT COLUMN
@@ -281,24 +275,25 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Share a live URL of a web tool or landing experience you shipped.',
     statusBadge: 'Active Ecosystem Need',
     column: 'right',
-    // Original Indigo/Blue Visual Identity
-    accentColor: '#4F46E5',
-    cardBg: '#09091A',
-    cardBgHover: '#111130',
-    cardBorder: 'rgba(79, 70, 229, 0.3)',
-    cardBorderHover: '#4F46E5',
-    badgeBg: '#4F46E5',
+    // Intentional Black Contrast Card (Dark Mode Contrast Accent)
+    isWhiteBase: false,
+    accentColor: '#E31B23',
+    cardBg: '#111111',
+    cardBgHover: '#181818',
+    cardBorder: '#262626',
+    cardBorderHover: '#E31B23',
+    badgeBg: '#E31B23',
     badgeText: '#FFFFFF',
-    chipBg: 'rgba(79, 70, 229, 0.15)',
-    chipBorder: 'rgba(79, 70, 229, 0.35)',
-    chipText: '#A5B4FC',
-    boxBg: '#131338',
-    boxBorder: '#3730A3',
-    boxText: '#E5E7EB',
+    chipBg: 'rgba(255, 255, 255, 0.08)',
+    chipBorder: 'rgba(255, 255, 255, 0.18)',
+    chipText: '#F3F4F6',
+    boxBg: 'rgba(255, 255, 255, 0.05)',
+    boxBorder: 'rgba(255, 255, 255, 0.15)',
+    boxText: '#F9FAFB',
     textPrimary: '#FFFFFF',
     textSecondary: '#D1D5DB',
     textMuted: '#9CA3AF',
-    shadow: '0 8px 30px rgba(79, 70, 229, 0.2)'
+    shadow: '0 12px 32px -4px rgba(0, 0, 0, 0.4)'
   },
   {
     id: 'c-6',
@@ -318,24 +313,25 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Show a campaign deck or multichannel copy matrix you designed.',
     statusBadge: 'Active Ecosystem Need',
     column: 'right',
-    // Original Orange Visual Identity
-    accentColor: '#EA580C',
-    cardBg: '#160B04',
-    cardBgHover: '#261307',
-    cardBorder: 'rgba(234, 88, 12, 0.3)',
-    cardBorderHover: '#EA580C',
-    badgeBg: '#EA580C',
+    // White Base + UpShift Red Accent
+    isWhiteBase: true,
+    accentColor: '#E31B23',
+    cardBg: '#FFFFFF',
+    cardBgHover: '#FFFFFF',
+    cardBorder: '#E7E4DF',
+    cardBorderHover: '#E31B23',
+    badgeBg: '#E31B23',
     badgeText: '#FFFFFF',
-    chipBg: 'rgba(234, 88, 12, 0.15)',
-    chipBorder: 'rgba(234, 88, 12, 0.35)',
-    chipText: '#FDBA74',
-    boxBg: '#2C1609',
-    boxBorder: '#7C2D12',
-    boxText: '#E5E7EB',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
-    shadow: '0 8px 30px rgba(234, 88, 12, 0.2)'
+    chipBg: '#FFF1F1',
+    chipBorder: '#FEE2E2',
+    chipText: '#991B1B',
+    boxBg: '#FFF8F8',
+    boxBorder: '#FEE2E2',
+    boxText: '#111111',
+    textPrimary: '#111111',
+    textSecondary: '#4B5563',
+    textMuted: '#6B7280',
+    shadow: '0 12px 32px -4px rgba(227, 27, 35, 0.12)'
   },
   {
     id: 'c-5',
@@ -355,24 +351,25 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Provide an agent architecture flowchart or webhook execution log.',
     statusBadge: 'Active Ecosystem Need',
     column: 'right',
-    // Original Teal Visual Identity
-    accentColor: '#0D9488',
-    cardBg: '#041412',
-    cardBgHover: '#072420',
-    cardBorder: 'rgba(13, 148, 136, 0.3)',
-    cardBorderHover: '#0D9488',
-    badgeBg: '#0D9488',
+    // White Base + Tech Green Accent
+    isWhiteBase: true,
+    accentColor: '#059669',
+    cardBg: '#FFFFFF',
+    cardBgHover: '#FFFFFF',
+    cardBorder: '#E7E4DF',
+    cardBorderHover: '#059669',
+    badgeBg: '#059669',
     badgeText: '#FFFFFF',
-    chipBg: 'rgba(13, 148, 136, 0.15)',
-    chipBorder: 'rgba(13, 148, 136, 0.35)',
-    chipText: '#5EEAD4',
-    boxBg: '#082924',
-    boxBorder: '#115E59',
-    boxText: '#E5E7EB',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
-    shadow: '0 8px 30px rgba(13, 148, 136, 0.2)'
+    chipBg: '#ECFDF5',
+    chipBorder: '#A7F3D0',
+    chipText: '#065F46',
+    boxBg: '#F0FDF4',
+    boxBorder: '#BBF7D0',
+    boxText: '#111111',
+    textPrimary: '#111111',
+    textSecondary: '#4B5563',
+    textMuted: '#6B7280',
+    shadow: '0 12px 32px -4px rgba(5, 150, 105, 0.12)'
   }
 ];
 
@@ -401,7 +398,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
         style={{
           backgroundColor: isActive ? card.cardBgHover : card.cardBg,
           border: `1px solid ${isActive ? card.cardBorderHover : card.cardBorder}`,
-          boxShadow: isActive ? card.shadow : '0 4px 14px rgba(0, 0, 0, 0.25)',
+          boxShadow: isActive ? card.shadow : '0 2px 8px rgba(0, 0, 0, 0.04)',
         }}
         role="button"
         tabIndex={0}
@@ -413,7 +410,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
           }
         }}
       >
-        {/* Compact Default Card View (Restoring Original Colors & Styling) */}
+        {/* Compact Default Card View */}
         <div className="opp-wall-card-compact">
           <div className="opp-wall-compact-left">
             <span 
@@ -441,8 +438,8 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
           <div 
             className="opp-wall-arrow-btn"
             style={{
-              backgroundColor: isActive ? card.accentColor : 'rgba(255, 255, 255, 0.06)',
-              border: `1px solid ${isActive ? card.accentColor : 'rgba(255, 255, 255, 0.15)'}`,
+              backgroundColor: isActive ? card.accentColor : (card.isWhiteBase ? '#FAF8F5' : 'rgba(255, 255, 255, 0.08)'),
+              border: `1px solid ${isActive ? card.accentColor : (card.isWhiteBase ? '#E7E4DF' : 'rgba(255, 255, 255, 0.15)')}`,
               color: isActive ? '#FFFFFF' : card.textMuted
             }}
           >
@@ -455,7 +452,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
           <div className="opp-wall-expand-inner">
             <div className="opp-wall-expand-content">
 
-              {/* Original Graphic System Illustration */}
+              {/* Graphic System Illustration */}
               {GraphicComponent && (
                 <div style={{ marginTop: '12px', marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
                   <GraphicComponent accentColor={card.accentColor} />
@@ -467,7 +464,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                 <span style={{ fontFamily: 'monospace', fontSize: '11px', fontWeight: 800, color: card.accentColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   {card.code} · {card.name.toUpperCase()}
                 </span>
-                <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.16)', color: '#34D399', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(5, 150, 105, 0.12)', color: '#059669', border: '1px solid rgba(5, 150, 105, 0.25)' }}>
                   ● {card.statusBadge.toUpperCase()}
                 </span>
               </div>
@@ -513,7 +510,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                 ))}
               </div>
 
-              {/* Original Snapshot Details Grid */}
+              {/* Snapshot Details Grid */}
               <div 
                 style={{
                   backgroundColor: card.boxBg,
@@ -540,7 +537,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                 </div>
               </div>
 
-              {/* Original Required Proof Spec Box */}
+              {/* Required Proof Spec Box */}
               <div 
                 style={{
                   backgroundColor: card.boxBg,
@@ -584,7 +581,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                     alignItems: 'center',
                     gap: '6px',
                     transition: 'all 0.2s ease',
-                    boxShadow: `0 4px 14px ${card.accentColor}40`
+                    boxShadow: `0 4px 14px ${card.accentColor}35`
                   }}
                 >
                   <span>View Opportunities</span>

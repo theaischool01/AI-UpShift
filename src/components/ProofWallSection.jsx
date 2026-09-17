@@ -525,44 +525,44 @@ export default function ProofWallSection() {
         </div>
 
         {/* ============================================================ */}
-        {/* DESKTOP ASYMMETRIC GRID (3 Columns with Stacked Mixed Cards) */}
+        {/* DESKTOP ASYMMETRIC GRID (3 Columns of Equal-Height Cards)    */}
         {/* ============================================================ */}
         <div className="proof-grid-desktop">
-          {/* Column 1: Large Featured (ReelRush) + Small (Vibe Coder) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <ProofCard project={reelrush} variant="large" />
-            <ProofCard project={vibecoder} variant="small" />
+          {/* Column 1 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+            <ProofCard project={reelrush} variant="medium" />
+            <ProofCard project={vibecoder} variant="medium" />
           </div>
 
-          {/* Column 2: Medium (VisualForge) + Medium (DeepAnnotator) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Column 2 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
             <ProofCard project={visualforge} variant="medium" />
             <ProofCard project={deepannotator} variant="medium" />
           </div>
 
-          {/* Column 3: Small (BrandBuzz) + Large Featured (AgentHandlers) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <ProofCard project={brandbuzz} variant="small" />
-            <ProofCard project={agenthandlers} variant="large" />
+          {/* Column 3 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+            <ProofCard project={brandbuzz} variant="medium" />
+            <ProofCard project={agenthandlers} variant="medium" />
           </div>
         </div>
 
         {/* ============================================================ */}
-        {/* TABLET VIEW (2 Columns with Balanced Rhythm)                 */}
+        {/* TABLET VIEW (2 Columns of Equal-Height Cards)                 */}
         {/* ============================================================ */}
         <div className="proof-grid-tablet">
           {/* Column A */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <ProofCard project={reelrush} variant="large" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+            <ProofCard project={reelrush} variant="medium" />
             <ProofCard project={visualforge} variant="medium" />
-            <ProofCard project={vibecoder} variant="small" />
+            <ProofCard project={vibecoder} variant="medium" />
           </div>
 
           {/* Column B */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
             <ProofCard project={deepannotator} variant="medium" />
-            <ProofCard project={brandbuzz} variant="small" />
-            <ProofCard project={agenthandlers} variant="large" />
+            <ProofCard project={brandbuzz} variant="medium" />
+            <ProofCard project={agenthandlers} variant="medium" />
           </div>
         </div>
 
@@ -573,8 +573,8 @@ export default function ProofWallSection() {
           <ProofCard project={reelrush} variant="medium" />
           <ProofCard project={visualforge} variant="medium" />
           <ProofCard project={deepannotator} variant="medium" />
-          <ProofCard project={vibecoder} variant="small" />
-          <ProofCard project={brandbuzz} variant="small" />
+          <ProofCard project={vibecoder} variant="medium" />
+          <ProofCard project={brandbuzz} variant="medium" />
           <ProofCard project={agenthandlers} variant="medium" />
         </div>
       </div>

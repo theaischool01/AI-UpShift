@@ -318,6 +318,7 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
+                  transform: 'scale(1.10)',
                   filter: 'drop-shadow(0 14px 26px rgba(0,0,0,0.18))',
                 }}
                 draggable={false}
