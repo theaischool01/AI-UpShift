@@ -1,0 +1,811 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI CareerOS — Build a Bigger You | THE AI SCHOOL</title>
+  <meta name="description"
+    content="AI CareerOS by THE AI SCHOOL helps undergraduates, graduates, and freshers master applied AI across 6 specialized role programs, build verifiable proof of work, and land paid opportunities.">
+
+  <!-- Favicon placeholder & theme styling -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦊</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/fox-theme.css">
+  <link rel="stylesheet" href="css/character-carousel.css">
+
+  <!-- External Animation & Payment Libraries -->
+  <!-- Lenis for smooth scroll -->
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <!-- GSAP 3 & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/InertiaPlugin.min.js"></script>
+  <!-- anime.js for UI micro-interactions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <!-- Three.js for Hero Neural Constellation WebGL Scene -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Razorpay Checkout.js -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Application Logic -->
+  <script src="js/payments.js" defer></script>
+  <script src="js/character-carousel.js" defer></script>
+  <script src="js/interactions.js?v=20260910-rebrand-v13" defer></script>
+</head>
+
+<body>
+  <!-- Accessibility Skip Link -->
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <!-- =========================================================================
+       1. FLOATING LIQUID-GLASS NAVBAR
+       ========================================================================= -->
+  <header class="floating-navbar-wrapper" id="site-header">
+    <div class="floating-navbar">
+      <!-- Left: Brand Logo Image -->
+      <a class="nav-brand-badge" href="#" aria-label="THE AI SCHOOL">
+        <img src="assets/AI-school LOGO.webp" alt="THE AI SCHOOL" class="nav-school-logo">
+      </a>
+
+      <!-- Center: Main Navigation Links -->
+      <nav class="floating-nav-links" aria-label="Main Navigation">
+        <a href="#about" class="nav-glass-link">The Program</a>
+        <a href="#programs" class="nav-glass-link">6 Programs</a>
+        <a href="#journey" class="nav-glass-link">How It Works</a>
+        <a href="#outcomes" class="nav-glass-link">Outcomes</a>
+        <a href="#pricing" class="nav-glass-link">Pricing</a>
+      </nav>
+
+      <!-- Right: CTA Button & Mobile Menu Toggle -->
+      <div class="nav-actions">
+        <button class="btn btn-primary btn-nav-enroll" data-enroll="bundle"
+          data-title="AI CareerOS All-Access Program Bundle" aria-label="Enroll in AI CareerOS">
+          <span>Enroll Now</span>
+          <span class="arrow-icon" aria-hidden="true">↗</span>
+        </button>
+        <button class="nav-mobile-toggle" id="nav-mobile-toggle" type="button" aria-label="Toggle navigation menu"
+          aria-expanded="false" aria-controls="nav-mobile-menu">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Expanded Liquid-Glass Dropdown Menu -->
+    <div class="floating-nav-mobile-menu" id="nav-mobile-menu" aria-hidden="true">
+      <nav class="mobile-nav-inner" aria-label="Mobile Navigation">
+        <a href="#about" class="mobile-nav-link">The Program</a>
+        <a href="#programs" class="mobile-nav-link">6 Programs</a>
+        <a href="#journey" class="mobile-nav-link">How It Works</a>
+        <a href="#outcomes" class="mobile-nav-link">Outcomes</a>
+        <a href="#pricing" class="mobile-nav-link">Pricing</a>
+        <div class="mobile-nav-cta-wrap">
+          <button class="btn btn-primary btn-block" data-enroll="bundle"
+            data-title="AI CareerOS All-Access Program Bundle">
+            Enroll Now ↗
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- =======================================================================
+         2. HERO SECTION
+         ======================================================================= -->
+    <section class="hero-section hero-dark-spotlight" id="hero">
+      <div id="about" class="nav-anchor" aria-hidden="true"
+        style="position: absolute; top: 0; left: 0; width: 0; height: 0; pointer-events: none;"></div>
+
+      <div class="hero-container">
+        <!-- Left Column: Copy Block -->
+        <div class="hero-content" id="hero-copy">
+          <!-- Eyebrow Pill -->
+          <div class="hero-eyebrow-pill" id="hero-eyebrow">
+            <span class="eyebrow-icon">⚡</span>
+            <span class="eyebrow-text">Build skills that turn into real income.</span>
+          </div>
+
+          <!-- Headline -->
+          <h1 class="hero-spotlight-headline" id="hero-headline">
+            Tired of learning skills that don’t turn into <span class="accent-crimson">real income</span>?
+          </h1>
+
+          <!-- Body Paragraph -->
+          <p class="hero-spotlight-body" id="hero-body">
+            UpShift takes you from zero to a paid AI skill — real programs, real proof of work, a real shot at paid opportunities.
+          </p>
+
+          <!-- Skill → Proof of Work → Earning Strip -->
+          <div class="hero-journey-strip" id="hero-journey-strip" aria-label="Learning pathway stages">
+            <a href="#journey-strip" class="hero-journey-step" data-target-stage="1">
+              <span class="step-num">01</span>
+              <span class="step-label">Skills</span>
+              <span class="step-arrow">↗</span>
+            </a>
+            <span class="step-sep">·</span>
+            <a href="#journey-strip" class="hero-journey-step" data-target-stage="2">
+              <span class="step-num">02</span>
+              <span class="step-label">Proof of Work</span>
+              <span class="step-arrow">↗</span>
+            </a>
+            <span class="step-sep">·</span>
+            <a href="#journey-strip" class="hero-journey-step" data-target-stage="3">
+              <span class="step-num">03</span>
+              <span class="step-label">Earnings</span>
+              <span class="step-arrow">↗</span>
+            </a>
+          </div>
+
+          <!-- CTA Row -->
+          <div class="hero-actions" id="hero-actions">
+            <a class="btn btn-primary btn-hero-cta" href="#programs">
+              Explore the Programs <span class="arrow-icon">↗</span>
+            </a>
+            <a class="btn btn-secondary btn-hero-cta btn-hero-ghost" href="#journey-strip">
+              Find Your Path <span class="arrow-icon">↓</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Mascot + Spotlight Beam -->
+        <div class="hero-spotlight-stage" id="hero-spotlight-stage" aria-label="Hero Mascot Spotlight Presentation">
+          <!-- Spotlight Light Beams (Layered CSS Gradients with Gaussian Blur) -->
+          <div class="hero-spotlight-beam-ambient" aria-hidden="true"></div>
+          <div class="hero-spotlight-beam-core" aria-hidden="true"></div>
+          <div class="hero-spotlight-mascot-glow" aria-hidden="true"></div>
+
+          <!-- Mascot Image Layer -->
+          <div class="hero-spotlight-mascot-wrap" id="hero-spotlight-mascot-wrap">
+            <img class="hero-spotlight-mascot-img" id="hero-spotlight-mascot-img" src="assets/Hero-1.png"
+              alt="UpShift Fox Mascot standing confidently in the spotlight" width="620" height="720">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         2.5 PROGRAM ORBIT (Rotating Wireframe Globe & 6-Program Ring)
+         ======================================================================= -->
+    <section class="program-orbit-section" id="program-orbit" role="region"
+      aria-label="Interactive 6-Program Orbit Sphere">
+      <div class="orbit-two-column-layout">
+        <!-- LEFT COLUMN: Editorial Course Intelligence Panel -->
+        <div class="orbit-editorial-col">
+          <div class="orbit-editorial-header">
+            <span class="orbit-eyebrow">EXPLORE OUR AI UNIVERSE</span>
+            <h2 class="orbit-title">Orbit</h2>
+            <p class="orbit-subtitle">Discover how our AI disciplines connect, build, and evolve across commercial
+              workflows.</p>
+          </div>
+
+          <div class="orbit-active-panel" id="orbit-active-panel" aria-live="polite">
+            <div class="orbit-panel-inner" id="orbit-panel-inner">
+              <div class="panel-header-row">
+                <span class="panel-kicker">IN FOCUS</span>
+                <span class="panel-index" id="orbit-panel-index">01</span>
+              </div>
+
+              <div class="panel-course-info">
+                <h3 class="panel-course-title" id="orbit-panel-title">ReelRush AI</h3>
+                <p class="panel-course-role" id="orbit-panel-role">AI Video &amp; Short Video Creator</p>
+                <p class="panel-course-desc" id="orbit-panel-desc">Produce cinematic business shorts, AI B-roll, viral
+                  social clips, and voice-synthesized commercials for brands and agencies.</p>
+              </div>
+
+              <div class="panel-divider" aria-hidden="true"></div>
+
+              <div class="panel-capabilities-block">
+                <span class="panel-section-label">CAPABILITIES</span>
+                <ul class="panel-capabilities-list" id="orbit-panel-capabilities-list">
+                  <li><span class="cap-pip"></span><span class="cap-text">Generative B-Roll</span></li>
+                  <li><span class="cap-pip"></span><span class="cap-text">Prompt Motion</span></li>
+                  <li><span class="cap-pip"></span><span class="cap-text">Voice Cloning</span></li>
+                  <li><span class="cap-pip"></span><span class="cap-text">Retention Engineering</span></li>
+                </ul>
+              </div>
+
+              <div class="panel-footer-row">
+                <button class="panel-cta-btn" id="orbit-panel-cta" type="button"
+                  aria-label="Explore Curriculum for Active Program">
+                  <span>EXPLORE PROGRAM</span>
+                  <span class="cta-arrow" aria-hidden="true">↗</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: 3D Interactive Globe & Constellation Stage -->
+        <div class="orbit-stage-col">
+          <div class="orbit-stage-wrapper" id="orbit-stage">
+            <!-- WebGL Canvas for Wireframe Globe & Orbit Ring -->
+            <canvas class="orbit-webgl-canvas" id="orbit-webgl-canvas" aria-hidden="true"></canvas>
+
+            <!-- Dynamic 2D HTML Labels Projected Over 3D Ring Anchors -->
+            <div class="orbit-labels-overlay" id="orbit-labels-overlay" aria-label="Program Orbit Navigation">
+              <button class="orbit-pill-label" data-orbit-index="0" data-target-program="reelrush" type="button"
+                aria-label="Program 01: ReelRush AI">
+                <span class="orbit-pill-pip"></span>
+                <span class="orbit-pill-tag">01</span>
+                <span class="orbit-pill-name">ReelRush AI</span>
+                <span class="orbit-pill-role">Video Creator</span>
+              </button>
+              <button class="orbit-pill-label" data-orbit-index="1" data-target-program="visualforge" type="button"
+                aria-label="Program 02: VisualForge AI">
+                <span class="orbit-pill-pip"></span>
+                <span class="orbit-pill-tag">02</span>
+                <span class="orbit-pill-name">VisualForge AI</span>
+                <span class="orbit-pill-role">Designer</span>
+              </button>
+              <button class="orbit-pill-label" data-orbit-index="2" data-target-program="deepannotator" type="button"
+                aria-label="Program 03: DeepAnnotator">
+                <span class="orbit-pill-pip"></span>
+                <span class="orbit-pill-tag">03</span>
+                <span class="orbit-pill-name">DeepAnnotator</span>
+                <span class="orbit-pill-role">Data &amp; Eval</span>
+              </button>
+              <button class="orbit-pill-label" data-orbit-index="3" data-target-program="vibecoder" type="button"
+                aria-label="Program 04: Vibe Coder">
+                <span class="orbit-pill-pip"></span>
+                <span class="orbit-pill-tag">04</span>
+                <span class="orbit-pill-name">Vibe Coder</span>
+                <span class="orbit-pill-role">Micro-Apps</span>
+              </button>
+              <button class="orbit-pill-label" data-orbit-index="4" data-target-program="brandbuzz" type="button"
+                aria-label="Program 05: BrandBuzz">
+                <span class="orbit-pill-pip"></span>
+                <span class="orbit-pill-tag">05</span>
+                <span class="orbit-pill-name">BrandBuzz</span>
+                <span class="orbit-pill-role">Growth</span>
+              </button>
+              <button class="orbit-pill-label" data-orbit-index="5" data-target-program="agenthandlers" type="button"
+                aria-label="Program 06: AgentHandlers">
+                <span class="orbit-pill-pip"></span>
+                <span class="orbit-pill-tag">06</span>
+                <span class="orbit-pill-name">AgentHandlers</span>
+                <span class="orbit-pill-role">AI Agents</span>
+              </button>
+            </div>
+
+            <!-- SVG Connector Lines Overlay between ring anchors and pills -->
+            <svg class="orbit-connectors-svg" id="orbit-connectors-svg" aria-hidden="true">
+              <line class="orbit-connector-line" id="orbit-line-0" x1="0" y1="0" x2="0" y2="0"></line>
+              <line class="orbit-connector-line" id="orbit-line-1" x1="0" y1="0" x2="0" y2="0"></line>
+              <line class="orbit-connector-line" id="orbit-line-2" x1="0" y1="0" x2="0" y2="0"></line>
+              <line class="orbit-connector-line" id="orbit-line-3" x1="0" y1="0" x2="0" y2="0"></line>
+              <line class="orbit-connector-line" id="orbit-line-4" x1="0" y1="0" x2="0" y2="0"></line>
+              <line class="orbit-connector-line" id="orbit-line-5" x1="0" y1="0" x2="0" y2="0"></line>
+            </svg>
+
+            <!-- 3D Projected Branch Constellation Badges Overlay -->
+            <div class="orbit-constellation-overlay" id="orbit-constellation-overlay" aria-hidden="true">
+              <div class="orbit-branch-badge" id="orbit-branch-badge-0"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+              <div class="orbit-branch-badge" id="orbit-branch-badge-1"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+              <div class="orbit-branch-badge" id="orbit-branch-badge-2"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+              <div class="orbit-branch-badge" id="orbit-branch-badge-3"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+              <div class="orbit-branch-badge" id="orbit-branch-badge-4"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+              <div class="orbit-branch-badge" id="orbit-branch-badge-5"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+              <div class="orbit-branch-badge" id="orbit-branch-badge-6"><span class="branch-pip"></span><span
+                  class="branch-text"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drag Hint Badge -->
+      <div class="orbit-interaction-hint" aria-hidden="true">
+        <span class="hint-icon">⟲</span>
+        <span class="hint-text">DRAG TO EXPLORE 360° · CLICK ANY DISCIPLINE</span>
+      </div>
+
+      <!-- WebGL Fallback Grid (Visible if WebGL is disabled/unavailable) -->
+      <div class="orbit-fallback-grid" id="orbit-fallback-grid" style="display: none;">
+        <button class="orbit-fallback-card" data-orbit-index="0" type="button">
+          <span class="fallback-tag">01 / CREATIVE</span>
+          <h4>ReelRush AI</h4>
+          <p>AI Video &amp; Short Video Creator</p>
+        </button>
+        <button class="orbit-fallback-card" data-orbit-index="1" type="button">
+          <span class="fallback-tag">02 / DESIGN</span>
+          <h4>VisualForge AI</h4>
+          <p>AI Creative Designer Associate</p>
+        </button>
+        <button class="orbit-fallback-card" data-orbit-index="2" type="button">
+          <span class="fallback-tag">03 / DATA</span>
+          <h4>DeepAnnotator</h4>
+          <p>Data Annotation &amp; AI Evaluation Associate</p>
+        </button>
+        <button class="orbit-fallback-card" data-orbit-index="3" type="button">
+          <span class="fallback-tag">04 / APPS</span>
+          <h4>Vibe Coder</h4>
+          <p>AI Website &amp; Micro-App Builder Associate</p>
+        </button>
+        <button class="orbit-fallback-card" data-orbit-index="4" type="button">
+          <span class="fallback-tag">05 / GROWTH</span>
+          <h4>BrandBuzz</h4>
+          <p>AI-Powered Social Growth for Businesses</p>
+        </button>
+        <button class="orbit-fallback-card" data-orbit-index="5" type="button">
+          <span class="fallback-tag">06 / AUTOMATION</span>
+          <h4>AgentHandlers</h4>
+          <p>AI Agent Workflows Associate</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         3. JOURNEY STRIP (Scroll-Pinned 3-Stage Progress)
+         ======================================================================= -->
+    <section class="journey-strip-wrapper" id="journey-strip">
+      <div class="container journey-strip-container">
+        <div class="journey-strip-header">
+          <span class="strip-label">YOUR CAREER, IN MOTION</span>
+          <span class="strip-meta">01 Skills ↗ 02 Proof of Work ↗ 03 Earnings</span>
+        </div>
+
+        <div class="journey-stages-grid">
+          <div class="journey-stage-card is-active" data-stage="1">
+            <div class="stage-top">
+              <span class="stage-num">01</span>
+              <span class="stage-tag">UNDERSTAND & MASTER</span>
+            </div>
+            <h3>Skills</h3>
+            <p>Turn curiosity into commercial capability. Explore applied AI tools through real tasks and hands-on
+              briefs.</p>
+          </div>
+
+          <div class="journey-stage-card" data-stage="2">
+            <div class="stage-top">
+              <span class="stage-num">02</span>
+              <span class="stage-tag">BUILD & PUBLISH</span>
+            </div>
+            <h3>Proof of Work</h3>
+            <p>Don’t just claim skills — showcase tangible deliverables, client-ready projects, and an interactive
+              portfolio.</p>
+          </div>
+
+          <div class="journey-stage-card" data-stage="3">
+            <div class="stage-top">
+              <span class="stage-num">03</span>
+              <span class="stage-tag">POSITION & MONETIZE</span>
+            </div>
+            <h3>Earnings</h3>
+            <p>Package and pitch your capabilities for gigs, paid internships, agency contracts, and modern startup
+              roles.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         4. THE 6 PROGRAMS (Draggable Fanned Card Hand)
+         ======================================================================= -->
+    <section class="programs-section" id="programs">
+      <div class="container programs-header-container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">01 / THE PROGRAMS</span>
+            <h2 class="section-title">One generalist foundation.<br><span class="accent-red">6 high-demand
+                programs.</span></h2>
+          </div>
+          <p class="section-lead">
+            Drag, swipe, or click through the 6 role programs fanned across the deck. Every track delivers practical
+            toolkits and verifiable proof of work.
+          </p>
+        </div>
+      </div>
+
+      <!-- Accessible screen-reader programs list (isolated from 3D card transforms) -->
+      <div class="sr-only">
+        <h3>Available Programs:</h3>
+        <ul>
+          <li>Program 1: ReelRush AI — AI Video &amp; Short Video Creator. Fee ₹999.</li>
+          <li>Program 2: VisualForge AI — AI Creative Designer Associate. Fee ₹999.</li>
+          <li>Program 3: DeepAnnotator — Data Annotation &amp; AI Evaluation Associate. Fee ₹999.</li>
+          <li>Program 4: Vibe Coder — AI Website &amp; Micro-App Builder Associate. Fee ₹999.</li>
+          <li>Program 5: BrandBuzz — AI-Powered Social Growth for Businesses. Fee ₹999.</li>
+          <li>Program 6: AgentHandlers — AI Agent Workflows Associate. Fee ₹999.</li>
+        </ul>
+      </div>
+
+      <!-- Character Carousel Mounting Container -->
+      <div id="program-character-carousel" class="character-carousel-host" role="region" aria-label="6 Character Programs Carousel"></div>
+    </section>
+
+    <!-- =======================================================================
+         5. FROM LEARNING TO DOING (3-Step Process)
+         ======================================================================= -->
+    <section class="process-section" id="journey">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">02 / THE 3-STEP ROADMAP</span>
+            <h2 class="section-title">A skill is the start.<br><span class="accent-red">What you do with it
+                matters.</span></h2>
+          </div>
+          <p class="section-lead">
+            Build a direct bridge from initial learning to monetizable proof-of-work that stands out to clients and
+            hiring managers.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step-card">
+            <span class="step-number">01</span>
+            <h3>Learn the skill.</h3>
+            <p>Explore applied AI tools through practical tasks, industry challenges, and real business role
+              simulations.</p>
+            <span class="step-tag">UNDERSTAND + PRACTISE</span>
+          </article>
+
+          <article class="step-card">
+            <span class="step-number">02</span>
+            <h3>Build the proof.</h3>
+            <p>Create commercial projects and client-ready deliverables. Bring your strongest work together in a
+              verified portfolio.</p>
+            <span class="step-tag">CREATE + PUBLISH</span>
+          </article>
+
+          <article class="step-card">
+            <span class="step-number">03</span>
+            <h3>Pitch your value.</h3>
+            <p>Package, price, and pitch your services to startups, SMEs, agencies, and global clients seeking AI
+              implementation.</p>
+            <span class="step-tag">POSITION + CONNECT</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         6. OUTCOMES (Dark Checklist Section)
+         ======================================================================= -->
+    <section class="outcomes-section" id="outcomes">
+      <div class="container outcomes-grid">
+        <div class="outcomes-copy">
+          <span class="eyebrow" style="color: #ff865d;"><span class="dot" style="background: #ff865d;"></span> 03 /
+            LEAVE WITH MORE THAN KNOWLEDGE</span>
+          <h2>“Here’s the problem I can solve.<br>Here’s my proof of work.”</h2>
+          <p>
+            That is the confidence AI CareerOS gives you. Not abstract theory or passive video lectures, but verified
+            client-facing deliverables.
+          </p>
+        </div>
+
+        <div class="outcomes-list">
+          <div class="outcome-item">
+            <div class="outcome-icon">✓</div>
+            <div>
+              <strong>A professional AI Generalist portfolio</strong>
+              <p>Live, public-facing project deliverables demonstrating hands-on execution across real client briefs.
+              </p>
+            </div>
+          </div>
+
+          <div class="outcome-item">
+            <div class="outcome-icon">✓</div>
+            <div>
+              <strong>Services you can clearly explain</strong>
+              <p>Defined service menus, structured client proposals, pricing frameworks, and a polished digital
+                presence.</p>
+            </div>
+          </div>
+
+          <div class="outcome-item">
+            <div class="outcome-icon">✓</div>
+            <div>
+              <strong>The ability to deliver professionally</strong>
+              <p>Practical experience interpreting client scopes, applying human quality checks, and managing revision
+                cycles.</p>
+            </div>
+          </div>
+
+          <div class="outcome-item">
+            <div class="outcome-icon">✓</div>
+            <div>
+              <strong>A clearer direction for your career</strong>
+              <p>Test multiple high-growth domains, discover your competitive edge, and decide where to specialize.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         7. PRICING & ENROLLMENT
+         ======================================================================= -->
+    <section class="pricing-section" id="pricing">
+      <div class="container">
+        <div class="section-head"
+          style="text-align: center; justify-content: center; flex-direction: column; align-items: center;">
+          <span class="section-tag">04 / FLAT LAUNCH PRICING</span>
+          <h2 class="section-title">Transparent, affordable career investment.</h2>
+          <p class="section-lead">
+            Every enrollment includes live project briefs, portfolio reviews, community support, and verified completion
+            certification.
+          </p>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- Single Program Pricing Card -->
+          <div class="pricing-card">
+            <div>
+              <h3 class="pricing-title">Single Track Program</h3>
+              <p class="pricing-subtitle">Pick any 1 of the 6 specialized role tracks.</p>
+
+              <div class="pricing-price-wrap">
+                <span class="pricing-currency">₹</span>
+                <span class="pricing-amount">999</span>
+                <span class="pricing-period">/ one-time</span>
+              </div>
+
+              <ul class="pricing-features-list">
+                <li><span class="check-icon">✓</span> Full curriculum access for 1 selected track</li>
+                <li><span class="check-icon">✓</span> 3 hands-on commercial project briefs</li>
+                <li><span class="check-icon">✓</span> 1 verified proof-of-work portfolio deliverable</li>
+                <li><span class="check-icon">✓</span> Peer feedback & project review community</li>
+                <li><span class="check-icon">✓</span> Certificate of Applied AI Completion</li>
+              </ul>
+            </div>
+
+            <button class="btn btn-secondary" data-enroll="single_track" data-title="Single Track Program">
+              Enroll in Track (₹999) <span class="arrow-icon">↗</span>
+            </button>
+          </div>
+
+          <!-- All-Access Bundle Pricing Card (Featured) -->
+          <div class="pricing-card featured">
+            <span class="featured-ribbon">Most Popular · All 6 Tracks</span>
+
+            <div>
+              <h3 class="pricing-title">CareerOS All-Access Bundle</h3>
+              <p class="pricing-subtitle">Master all 6 roles and become a full-spectrum AI generalist.</p>
+
+              <div class="pricing-price-wrap">
+                <span class="pricing-currency">₹</span>
+                <span class="pricing-amount">999</span>
+                <span class="pricing-period">/ one-time launch offer</span>
+              </div>
+
+              <ul class="pricing-features-list">
+                <li><span class="check-icon">✓</span> <strong>Unrestricted access to all 6 programs</strong></li>
+                <li><span class="check-icon">✓</span> 6 verified portfolio deliverables & capstone project</li>
+                <li><span class="check-icon">✓</span> Client outreach pitch templates & pricing calculator</li>
+                <li><span class="check-icon">✓</span> Lifetime access to THE AI SCHOOL resource library</li>
+                <li><span class="check-icon">✓</span> Dedicated discord channels for gig & internship leads</li>
+                <li><span class="check-icon">✓</span> Master AI Generalist Certification</li>
+              </ul>
+            </div>
+
+            <button class="btn btn-primary" data-enroll="bundle" data-title="AI CareerOS All-Access Program Bundle">
+              Enroll in All-Access Bundle (₹999) <span class="arrow-icon">↗</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         8. OPPORTUNITIES ("Start local. Think beyond borders.")
+         ======================================================================= -->
+    <section class="opportunities-section" id="opportunities">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">05 / CAREER MOBILITY</span>
+            <h2 class="section-title">Start local.<br><span class="accent-red">Think beyond borders.</span></h2>
+          </div>
+          <p class="section-lead">
+            Apply your AI capabilities to businesses in your city or clients across the world. Build towards the
+            flexible opportunities that fit your lifestyle.
+          </p>
+        </div>
+
+        <div class="opportunity-pills">
+          <div class="opportunity-pill"><span class="pill-dot"></span> Freelance assignments</div>
+          <div class="opportunity-pill"><span class="pill-dot"></span> Paid internships</div>
+          <div class="opportunity-pill"><span class="pill-dot"></span> Remote gig work</div>
+          <div class="opportunity-pill"><span class="pill-dot"></span> Startup roles</div>
+          <div class="opportunity-pill"><span class="pill-dot"></span> Part-time projects</div>
+          <div class="opportunity-pill"><span class="pill-dot"></span> Local business automation</div>
+        </div>
+
+        <div class="impact-box">
+          <h3>Skills that create value beyond conventional jobs.</h3>
+          <p>
+            Help local businesses produce daily video content, enrich their sales pipelines, and eliminate repetitive
+            operational tasks. Grow towards an independent service consultancy or a boutique AI agency, while bringing
+            tangible technology into real-world commerce.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         9. CLOSING CTA
+         ======================================================================= -->
+    <section class="closing-section">
+      <div class="container closing-grid">
+        <div class="closing-content">
+          <p class="eyebrow"><span class="dot"></span> AI CAREEROS · BY THE AI SCHOOL</p>
+          <h2 class="closing-title">Same you.<br><span>Bigger possibilities.</span></h2>
+          <p class="closing-sub">
+            Learn applied AI. Build proof of work. Secure your first paid opportunity today.
+          </p>
+          <button class="btn btn-white" data-enroll="bundle" data-title="AI CareerOS All-Access Program Bundle">
+            Find Your Starting Point (₹999) <span class="arrow-icon">↗</span>
+          </button>
+        </div>
+
+        <img class="closing-mascot-img" src="assets/fox-mascot.png" alt="AI Go Getter fox mascot" width="480"
+          height="480" loading="lazy">
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       10. FOOTER
+       ========================================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <strong>THE AI SCHOOL</strong>
+          <span>AI CareerOS · Skills → Proof of Work → Earnings</span>
+        </div>
+
+        <div class="footer-links">
+          <a href="#hero">Overview</a>
+          <a href="#programs">6 Programs</a>
+          <a href="#journey">Roadmap</a>
+          <a href="#pricing">Pricing</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 THE AI SCHOOL. All rights reserved. Razorpay Secured.</p>
+        <a href="#hero" style="color: #ff9d7d;">Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODALS: PROGRAM DETAIL, CHECKOUT LEAD CAPTURE, & PAYMENT RECEIPT
+       ========================================================================= -->
+
+  <!-- Program Detail Modal -->
+  <div class="modal-backdrop" id="program-detail-modal" aria-hidden="true" role="dialog"
+    aria-labelledby="modal-program-title">
+    <div class="modal-dialog detail-modal-dialog">
+      <button class="modal-close-btn" id="detail-modal-close" aria-label="Close modal">×</button>
+
+      <div class="modal-header">
+        <span class="program-badge" id="modal-program-badge">01 / TRACK</span>
+        <h3 id="modal-program-title">Program Title</h3>
+        <p id="modal-program-role" style="color: var(--red); font-weight: 700;">Role Title</p>
+      </div>
+
+      <div class="detail-pills" id="modal-program-pills"></div>
+      <p id="modal-program-desc" style="color: var(--muted); margin-bottom: 24px;"></p>
+
+      <div class="detail-section-block">
+        <h4>What You’ll Learn</h4>
+        <ul id="modal-program-learnings"></ul>
+      </div>
+
+      <div class="detail-section-block">
+        <h4>Primary Tools & Technologies</h4>
+        <p id="modal-program-tools"></p>
+      </div>
+
+      <div class="detail-section-block">
+        <h4>Proof of Work Deliverable</h4>
+        <p id="modal-program-deliverable" style="font-weight: 600; color: var(--navy);"></p>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; gap: 20px;">
+        <div>
+          <span style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Enrollment Fee</span>
+          <div style="font-size: 22px; font-weight: 900; color: var(--navy);">₹999</div>
+        </div>
+        <button class="btn btn-primary" id="detail-enroll-btn">
+          Enroll in Track (₹999) <span class="arrow-icon">↗</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-Checkout Lead Capture Modal -->
+  <div class="modal-backdrop" id="checkout-modal" aria-hidden="true" role="dialog"
+    aria-labelledby="checkout-modal-title">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="checkout-modal-close" aria-label="Close modal">×</button>
+
+      <div class="modal-header">
+        <h3 id="checkout-modal-title">Complete Your Enrollment</h3>
+        <p>Enter your details to reserve your seat and proceed to Razorpay secure checkout.</p>
+      </div>
+
+      <div class="order-summary-box">
+        <div>
+          <span style="font-size: 11px; text-transform: uppercase; color: var(--muted); display: block;">Program</span>
+          <span class="item-title" id="checkout-program-name">AI CareerOS All-Access Program Bundle</span>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 11px; text-transform: uppercase; color: var(--muted); display: block;">Amount</span>
+          <span class="item-price" id="checkout-amount-display">₹999</span>
+        </div>
+      </div>
+
+      <form class="checkout-form" id="enrollment-form" style="margin-top: 18px;">
+        <div class="form-group">
+          <label for="lead-name">Full Name *</label>
+          <input type="text" id="lead-name" required placeholder="e.g. Saheel Sharma" autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label for="lead-email">Email Address *</label>
+          <input type="email" id="lead-email" required placeholder="name@example.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="lead-phone">Phone Number (WhatsApp) *</label>
+          <input type="tel" id="lead-phone" required placeholder="e.g. +91 9876543210" autocomplete="tel">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="checkout-submit-btn" style="width: 100%; margin-top: 10px;">
+          Proceed to Pay ₹999 <span class="arrow-icon">↗</span>
+        </button>
+
+        <p style="font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px;">
+          🔒 256-bit encrypted checkout via Razorpay. Your data is stored safely.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation Receipt Modal -->
+  <div class="modal-backdrop" id="confirmation-modal" aria-hidden="true" role="dialog"
+    aria-labelledby="confirmation-modal-title">
+    <div class="modal-dialog confirmation-card">
+      <button class="modal-close-btn" id="confirmation-modal-close" aria-label="Close modal">×</button>
+
+      <div class="confirmation-icon">✓</div>
+      <h3 id="confirmation-modal-title">Enrollment Confirmed!</h3>
+      <p style="color: var(--muted); font-size: 14px;">Welcome to THE AI SCHOOL! Your payment has been successfully
+        processed.</p>
+
+      <div class="confirmation-receipt-box">
+        <div><strong>Enrollment ID:</strong> <span id="receipt-enrollment-id">ENR-123456</span></div>
+        <div><strong>Student:</strong> <span id="receipt-student-name">Student</span></div>
+        <div><strong>Program:</strong> <span id="receipt-program-title">AI CareerOS All-Access</span></div>
+        <div><strong>Amount Paid:</strong> <span id="receipt-amount">₹999</span></div>
+        <div><strong>Payment Reference:</strong> <span id="receipt-payment-id">pay_test_xyz</span></div>
+        <div><strong>Date:</strong> <span id="receipt-timestamp">Just now</span></div>
+      </div>
+
+      <p style="font-size: 13px; color: var(--navy); margin-bottom: 20px;">
+        A welcome kit with Discord access, roadmap links, and schedule details has been logged for your email.
+      </p>
+
+      <button class="btn btn-primary"
+        onclick="document.getElementById('confirmation-modal').classList.remove('is-open')" style="width: 100%;">
+        Access Student Portal ↗
+      </button>
+    </div>
+  </div>
+
+</body>
+
+</html>
