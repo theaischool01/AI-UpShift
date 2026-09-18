@@ -2,15 +2,15 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { 
   Users, 
-  Sparkles, 
   Award, 
+  Briefcase,
   GraduationCap, 
   AlertCircle 
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import AdminMetricCard from '../../components/admin/AdminMetricCard';
 import RegistrationChart from '../../components/admin/RegistrationChart';
-import CourseDistribution from '../../components/admin/CourseDistribution';
+import ProgramOverviewPanel from '../../components/admin/ProgramOverviewPanel';
 import RecentRegistrationsTable from '../../components/admin/RecentRegistrationsTable';
 
 export default function AdminDashboardPage() {
@@ -19,6 +19,7 @@ export default function AdminDashboardPage() {
   const [learners, setLearners] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
+  const [gigsCount, setGigsCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -27,14 +28,14 @@ export default function AdminDashboardPage() {
     setErrorMessage(null);
 
     try {
-      const [profilesRes, tracksRes, enrollmentsRes] = await Promise.all([
+      const [profilesRes, tracksRes, enrollmentsRes, gigsRes] = await Promise.all([
         // 1. Fetch only learner profiles (strictly exclude admins)
         supabase
           .from('profiles')
           .select('id, full_name, email, college, college_email, role, created_at')
           .eq('role', 'learner'),
 
-        // 2. Fetch all 6 seeded tracks
+        // 2. Fetch all seeded tracks for relational mapping
         supabase
           .from('tracks')
           .select('id, code, name, category, color, bg_color')
@@ -45,6 +46,12 @@ export default function AdminDashboardPage() {
           .from('enrollments')
           .select('id, user_id, track_id, enrolled_at, status')
           .order('enrolled_at', { ascending: false }),
+
+        // 4. Fetch live opportunities count
+        supabase
+          .from('gigs')
+          .select('id, is_active')
+          .eq('is_active', true),
       ]);
 
       // Fallback if tracks table rename is in progress
@@ -74,6 +81,7 @@ export default function AdminDashboardPage() {
       setLearners(profilesRes.data || []);
       setTracks(activeTracks || []);
       setEnrollments(activeEnrollments || []);
+      setGigsCount(gigsRes.data?.length || 0);
     } catch (err) {
       console.error('[UpShift Admin Dashboard] Data fetch error:', err);
       setErrorMessage('Unable to load dashboard data. Please refresh and try again.');
@@ -112,52 +120,16 @@ export default function AdminDashboardPage() {
     return map;
   }, [tracks]);
 
-  // Metric 1: Total Students (only role = 'learner')
+  // Metric 1: Total Learners
   const totalStudents = learners.length;
 
-  // Metric 2: Total Program Registrations
+  // Metric 2: Active Enrollments
   const totalRegistrations = enrollments.length;
+  const activeEnrollmentsCount = useMemo(() => {
+    return enrollments.filter(e => e.status === 'active').length || totalRegistrations;
+  }, [enrollments, totalRegistrations]);
 
-  // Metric 3: Most Popular Track
-  const topTrackInfo = useMemo(() => {
-    if (enrollments.length === 0 || tracks.length === 0) {
-      return { name: 'None yet', subtitle: 'Awaiting first enrollment' };
-    }
-
-    const counts = {};
-    enrollments.forEach((e) => {
-      const tid = e.track_id || e.course_id;
-      if (tid) {
-        counts[tid] = (counts[tid] || 0) + 1;
-      }
-    });
-
-    let maxId = null;
-    let maxCount = 0;
-
-    Object.entries(counts).forEach(([trackId, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        maxId = trackId;
-      }
-    });
-
-    if (!maxId || maxCount === 0) {
-      return { name: 'None yet', subtitle: 'Awaiting track assignments' };
-    }
-
-    const foundTrack = tracks.find((t) => t.id === maxId || t.code === maxId);
-    const trackCode = foundTrack?.code ? `${foundTrack.code} · ` : '';
-    const trackName = foundTrack?.name || maxId;
-
-    const percentage = Math.round((maxCount / enrollments.length) * 100);
-    return {
-      name: `${trackCode}${trackName}`,
-      subtitle: `${maxCount} ${maxCount === 1 ? 'enrollment' : 'enrollments'} (${percentage}%)`
-    };
-  }, [enrollments, tracks]);
-
-  // Metric 4: Top College
+  // Metric 4: Top Institution
   const topCollegeInfo = useMemo(() => {
     if (learners.length === 0) {
       return { name: 'None yet', subtitle: 'Awaiting student registrations' };
@@ -194,7 +166,7 @@ export default function AdminDashboardPage() {
             <span>Program Overview</span>
           </h1>
           <p className="admin-page-description">
-            Live cohort analytics, track distributions, and institutional enrollment metrics.
+            Cohort analytics, program activity, and verified enrollment pipeline.
           </p>
         </div>
       </div>
@@ -221,34 +193,34 @@ export default function AdminDashboardPage() {
       {/* Four KPI Metrics Grid */}
       <div className="admin-metrics-grid">
         <AdminMetricCard
-          title="Total Students"
+          title="TOTAL LEARNERS"
           value={isLoading ? '—' : totalStudents}
-          subtitle="Unique learner profiles"
+          subtitle="Registered student profiles"
           icon={Users}
           color="#E31B23"
           isLoading={isLoading}
         />
 
         <AdminMetricCard
-          title="Program Registrations"
+          title="ACTIVE ENROLLMENTS"
           value={isLoading ? '—' : totalRegistrations}
-          subtitle="UpShift admissions"
+          subtitle="Admitted into UpShift"
           icon={Award}
           color="#059669"
           isLoading={isLoading}
         />
 
         <AdminMetricCard
-          title="Top Track"
-          value={isLoading ? '—' : topTrackInfo.name}
-          subtitle={isLoading ? '' : topTrackInfo.subtitle}
-          icon={Sparkles}
-          color="#4F46E5"
+          title="LIVE OPPORTUNITIES"
+          value={isLoading ? '—' : gigsCount}
+          subtitle="Commercial gigs & bounties"
+          icon={Briefcase}
+          color="#2563EB"
           isLoading={isLoading}
         />
 
         <AdminMetricCard
-          title="Top College"
+          title="TOP INSTITUTION"
           value={isLoading ? '—' : topCollegeInfo.name}
           subtitle={isLoading ? '' : topCollegeInfo.subtitle}
           icon={GraduationCap}
@@ -257,21 +229,23 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      {/* Middle Analytics Grid: Registration Velocity & Track Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 2 Cols: Registration Velocity Chart */}
-        <div className="lg:col-span-2">
+      {/* Middle Analytics Grid: Program Activity & Program Overview Snapshot */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Left: Program Activity Timeline Chart */}
+        <div className="lg:col-span-7 flex flex-col">
           <RegistrationChart 
             enrollments={enrollments} 
             isLoading={isLoading} 
           />
         </div>
 
-        {/* 1 Col: Track Distribution Breakdown */}
-        <div className="lg:col-span-1">
-          <CourseDistribution 
-            courses={tracks} 
-            enrollments={enrollments} 
+        {/* Right: Program Overview / Snapshot Panel */}
+        <div className="lg:col-span-5 flex flex-col">
+          <ProgramOverviewPanel 
+            learnersCount={totalStudents} 
+            enrollmentsCount={totalRegistrations} 
+            activeEnrollmentsCount={activeEnrollmentsCount}
+            gigsCount={gigsCount}
             isLoading={isLoading} 
           />
         </div>

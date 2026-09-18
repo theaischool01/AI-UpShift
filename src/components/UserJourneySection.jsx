@@ -6,35 +6,26 @@ import dianaAvatar from '../assets/diana_johnston.jpg';
 const STORIES_DATA = [
   {
     id: 1,
-    name: 'Edward Alexander',
-    shortCode: 'EA',
-    rating: '4.9',
-    role: 'Undergraduate Builder · ReelRush & Vibe Coder Track',
-    quote: 'Overall pleasurable experience. Pay a little first and Pay a little during the development of the app as milestones are achieved, which made me feel very confident and comfortable. Seamless and Easy process.',
-    story: 'After completing the ReelRush and Vibe Coder tracks, I delivered three automated video workflows for an e-commerce brand. Having real proof of work changed every client conversation.',
-    badge: 'Verified Commercial Dispatch',
+    name: 'B. Deepak',
+    shortCode: 'BD',
+    role: 'Applied AI Builder',
+    quote: 'I started by helping with a few small projects. As I completed more work, I began receiving paid gigs regularly. I saved those earnings and bought my own laptop. That was the moment I felt I could genuinely build something for myself.',
     avatar: null
   },
   {
     id: 2,
     name: 'Likitha',
     shortCode: 'L',
-    rating: '5.0',
     role: 'Autonomous Agent Handler · AgentHandlers Track',
     quote: 'Zero prior coding background. Built client agents in 3 weeks with automated API workflows.',
-    story: 'AgentHandlers taught me how to wire multi-agent workflows with real APIs. Building and shipping functional tools gave me the confidence to pitch and close local businesses on custom automation.',
-    badge: 'Commercial Proof Verified',
     avatar: dianaAvatar
   },
   {
     id: 3,
-    name: 'Lauren Contreras',
-    shortCode: 'LC',
-    rating: '4.9',
-    role: 'AI Annotation Specialist · DeepAnnotator Track',
-    quote: 'Been working with UpShift for a number of years now with a variety of different apps. They have my recommendation. They are a great team.',
-    story: 'DeepAnnotator gave me hands-on dataset evaluation skills that enterprise teams actually need. The portfolio project I published through UpShift became my proof of competence for a remote data curation contract.',
-    badge: 'Sprint Retainer Completed',
+    name: 'Edward Alexander',
+    shortCode: 'EA',
+    role: 'Undergraduate Builder · ReelRush & Vibe Coder Track',
+    quote: 'Overall pleasurable experience. Pay a little first and Pay a little during the development of the app as milestones are achieved, which made me feel very confident and comfortable. Seamless and Easy process.',
     avatar: null
   }
 ];
