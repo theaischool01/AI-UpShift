@@ -87,24 +87,24 @@ export default function UserJourneySection() {
   const steps = [
     {
       number: '01',
-      label: 'LEARN',
-      title: 'Build the Skill',
+      label: 'BUILD THE SKILL',
+      title: 'Learn',
       description: 'Master applied AI capabilities through intensive applied learning built around real-world tools.',
       artifactLabel: 'Applied AI Curriculum',
       artifactContent: 'ReelRush · VibeCoder · BrandBuzz'
     },
     {
       number: '02',
-      label: 'PROOF OF WORK',
-      title: 'Show the Work',
+      label: 'SHOW THE WORK',
+      title: 'Proof of Work',
       description: 'Create and publish real deliverables that demonstrate what you can actually do.',
       artifactLabel: 'Verified Project Sheet',
       artifactContent: '100% Industry Fidelity Seal · Pinned Exhibit'
     },
     {
       number: '03',
-      label: 'EARNING',
-      title: 'Go After Opportunity',
+      label: 'GO AFTER OPPORTUNITY',
+      title: 'Earning',
       description: 'Connect your verified deliverables to client retainers, startup sprints, and paid opportunities.',
       artifactLabel: 'Opportunity Dispatch',
       artifactContent: 'Sprint Retainer · Freelance Brief'
