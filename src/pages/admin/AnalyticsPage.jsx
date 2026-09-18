@@ -3,19 +3,19 @@ import {
   TrendingUp, 
   Users, 
   GraduationCap, 
-  Sparkles, 
   Calendar, 
   Loader2, 
-  AlertCircle 
+  AlertCircle,
+  Layers,
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function AnalyticsPage() {
   const [dateRange, setDateRange] = useState('ALL'); // '7D', '30D', '90D', 'ALL'
-  const [selectedTrack, setSelectedTrack] = useState('ALL');
 
   const [enrollments, setEnrollments] = useState([]);
-  const [tracks, setTracks] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,44 +25,19 @@ export default function AnalyticsPage() {
     setError(null);
 
     try {
-      const [enrollmentsRes, tracksRes, profilesRes] = await Promise.all([
+      const [enrollmentsRes, profilesRes] = await Promise.all([
         supabase
           .from('enrollments')
-          .select('id, user_id, track_id, enrolled_at, status'),
-        supabase
-          .from('tracks')
-          .select('id, code, name, color, bg_color')
-          .order('code', { ascending: true }),
+          .select('id, user_id, enrolled_at, status'),
         supabase
           .from('profiles')
           .select('id, college, created_at')
           .eq('role', 'learner'),
       ]);
 
-      let activeTracks = tracksRes.data;
-      if (tracksRes.error || !activeTracks) {
-        const fallbackRes = await supabase
-          .from('courses')
-          .select('id, code, name, color, bg_color')
-          .order('code', { ascending: true });
-        activeTracks = fallbackRes.data || [];
-      }
-
-      let activeEnrollments = enrollmentsRes.data;
-      if (enrollmentsRes.error || !activeEnrollments) {
-        const fallbackRes = await supabase
-          .from('enrollments')
-          .select('id, user_id, course_id, enrolled_at, status');
-        activeEnrollments = (fallbackRes.data || []).map(e => ({
-          ...e,
-          track_id: e.course_id
-        }));
-      }
-
       if (profilesRes.error) throw profilesRes.error;
 
-      setEnrollments(activeEnrollments || []);
-      setTracks(activeTracks || []);
+      setEnrollments(enrollmentsRes.data || []);
       setProfiles(profilesRes.data || []);
     } catch (err) {
       console.error('[AnalyticsPage] Data load error:', err);
@@ -84,8 +59,6 @@ export default function AnalyticsPage() {
     else if (dateRange === '90D') cutoff = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
     const activeEnrollments = enrollments.filter(e => {
-      const tid = e.track_id || e.course_id;
-      if (selectedTrack !== 'ALL' && tid !== selectedTrack) return false;
       if (cutoff && new Date(e.enrolled_at) < cutoff) return false;
       return true;
     });
@@ -93,6 +66,7 @@ export default function AnalyticsPage() {
     const profileMap = new Map();
     profiles.forEach(p => profileMap.set(p.id, p));
 
+    // College distribution
     const collegeCounts = {};
     activeEnrollments.forEach(e => {
       const p = profileMap.get(e.user_id);
@@ -104,26 +78,21 @@ export default function AnalyticsPage() {
       .map(([college, count]) => ({ college, count }))
       .sort((a, b) => b.count - a.count);
 
-    const trackCountMap = {};
-    tracks.forEach(t => { trackCountMap[t.id] = 0; });
+    // Status breakdown
+    const statusCounts = { active: 0, completed: 0, dropped: 0, pending: 0 };
     activeEnrollments.forEach(e => {
-      const tid = e.track_id || e.course_id;
-      if (trackCountMap[tid] !== undefined) {
-        trackCountMap[tid]++;
+      const st = (e.status || 'active').toLowerCase();
+      if (statusCounts[st] !== undefined) {
+        statusCounts[st]++;
+      } else {
+        statusCounts.active++;
       }
     });
 
-    const trackDistribution = tracks.map(t => ({
-      ...t,
-      count: trackCountMap[t.id] || 0,
-      percentage: activeEnrollments.length > 0 
-        ? Math.round(((trackCountMap[t.id] || 0) / activeEnrollments.length) * 100) 
-        : 0,
-    }));
-
+    // Timeline
     const dailyMap = {};
     activeEnrollments.forEach(e => {
-      const dateKey = new Date(e.enrolled_at).toISOString().split('T')[0];
+      const dateKey = new Date(e.enrolled_at || Date.now()).toISOString().split('T')[0];
       dailyMap[dateKey] = (dailyMap[dateKey] || 0) + 1;
     });
 
@@ -137,10 +106,10 @@ export default function AnalyticsPage() {
     return {
       totalRegistrations: activeEnrollments.length,
       colleges: sortedColleges,
-      trackDistribution,
+      statusCounts,
       timeline,
     };
-  }, [enrollments, tracks, profiles, dateRange, selectedTrack]);
+  }, [enrollments, profiles, dateRange]);
 
   return (
     <div className="admin-page">
@@ -149,10 +118,10 @@ export default function AnalyticsPage() {
         <div className="admin-page-title-group">
           <h1 className="admin-page-title">
             <TrendingUp size={22} />
-            <span>Registration & Growth Analytics</span>
+            <span>UpShift Enrollment & Growth Analytics</span>
           </h1>
           <p className="admin-page-description">
-            Explore enrollment velocity, track demand distribution, and institutional breakdown.
+            Program-wide learner velocity, cohort progression, and institutional enrollment breakdown.
           </p>
         </div>
 
@@ -180,19 +149,6 @@ export default function AnalyticsPage() {
               </button>
             ))}
           </div>
-
-          {/* Track Selector */}
-          <select
-            value={selectedTrack}
-            onChange={(e) => setSelectedTrack(e.target.value)}
-            className="admin-select"
-            style={{ width: 'auto', minWidth: '160px', height: '36px', fontSize: '12px' }}
-          >
-            <option value="ALL">All UpShift Tracks</option>
-            {tracks.map(t => (
-              <option key={t.id} value={t.id}>{t.code} — {t.name}</option>
-            ))}
-          </select>
         </div>
       </div>
 
@@ -214,90 +170,120 @@ export default function AnalyticsPage() {
       {loading ? (
         <div className="admin-card" style={{ padding: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#6B7280' }}>
           <Loader2 size={24} className="animate-spin" style={{ color: '#E31B23' }} />
-          <span style={{ fontSize: '13px', fontWeight: 500 }}>Aggregating analytics data...</span>
+          <span style={{ fontSize: '13px', fontWeight: 500 }}>Aggregating program analytics...</span>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Key KPI Row */}
           <div className="admin-grid-3">
             <div className="admin-card admin-card-compact">
-              <span className="admin-stat-label">Active Period Registrations</span>
+              <span className="admin-stat-label">UpShift Enrollments</span>
               <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#E31B23' }}>
                 {filteredData.totalRegistrations}
               </p>
+              <span style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px', display: 'block' }}>
+                Selected period admissions
+              </span>
             </div>
 
             <div className="admin-card admin-card-compact">
-              <span className="admin-stat-label">Unique Colleges / Universities</span>
-              <p className="admin-stat-value" style={{ margin: '4px 0 0 0' }}>
+              <span className="admin-stat-label">Represented Colleges</span>
+              <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#2563EB' }}>
                 {filteredData.colleges.length}
               </p>
+              <span style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px', display: 'block' }}>
+                Active partner universities
+              </span>
             </div>
 
             <div className="admin-card admin-card-compact">
-              <span className="admin-stat-label">Track Diversity</span>
+              <span className="admin-stat-label">Program Architecture</span>
               <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#059669' }}>
-                {tracks.length} Applied Tracks
+                1 Program
               </p>
+              <span style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px', display: 'block' }}>
+                Unified UpShift experience
+              </span>
             </div>
           </div>
 
-          {/* Split View: Track Distribution & College Leaderboard */}
+          {/* Split View: Program Enrollment Status & College Distribution */}
           <div className="admin-dashboard-split">
-            {/* Track Enrollment Distribution */}
+            {/* Program Enrollment Status */}
             <div className="admin-card">
               <div className="admin-card-header">
                 <div className="admin-card-header-left">
                   <span className="admin-card-eyebrow" style={{ color: '#059669' }}>
-                    <Sparkles size={13} />
-                    <span>Track Demand</span>
+                    <Layers size={13} />
+                    <span>Progression</span>
                   </span>
-                  <h3 className="admin-card-title">Track Distribution</h3>
+                  <h3 className="admin-card-title">Program Enrollment Status</h3>
                 </div>
               </div>
 
-              <div className="admin-track-list">
-                {filteredData.trackDistribution.map(track => {
-                  const accentColor = track.color || '#E31B23';
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '8px' }}>
+                {/* Active Row */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: 600, color: '#111827', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                      Active Learners
+                    </span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#111827' }}>
+                      {filteredData.statusCounts.active} ({filteredData.totalRegistrations > 0 ? Math.round((filteredData.statusCounts.active / filteredData.totalRegistrations) * 100) : 0}%)
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: '8px', backgroundColor: '#F3F4F6', borderRadius: '9999px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${filteredData.totalRegistrations > 0 ? (filteredData.statusCounts.active / filteredData.totalRegistrations) * 100 : 0}%`,
+                      height: '100%',
+                      backgroundColor: '#10B981',
+                      borderRadius: '9999px'
+                    }} />
+                  </div>
+                </div>
 
-                  return (
-                    <div key={track.id} className="admin-track-row">
-                      <div className="admin-track-identity">
-                        <span 
-                          className="admin-track-code"
-                          style={{ 
-                            backgroundColor: `${accentColor}18`, 
-                            color: accentColor,
-                            border: `1px solid ${accentColor}35`
-                          }}
-                        >
-                          {track.code}
-                        </span>
-                        <span className="admin-track-name" title={track.name}>
-                          {track.name}
-                        </span>
-                      </div>
+                {/* Completed Row */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: 600, color: '#111827', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#3B82F6' }} />
+                      Completed
+                    </span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#111827' }}>
+                      {filteredData.statusCounts.completed} ({filteredData.totalRegistrations > 0 ? Math.round((filteredData.statusCounts.completed / filteredData.totalRegistrations) * 100) : 0}%)
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: '8px', backgroundColor: '#F3F4F6', borderRadius: '9999px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${filteredData.totalRegistrations > 0 ? (filteredData.statusCounts.completed / filteredData.totalRegistrations) * 100 : 0}%`,
+                      height: '100%',
+                      backgroundColor: '#3B82F6',
+                      borderRadius: '9999px'
+                    }} />
+                  </div>
+                </div>
 
-                      <div className="admin-track-bar-container">
-                        <div className="admin-track-bar-bg">
-                          <div 
-                            className="admin-track-bar-fill"
-                            style={{ 
-                              width: `${track.percentage}%`,
-                              backgroundColor: accentColor,
-                              minWidth: track.count > 0 ? '4px' : '0px'
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="admin-track-meta">
-                        <span className="admin-track-count">{track.count}</span>
-                        <span className="admin-track-pct">({track.percentage}%)</span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {/* Dropped Row */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: 600, color: '#111827', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
+                      Dropped / Inactive
+                    </span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#111827' }}>
+                      {filteredData.statusCounts.dropped} ({filteredData.totalRegistrations > 0 ? Math.round((filteredData.statusCounts.dropped / filteredData.totalRegistrations) * 100) : 0}%)
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: '8px', backgroundColor: '#F3F4F6', borderRadius: '9999px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${filteredData.totalRegistrations > 0 ? (filteredData.statusCounts.dropped / filteredData.totalRegistrations) * 100 : 0}%`,
+                      height: '100%',
+                      backgroundColor: '#EF4444',
+                      borderRadius: '9999px'
+                    }} />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -309,7 +295,7 @@ export default function AnalyticsPage() {
                     <GraduationCap size={13} />
                     <span>Institutions</span>
                   </span>
-                  <h3 className="admin-card-title">Top Registered Colleges</h3>
+                  <h3 className="admin-card-title">College Distribution</h3>
                 </div>
               </div>
 

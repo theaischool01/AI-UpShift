@@ -88,6 +88,7 @@ export default function GigsPage() {
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
+      // Primary query: Attempt relational join with tracks
       let query = supabase
         .from('gigs')
         .select(`
@@ -107,7 +108,8 @@ export default function GigsPage() {
           track:tracks (
             id,
             code,
-            name
+            name,
+            color
           )
         `, { count: 'exact' });
 
@@ -122,19 +124,20 @@ export default function GigsPage() {
       }
 
       // Order & Paginate
-      const { data, count, error: queryError } = await query
+      let { data, count, error: queryError } = await query
         .order('created_at', { ascending: false })
         .range(from, to);
 
       if (queryError) {
-        console.warn('[GigsPage] Relational query error, falling back to flat query:', queryError);
-        let flatQuery = supabase
+        console.warn('[GigsPage] Relational tracks query not available, trying courses relation fallback:', queryError.message || queryError);
+        
+        let legacyRelQuery = supabase
           .from('gigs')
           .select(`
             id,
             external_gig_id,
             title,
-            track_id,
+            course_id,
             short_description,
             overview,
             responsibilities,
@@ -143,30 +146,89 @@ export default function GigsPage() {
             proof_spec,
             origin_url,
             payment_amount,
-            created_at
+            created_at,
+            course:courses (
+              id,
+              code,
+              name,
+              color
+            )
           `, { count: 'exact' });
 
         if (debouncedSearch) {
-          flatQuery = flatQuery.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
+          legacyRelQuery = legacyRelQuery.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
         }
         if (selectedTrack !== 'ALL') {
-          flatQuery = flatQuery.eq('track_id', selectedTrack);
+          legacyRelQuery = legacyRelQuery.eq('course_id', selectedTrack);
         }
 
-        const { data: flatData, count: flatCount, error: flatError } = await flatQuery
+        const legacyRelRes = await legacyRelQuery
           .order('created_at', { ascending: false })
           .range(from, to);
 
-        if (flatError) throw flatError;
-        setGigs(flatData || []);
-        setTotalGigs(flatCount || 0);
-      } else {
-        setGigs(data || []);
-        setTotalGigs(count || 0);
+        if (!legacyRelRes.error && legacyRelRes.data) {
+          data = legacyRelRes.data.map(g => ({
+            ...g,
+            track_id: g.course_id,
+            track: g.course
+          }));
+          count = legacyRelRes.count;
+          queryError = null;
+        } else {
+          console.warn('[GigsPage] Courses relation failed, attempting flat query:', legacyRelRes.error?.message || legacyRelRes.error);
+          
+          let flatQuery = supabase
+            .from('gigs')
+            .select(`
+              id,
+              external_gig_id,
+              title,
+              short_description,
+              overview,
+              responsibilities,
+              deliverables,
+              requirements,
+              proof_spec,
+              origin_url,
+              payment_amount,
+              created_at
+            `, { count: 'exact' });
+
+          if (debouncedSearch) {
+            flatQuery = flatQuery.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
+          }
+
+          const flatRes = await flatQuery
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+          if (flatRes.error) {
+            console.error('[GigsPage] Diagnostic DB error details:', {
+              code: flatRes.error.code,
+              message: flatRes.error.message,
+              details: flatRes.error.details,
+              hint: flatRes.error.hint
+            });
+            throw flatRes.error;
+          }
+
+          data = (flatRes.data || []).map(g => {
+            const trackMatch = tracks.find(t => t.id === g.track_id || t.id === g.course_id);
+            return {
+              ...g,
+              track_id: g.track_id || g.course_id,
+              track: trackMatch || null
+            };
+          });
+          count = flatRes.count || data.length;
+        }
       }
+
+      setGigs(data || []);
+      setTotalGigs(count || 0);
     } catch (err) {
       console.error('[GigsPage] Fetch gigs error:', err);
-      setError('Unable to load commercial opportunities. Please refresh.');
+      setError(`Unable to load commercial opportunities: ${err.message || 'Database connection error'}. Please refresh.`);
     } finally {
       setLoading(false);
     }
@@ -290,9 +352,9 @@ export default function GigsPage() {
                 setPage(1);
               }}
               className="admin-select"
-              aria-label="Filter by UpShift track"
+              aria-label="Filter by UpShift module"
             >
-              <option value="ALL">All UpShift Tracks</option>
+              <option value="ALL">All UpShift Modules</option>
               {tracks.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.code} — {t.name}
@@ -337,9 +399,10 @@ export default function GigsPage() {
               <thead>
                 <tr>
                   <th>Opportunity</th>
-                  <th>Track</th>
+                  <th>Gig ID</th>
+                  <th>Module</th>
                   <th>Compensation</th>
-                  <th>Apply Gateway</th>
+                  <th>Gateway</th>
                   <th>Created</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
@@ -356,13 +419,29 @@ export default function GigsPage() {
                           {gig.title}
                         </div>
                         {gig.short_description && (
-                          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, maxWidth: '420px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, maxWidth: '380px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {gig.short_description}
                           </p>
                         )}
                       </td>
 
-                      {/* Track Code / Badge */}
+                      {/* Gig ID */}
+                      <td>
+                        <span style={{ 
+                          display: 'inline-flex', 
+                          padding: '2px 6px', 
+                          borderRadius: '4px', 
+                          fontSize: '11px', 
+                          fontWeight: 700, 
+                          fontFamily: 'monospace',
+                          backgroundColor: '#F3F4F6',
+                          color: '#4B5563'
+                        }}>
+                          {gig.external_gig_id || '—'}
+                        </span>
+                      </td>
+
+                      {/* Module Code / Badge */}
                       <td>
                         <span style={{ 
                           display: 'inline-flex', 
@@ -387,7 +466,7 @@ export default function GigsPage() {
                         </span>
                       </td>
 
-                      {/* Apply Gateway Origin */}
+                      {/* Apply Gateway */}
                       <td>
                         {gig.origin_url ? (
                           <a
@@ -396,9 +475,9 @@ export default function GigsPage() {
                             rel="noopener noreferrer"
                             className="admin-link"
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#4F46E5', fontWeight: 500 }}
-                            title={gig.origin_url}
+                            title="Open external apply gateway"
                           >
-                            <span>Open URL</span>
+                            <span>Gateway</span>
                             <ExternalLink size={11} />
                           </a>
                         ) : (

@@ -264,3 +264,6 @@ export const PROGRAMS_DATA = [
     }
   }
 ];
+
+export const UPSHIFT_TRACKS = PROGRAMS_DATA;
+export default PROGRAMS_DATA;

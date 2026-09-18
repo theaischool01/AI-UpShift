@@ -1241,7 +1241,7 @@
 
 .admin-input-icon {
   position: absolute;
-  left: 13px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: #9CA3AF;
@@ -1250,6 +1250,16 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
+  width: 20px;
+  height: 20px;
+}
+
+.admin-input-icon svg,
+.admin-input-icon .lucide {
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex-shrink: 0;
 }
 
 .admin-input,
@@ -1269,7 +1279,18 @@
 
 .admin-input-with-icon,
 .admin-select.admin-input-with-icon {
-  padding-left: 38px !important;
+  padding-left: 46px !important;
+}
+
+.admin-input-right-action {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
 .admin-textarea {

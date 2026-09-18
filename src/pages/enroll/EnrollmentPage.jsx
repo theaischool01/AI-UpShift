@@ -62,6 +62,17 @@ export default function EnrollmentPage() {
   const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
+    // Reset scroll position to the absolute top of the page immediately upon entering enrollment
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
     if (location.state?.gig) {
       setSelectedGig(location.state.gig);
     } else if (gigParam) {

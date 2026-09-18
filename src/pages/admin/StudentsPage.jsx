@@ -12,7 +12,6 @@ import {
   AlertCircle, 
   CheckCircle2, 
   GraduationCap,
-  Sparkles,
   Mail
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
@@ -23,7 +22,6 @@ export default function StudentsPage() {
   // Data states
   const [students, setStudents] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [tracks, setTracks] = useState([]);
   const [collegeList, setCollegeList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -31,7 +29,6 @@ export default function StudentsPage() {
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedTrack, setSelectedTrack] = useState('all');
   const [selectedCollege, setSelectedCollege] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
 
@@ -51,30 +48,16 @@ export default function StudentsPage() {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // 2. Fetch Filter Metadata (Tracks & Colleges)
+  // 2. Fetch Colleges Metadata
   useEffect(() => {
     async function loadFilterMetadata() {
       try {
-        let { data: tracksData, error } = await supabase
-          .from('tracks')
-          .select('id, code, name, color')
-          .order('code', { ascending: true });
-
-        if (error) {
-          const fallbackRes = await supabase
-            .from('courses')
-            .select('id, code, name, color')
-            .order('code', { ascending: true });
-          tracksData = fallbackRes.data || [];
-        }
-
         const collegesRes = await supabase
           .from('profiles')
           .select('college')
           .eq('role', 'learner')
           .not('college', 'is', null);
 
-        if (tracksData) setTracks(tracksData);
         if (collegesRes.data) {
           const uniqueColleges = Array.from(
             new Set(collegesRes.data.map((c) => c.college?.trim()).filter(Boolean))
@@ -88,16 +71,16 @@ export default function StudentsPage() {
     loadFilterMetadata();
   }, [refreshTrigger]);
 
-  // 3. Main Server-Side Query
+  // 3. Main Server-Side Query (Program-wide enrollment)
   const fetchStudents = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const needsInnerEnrollment = selectedTrack !== 'all' || selectedStatus !== 'all';
+      const needsInnerEnrollment = selectedStatus !== 'all';
       const enrollmentSelect = needsInnerEnrollment
-        ? 'enrollments!inner(id, enrolled_at, status, track_id, track:tracks(id, code, name, color))'
-        : 'enrollments(id, enrolled_at, status, track_id, track:tracks(id, code, name, color))';
+        ? 'enrollments!inner(id, enrolled_at, status)'
+        : 'enrollments(id, enrolled_at, status)';
 
       let query = supabase
         .from('profiles')
@@ -113,11 +96,6 @@ export default function StudentsPage() {
       // College Filter
       if (selectedCollege !== 'all') {
         query = query.eq('college', selectedCollege);
-      }
-
-      // Track Filter
-      if (selectedTrack !== 'all') {
-        query = query.eq('enrollments.track_id', selectedTrack);
       }
 
       // Status Filter
@@ -136,15 +114,10 @@ export default function StudentsPage() {
       const { data, count, error } = await query;
 
       if (error) {
-        console.warn('[StudentsPage] Relational query error, trying fallback query:', error);
-        // Fallback query for transitional schemas
-        const fallbackSelect = needsInnerEnrollment
-          ? 'enrollments!inner(id, enrolled_at, status, course_id, course:courses(id, code, name, color))'
-          : 'enrollments(id, enrolled_at, status, course_id, course:courses(id, code, name, color))';
-
+        console.warn('[StudentsPage] Primary query error, trying simple fallback:', error);
         let fbQuery = supabase
           .from('profiles')
-          .select(`id, full_name, email, college, college_email, created_at, ${fallbackSelect}`, { count: 'exact' })
+          .select('id, full_name, email, college, college_email, created_at', { count: 'exact' })
           .eq('role', 'learner');
 
         if (debouncedSearch) {
@@ -152,25 +125,13 @@ export default function StudentsPage() {
           fbQuery = fbQuery.or(`full_name.ilike.%${q}%,email.ilike.%${q}%,college_email.ilike.%${q}%,college.ilike.%${q}%`);
         }
         if (selectedCollege !== 'all') fbQuery = fbQuery.eq('college', selectedCollege);
-        if (selectedTrack !== 'all') fbQuery = fbQuery.eq('enrollments.course_id', selectedTrack);
-        if (selectedStatus !== 'all') fbQuery = fbQuery.eq('enrollments.status', selectedStatus);
 
         const { data: fbData, count: fbCount, error: fbError } = await fbQuery
           .order('created_at', { ascending: false })
           .range(startIndex, endIndex);
 
         if (fbError) throw fbError;
-
-        const normalizedData = (fbData || []).map(student => ({
-          ...student,
-          enrollments: (student.enrollments || []).map(e => ({
-            ...e,
-            track_id: e.course_id,
-            track: e.course
-          }))
-        }));
-
-        setStudents(normalizedData);
+        setStudents(fbData || []);
         setTotalCount(fbCount || 0);
       } else {
         setStudents(data || []);
@@ -182,16 +143,11 @@ export default function StudentsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [debouncedSearch, selectedTrack, selectedCollege, selectedStatus, currentPage, pageSize]);
+  }, [debouncedSearch, selectedCollege, selectedStatus, currentPage, pageSize]);
 
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents, refreshTrigger]);
-
-  const handleTrackFilterChange = (val) => {
-    setSelectedTrack(val);
-    setCurrentPage(1);
-  };
 
   const handleCollegeFilterChange = (val) => {
     setSelectedCollege(val);
@@ -294,7 +250,7 @@ export default function StudentsPage() {
             backgroundColor: '#F3F4F6',
             color: '#4B5563'
           }}>
-            {status || 'Unknown'}
+            {status || 'Active'}
           </span>
         );
     }
@@ -310,7 +266,7 @@ export default function StudentsPage() {
             <span>Students Directory</span>
           </h1>
           <p className="admin-page-description">
-            Manage enrolled learners, review UpShift track assignments, and institutional distribution.
+            Manage enrolled learners across the UpShift program and institutional distribution.
           </p>
         </div>
 
@@ -368,23 +324,6 @@ export default function StudentsPage() {
             />
           </div>
 
-          {/* Track Filter */}
-          <div>
-            <select
-              value={selectedTrack}
-              onChange={(e) => handleTrackFilterChange(e.target.value)}
-              className="admin-select"
-              aria-label="Filter by UpShift track"
-            >
-              <option value="all">All UpShift Tracks</option>
-              {tracks.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.code} — {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* College Filter */}
           <div>
             <select
@@ -438,7 +377,7 @@ export default function StudentsPage() {
               No Learners Found
             </h4>
             <p style={{ fontSize: '12.5px', color: '#6B7280', maxWidth: '440px', margin: '0 auto 20px auto', lineHeight: 1.5 }}>
-              {searchTerm || selectedTrack !== 'all' || selectedCollege !== 'all' || selectedStatus !== 'all'
+              {searchTerm || selectedCollege !== 'all' || selectedStatus !== 'all'
                 ? 'No learners match your search criteria. Try adjusting your filters.'
                 : 'Get started by creating your first student account or uploading a bulk CSV roster.'}
             </p>
@@ -459,7 +398,7 @@ export default function StudentsPage() {
                   <th>Student</th>
                   <th>College</th>
                   <th>College Email</th>
-                  <th>Assigned Track</th>
+                  <th>Program</th>
                   <th>Registered</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Action</th>
@@ -470,8 +409,6 @@ export default function StudentsPage() {
                   const enrollment = Array.isArray(student.enrollments) && student.enrollments.length > 0
                     ? student.enrollments[0]
                     : null;
-                  const track = enrollment?.track;
-                  const trackColor = track?.color || '#E31B23';
 
                   return (
                     <tr key={student.id}>
@@ -495,33 +432,21 @@ export default function StudentsPage() {
                         {student.college_email || '—'}
                       </td>
 
-                      {/* Track */}
+                      {/* Program */}
                       <td>
-                        {track ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span 
-                              style={{ 
-                                backgroundColor: `${trackColor}18`, 
-                                color: trackColor,
-                                border: `1px solid ${trackColor}35`,
-                                padding: '2px 5px',
-                                borderRadius: '4px',
-                                fontSize: '10px',
-                                fontFamily: 'monospace',
-                                fontWeight: 800,
-                                textTransform: 'uppercase',
-                                flexShrink: 0
-                              }}
-                            >
-                              {track.code}
-                            </span>
-                            <span style={{ fontWeight: 500, color: '#1F2937', fontSize: '12.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '170px' }}>
-                              {track.name}
-                            </span>
-                          </div>
-                        ) : (
-                          <span style={{ color: '#9CA3AF', fontStyle: 'italic', fontSize: '12px' }}>Not Assigned</span>
-                        )}
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          backgroundColor: '#F3F4F6',
+                          color: '#111827',
+                          border: '1px solid #E5E7EB'
+                        }}>
+                          UpShift
+                        </span>
                       </td>
 
                       {/* Registered Date */}
@@ -649,25 +574,16 @@ export default function StudentsPage() {
 
               <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '12px' }}>
                 <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                  Program & Track Enrollment
+                  Program Enrollment
                 </span>
-                {Array.isArray(viewingStudent.enrollments) && viewingStudent.enrollments.length > 0 ? (
-                  <div style={{ marginTop: '8px', padding: '10px 12px', borderRadius: '8px', backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#111827' }}>
-                      Program: UpShift Complete Applied AI Program
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#4B5563' }}>
-                      Assigned Track: <strong>{viewingStudent.enrollments[0]?.track?.code} — {viewingStudent.enrollments[0]?.track?.name}</strong>
-                    </div>
-                    <div style={{ fontSize: '11.5px', color: '#6B7280', fontFamily: 'monospace' }}>
-                      Enrolled: {formatDate(viewingStudent.enrollments[0]?.enrolled_at)} · Status: {viewingStudent.enrollments[0]?.status}
-                    </div>
+                <div style={{ marginTop: '8px', padding: '10px 12px', borderRadius: '8px', backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#111827' }}>
+                    UpShift Complete Applied AI Program
                   </div>
-                ) : (
-                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#9CA3AF', fontStyle: 'italic' }}>
-                    No active track enrollment recorded.
-                  </p>
-                )}
+                  <div style={{ fontSize: '11.5px', color: '#6B7280', fontFamily: 'monospace' }}>
+                    Enrolled: {formatDate(viewingStudent.created_at)} · Status: Active
+                  </div>
+                </div>
               </div>
             </div>
 

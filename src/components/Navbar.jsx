@@ -52,6 +52,7 @@ export default function Navbar({ onOpenRegistration }) {
   const navItems = [
     { id: 'programs', label: 'Programs' },
     { id: 'how-it-works', label: 'How It Works' },
+    { id: 'outcomes', label: 'Outcomes' },
     { id: 'opportunities', label: 'Opportunities' },
   ];
 
@@ -76,13 +77,13 @@ export default function Navbar({ onOpenRegistration }) {
         {/* LEFT: Brand Lockup (THE AI SCHOOL | UpShift) */}
         <div 
           onClick={() => handleNavigate('hero')}
-          className="flex items-center gap-2 cursor-pointer shrink-0 select-none group"
+          className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 select-none group min-w-0"
           style={{ textDecoration: 'none' }}
         >
           <div 
             style={{
-              width: '28px',
-              height: '28px',
+              width: '26px',
+              height: '26px',
               borderRadius: '50%',
               overflow: 'hidden',
               border: isHero ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,0,0,0.15)',
@@ -100,13 +101,13 @@ export default function Navbar({ onOpenRegistration }) {
               style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
             />
           </div>
-          <div className="flex items-center gap-1.5 leading-none">
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '11.5px', fontWeight: '800', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          <div className="flex items-center gap-1 sm:gap-1.5 leading-none whitespace-nowrap">
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '11px', fontWeight: '800', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
               <span style={{ color: isHero ? '#FFFFFF' : '#111111' }}>THE </span>
               <span style={{ color: '#E31B23' }}>AI SCHOOL</span>
             </span>
-            <span style={{ color: isHero ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: '12px', fontWeight: '300' }}>|</span>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: '800', letterSpacing: '-0.01em' }}>
+            <span style={{ color: isHero ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: '11px', fontWeight: '300' }}>|</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '12.5px', fontWeight: '800', letterSpacing: '-0.01em' }}>
               <UpShiftWordmark theme={isHero ? 'dark' : 'light'} />
             </span>
           </div>
@@ -205,31 +206,67 @@ export default function Navbar({ onOpenRegistration }) {
 
         {/* Mobile Hamburger Toggle */}
         <button
+          type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className={`nav-toggle-mobile p-1.5 transition-colors ${isHero ? 'text-white hover:text-[#E31B23]' : 'text-[#111111] hover:text-[#E31B23]'}`}
-          aria-label="Toggle Mobile Menu"
+          className={`nav-toggle-mobile p-2 transition-colors cursor-pointer ${isHero ? 'text-white hover:text-[#E31B23]' : 'text-[#111111] hover:text-[#E31B23]'}`}
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileMenuOpen}
+          style={{
+            minWidth: '44px',
+            minHeight: '44px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer'
+          }}
         >
-          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          {mobileMenuOpen ? (
+            <X size={24} strokeWidth={2.4} style={{ color: isHero ? '#FFFFFF' : '#111111' }} />
+          ) : (
+            <Menu size={24} strokeWidth={2.4} style={{ color: isHero ? '#FFFFFF' : '#111111' }} />
+          )}
         </button>
       </nav>
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div 
-          className="nav-mobile-dropdown mt-2 p-4 rounded-2xl border border-white/10 bg-[#111111]/95 backdrop-blur-xl shadow-2xl flex flex-col gap-3 animate-fadeIn select-none"
-          style={{ animationDuration: '200ms' }}
+          className="nav-mobile-dropdown mt-2.5 p-4 rounded-2xl flex flex-col gap-3 animate-fadeIn select-none"
+          style={{ 
+            animationDuration: '180ms', 
+            pointerEvents: 'auto',
+            position: 'relative',
+            zIndex: 1002,
+            width: '100%',
+            maxWidth: 'min(980px, calc(100vw - 32px))',
+            backgroundColor: '#080808',
+            background: '#080808',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+            boxSizing: 'border-box'
+          }}
         >
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             {navItems.map((item) => {
               const isActive = activeSection === item.id || (item.id === 'programs' && activeSection === 'courses');
               return (
                 <button
                   key={item.id}
+                  type="button"
                   onClick={() => handleNavigate(item.id)}
-                  className="px-4 py-2.5 rounded-xl font-display text-sm font-semibold text-left transition-colors"
+                  className="px-4 py-3 rounded-xl font-display text-sm font-semibold text-left transition-colors flex items-center"
                   style={{
-                    backgroundColor: isActive ? '#FFFFFF' : 'transparent',
-                    color: isActive ? '#111111' : 'rgba(255, 255, 255, 0.90)'
+                    minHeight: '44px',
+                    backgroundColor: isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.06)',
+                    color: isActive ? '#080808' : '#FFFFFF',
+                    border: isActive ? '1px solid #FFFFFF' : '1px solid rgba(255, 255, 255, 0.05)',
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                    width: '100%',
+                    fontWeight: isActive ? '700' : '600'
                   }}
                 >
                   {item.label}
@@ -238,13 +275,28 @@ export default function Navbar({ onOpenRegistration }) {
             })}
           </div>
 
-          <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
+          <div 
+            className="pt-3 flex flex-col gap-2.5"
+            style={{ borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}
+          >
             {user ? (
               <Link
                 to={role === 'admin' ? '/admin/dashboard' : '/learner/dashboard'}
                 onClick={() => setMobileMenuOpen(false)}
                 className="btn btn-secondary btn-md w-full justify-center font-bold"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#ffffff', borderRadius: '9999px', textDecoration: 'none' }}
+                style={{ 
+                  minHeight: '44px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+                  color: '#FFFFFF', 
+                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  borderRadius: '9999px', 
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'auto',
+                  fontSize: '13px'
+                }}
               >
                 <span>WORKSPACE</span>
               </Link>
@@ -253,7 +305,19 @@ export default function Navbar({ onOpenRegistration }) {
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
                 className="btn btn-secondary btn-md w-full justify-center font-bold"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#ffffff', borderRadius: '9999px', textDecoration: 'none' }}
+                style={{ 
+                  minHeight: '44px', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)', 
+                  color: '#FFFFFF', 
+                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  borderRadius: '9999px', 
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'auto',
+                  fontSize: '13px'
+                }}
               >
                 <span>LOGIN</span>
               </Link>
@@ -262,7 +326,20 @@ export default function Navbar({ onOpenRegistration }) {
               to="/enroll"
               onClick={() => setMobileMenuOpen(false)}
               className="btn btn-primary btn-md w-full justify-center font-extrabold"
-              style={{ backgroundColor: '#E31B23', borderRadius: '9999px', color: '#FFFFFF', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{ 
+                minHeight: '44px', 
+                backgroundColor: '#E31B23', 
+                borderRadius: '9999px', 
+                color: '#FFFFFF', 
+                textDecoration: 'none', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '6px',
+                pointerEvents: 'auto',
+                fontSize: '13px',
+                boxShadow: '0 4px 16px rgba(227, 27, 35, 0.45)'
+              }}
             >
               <span>GET STARTED</span>
               <ArrowUpRight size={16} />

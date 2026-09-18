@@ -255,7 +255,7 @@ export default function AdminDashboardPage() {
       <RecentRegistrationsTable
         enrollments={enrollments}
         learnersMap={learnersMap}
-        coursesMap={tracksMap}
+        tracksMap={tracksMap}
         isLoading={isLoading}
       />
     </div>

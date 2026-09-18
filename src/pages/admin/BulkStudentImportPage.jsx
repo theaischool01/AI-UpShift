@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   UploadCloud, 
@@ -10,7 +10,8 @@ import {
   Loader2, 
   ArrowLeft, 
   AlertTriangle,
-  Users
+  Users,
+  Info
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
@@ -67,10 +68,6 @@ export default function BulkStudentImportPage() {
   const { session } = useAuth();
   const fileInputRef = useRef(null);
 
-  const [tracks, setTracks] = useState([]);
-  const [trackMap, setTrackMap] = useState(new Map());
-  const [loadingTracks, setLoadingTracks] = useState(true);
-
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [parseError, setParseError] = useState(null);
@@ -84,48 +81,12 @@ export default function BulkStudentImportPage() {
   const [importComplete, setImportComplete] = useState(false);
   const [importFailures, setImportFailures] = useState([]);
 
-  useEffect(() => {
-    async function loadTracks() {
-      try {
-        let { data, error } = await supabase
-          .from('tracks')
-          .select('id, code, name, category')
-          .order('code', { ascending: true });
-
-        if (error) {
-          const fallbackRes = await supabase
-            .from('courses')
-            .select('id, code, name, category')
-            .order('code', { ascending: true });
-          if (fallbackRes.error) throw error;
-          data = fallbackRes.data;
-        }
-
-        setTracks(data || []);
-
-        const map = new Map();
-        (data || []).forEach(t => {
-          map.set(t.id.toLowerCase(), t);
-          map.set(t.code.toLowerCase(), t);
-          map.set(t.id, t);
-          map.set(t.code, t);
-        });
-        setTrackMap(map);
-      } catch (err) {
-        console.warn('[BulkStudentImport] Failed to fetch tracks:', err);
-      } finally {
-        setLoadingTracks(false);
-      }
-    }
-    loadTracks();
-  }, []);
-
   const handleDownloadTemplate = () => {
-    const headers = ['full_name', 'email', 'college_email', 'college', 'password', 'track_id'];
+    const headers = ['full_name', 'email', 'college_email', 'college', 'password'];
     const sampleRows = [
-      ['Aarav Sharma', 'aarav.sharma@example.com', 'aarav@iitd.ac.in', 'IIT Delhi', 'Passphrase2026!', 'M1'],
-      ['Diya Patel', 'diya.patel@example.com', 'diya@nitw.ac.in', 'NIT Warangal', 'SecurePass2026#', 'M2'],
-      ['Rohan Gupta', 'rohan.gupta@example.com', 'rohan@bits.ac.in', 'BITS Pilani', 'VibeCoder99!', 'M4']
+      ['Aarav Sharma', 'aarav.sharma@example.com', 'aarav@iitd.ac.in', 'IIT Delhi', 'Passphrase2026!'],
+      ['Diya Patel', 'diya.patel@example.com', 'diya@nitw.ac.in', 'NIT Warangal', 'SecurePass2026#'],
+      ['Rohan Gupta', 'rohan.gupta@example.com', 'rohan@bits.ac.in', 'BITS Pilani', 'VibeCoder99!']
     ];
 
     const csvContent = [
@@ -178,7 +139,6 @@ export default function BulkStudentImportPage() {
         collegeEmail: rawHeaders.findIndex(h => h === 'college_email' || h === 'university_email' || h === 'edu_email'),
         college: rawHeaders.findIndex(h => h === 'college' || h === 'university' || h === 'institution'),
         password: rawHeaders.findIndex(h => h === 'password' || h === 'initial_password' || h === 'passphrase'),
-        track: rawHeaders.findIndex(h => h === 'track_id' || h === 'track' || h === 'course_id' || h === 'course' || h === 'module'),
       };
 
       const missing = [];
@@ -187,10 +147,9 @@ export default function BulkStudentImportPage() {
       if (colMap.collegeEmail === -1) missing.push('college_email');
       if (colMap.college === -1) missing.push('college');
       if (colMap.password === -1) missing.push('password');
-      if (colMap.track === -1) missing.push('track_id');
 
       if (missing.length > 0) {
-        setParseError(`Missing required CSV columns: ${missing.join(', ')}. Please use the template format.`);
+        setParseError(`Missing required CSV columns: ${missing.join(', ')}. Please use the standard template format.`);
         return;
       }
 
@@ -211,7 +170,6 @@ export default function BulkStudentImportPage() {
         const collegeEmail = (row[colMap.collegeEmail] || '').toLowerCase();
         const college = row[colMap.college] || '';
         const password = row[colMap.password] || '';
-        const rawTrack = row[colMap.track] || '';
 
         const rowErrors = [];
 
@@ -242,11 +200,6 @@ export default function BulkStudentImportPage() {
           rowErrors.push('Password under 8 characters');
         }
 
-        const matchedTrack = trackMap.get(rawTrack.toLowerCase()) || trackMap.get(rawTrack);
-        if (!matchedTrack) {
-          rowErrors.push(`Unrecognized Track: "${rawTrack}"`);
-        }
-
         const isValid = rowErrors.length === 0;
         if (isValid) validCount++;
         else invalidCount++;
@@ -258,10 +211,7 @@ export default function BulkStudentImportPage() {
           collegeEmail,
           college,
           password,
-          rawTrack,
-          trackId: matchedTrack?.id || rawTrack,
-          trackCode: matchedTrack?.code || rawTrack,
-          trackName: matchedTrack?.name || '',
+          program: 'UpShift',
           isValid,
           errors: rowErrors,
         });
@@ -340,7 +290,7 @@ export default function BulkStudentImportPage() {
                 college_email: row.collegeEmail,
                 college: row.college,
                 password: row.password,
-                track_id: row.trackId,
+                program_id: 'upshift-complete-program',
               },
             };
 
@@ -366,7 +316,6 @@ export default function BulkStudentImportPage() {
               full_name: row.fullName,
               email: row.email,
               college: row.college,
-              track_id: row.rawTrack,
               error: errReason,
             });
           }
@@ -390,7 +339,7 @@ export default function BulkStudentImportPage() {
   };
 
   const handleDownloadErrorReport = () => {
-    const headers = ['row', 'full_name', 'email', 'college', 'track_id', 'error'];
+    const headers = ['row', 'full_name', 'email', 'college', 'error'];
     
     const allErrors = [
       ...allValidatedRows.filter(r => !r.isValid).map(r => ({
@@ -398,7 +347,6 @@ export default function BulkStudentImportPage() {
         full_name: r.fullName,
         email: r.email,
         college: r.college,
-        track_id: r.rawTrack,
         error: r.errors.join('; '),
       })),
       ...importFailures
@@ -411,7 +359,6 @@ export default function BulkStudentImportPage() {
         `"${(e.full_name || '').replace(/"/g, '""')}"`,
         `"${(e.email || '').replace(/"/g, '""')}"`,
         `"${(e.college || '').replace(/"/g, '""')}"`,
-        `"${(e.track_id || '').replace(/"/g, '""')}"`,
         `"${(e.error || '').replace(/"/g, '""')}"`,
       ].join(','))
     ];
@@ -437,7 +384,7 @@ export default function BulkStudentImportPage() {
             <span>Bulk Student CSV Import</span>
           </h1>
           <p className="admin-page-description">
-            Upload a CSV file to register multiple learners and enroll them into UpShift with their assigned track.
+            Upload a CSV file to register multiple learners and enroll them into the UpShift Program.
           </p>
         </div>
 
@@ -459,6 +406,16 @@ export default function BulkStudentImportPage() {
             <ArrowLeft size={14} />
             <span>Back to Students</span>
           </Link>
+        </div>
+      </div>
+
+      {/* Info Notice on Unified Program Model */}
+      <div className="admin-alert" style={{ backgroundColor: '#F0F9FF', borderColor: '#BAE6FD', color: '#0369A1' }}>
+        <div className="admin-alert-content">
+          <Info size={16} />
+          <span>
+            <strong>Unified UpShift Enrollment:</strong> Module assignment is no longer required. All imported learners are automatically enrolled into the single UpShift program.
+          </span>
         </div>
       </div>
 
@@ -503,7 +460,7 @@ export default function BulkStudentImportPage() {
                 Drag & Drop Student CSV Roster
               </h3>
               <p style={{ fontSize: '12.5px', color: '#6B7280', margin: 0 }}>
-                or click to browse your computer (.csv up to 5MB)
+                or click to browse your computer (CSV format: full_name, email, college_email, college, password)
               </p>
             </div>
           </div>
@@ -647,8 +604,9 @@ export default function BulkStudentImportPage() {
                       <th>Status</th>
                       <th>Student Name</th>
                       <th>Account Email</th>
+                      <th>College Email</th>
                       <th>College</th>
-                      <th>Track Code</th>
+                      <th>Program</th>
                       <th>Notes / Issues</th>
                     </tr>
                   </thead>
@@ -669,10 +627,11 @@ export default function BulkStudentImportPage() {
                         </td>
                         <td style={{ fontWeight: 600 }}>{r.fullName || '—'}</td>
                         <td style={{ fontFamily: 'monospace' }}>{r.email}</td>
+                        <td style={{ fontFamily: 'monospace' }}>{r.collegeEmail || '—'}</td>
                         <td>{r.college}</td>
                         <td>
-                          <span style={{ padding: '2px 5px', borderRadius: '4px', fontSize: '10.5px', fontFamily: 'monospace', fontWeight: 700, backgroundColor: '#F3F4F6' }}>
-                            {r.trackCode}
+                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: 700, backgroundColor: '#F3F4F6', color: '#111827', border: '1px solid #E5E7EB' }}>
+                            UpShift
                           </span>
                         </td>
                         <td>

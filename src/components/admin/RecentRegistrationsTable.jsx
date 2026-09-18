@@ -1,15 +1,11 @@
 import React from 'react';
-import { Users, GraduationCap, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Users, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function RecentRegistrationsTable({
   enrollments = [],
   learnersMap = {},
-  coursesMap = {},
-  tracksMap = {},
   isLoading = false,
 }) {
-  const activeTracksMap = Object.keys(tracksMap).length > 0 ? tracksMap : coursesMap;
-
   if (isLoading) {
     return (
       <div className="admin-card" style={{ opacity: 0.6 }}>
@@ -115,7 +111,7 @@ export default function RecentRegistrationsTable({
             backgroundColor: '#F3F4F6',
             color: '#4B5563'
           }}>
-            {status || 'Unknown'}
+            {status || 'Active'}
           </span>
         );
     }
@@ -152,7 +148,7 @@ export default function RecentRegistrationsTable({
               <tr>
                 <th>Student</th>
                 <th>College / University</th>
-                <th>Assigned Track</th>
+                <th>Program</th>
                 <th>Enrolled Date</th>
                 <th>Status</th>
               </tr>
@@ -160,9 +156,6 @@ export default function RecentRegistrationsTable({
             <tbody>
               {recentItems.map((enrollment) => {
                 const learner = learnersMap[enrollment.user_id] || {};
-                const trackId = enrollment.track_id || enrollment.course_id;
-                const track = activeTracksMap[trackId] || {};
-                const accentColor = track.color || '#E31B23';
 
                 return (
                   <tr key={enrollment.id}>
@@ -202,22 +195,22 @@ export default function RecentRegistrationsTable({
                       </span>
                     </td>
 
-                    {/* Assigned Track */}
+                    {/* Program */}
                     <td>
                       <span style={{ 
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '5px',
-                        padding: '2px 7px',
+                        padding: '2px 8px',
                         borderRadius: '6px',
                         fontSize: '11px',
                         fontWeight: 700,
-                        backgroundColor: `${accentColor}15`,
-                        color: accentColor,
-                        border: `1px solid ${accentColor}30`,
+                        backgroundColor: '#F3F4F6',
+                        color: '#111827',
+                        border: '1px solid #E5E7EB',
                         fontFamily: 'monospace'
                       }}>
-                        {track.code ? `${track.code} · ` : ''}{track.name || trackId || '—'}
+                        UpShift
                       </span>
                     </td>
 

@@ -91,14 +91,51 @@ export default function LearnerGigDetailPage() {
           .maybeSingle();
 
         if (fetchErr) {
-          console.warn('[LearnerGigDetailPage] Relational query error, trying flat query fallback:', fetchErr);
+          console.warn('[LearnerGigDetailPage] Relational tracks query failed, trying courses relation fallback:', fetchErr);
+          let { data: courseData, error: courseErr } = await supabase
+            .from('gigs')
+            .select(`
+              id,
+              external_gig_id,
+              title,
+              course_id,
+              short_description,
+              overview,
+              responsibilities,
+              deliverables,
+              requirements,
+              proof_spec,
+              origin_url,
+              payment_amount,
+              created_at,
+              course:courses (
+                id,
+                code,
+                name,
+                category,
+                color,
+                bg_color
+              )
+            `)
+            .eq('id', gigId)
+            .maybeSingle();
+
+          if (!courseErr && courseData) {
+            setGig({
+              ...courseData,
+              track_id: courseData.course_id,
+              track: courseData.course
+            });
+            return;
+          }
+
+          console.warn('[LearnerGigDetailPage] Courses relation failed, trying flat query fallback:', courseErr);
           const { data: flatData, error: flatErr } = await supabase
             .from('gigs')
             .select(`
               id,
               external_gig_id,
               title,
-              track_id,
               short_description,
               overview,
               responsibilities,
@@ -115,18 +152,7 @@ export default function LearnerGigDetailPage() {
           if (flatErr) throw flatErr;
 
           if (flatData) {
-            let trackData = null;
-            const targetTrackId = flatData.track_id;
-            if (targetTrackId) {
-              const { data: tData } = await supabase
-                .from('tracks')
-                .select('id, code, name, category, color, bg_color')
-                .eq('id', targetTrackId)
-                .maybeSingle();
-              trackData = tData;
-            }
-
-            setGig({ ...flatData, track: trackData || null });
+            setGig({ ...flatData, track: null });
           } else {
             setGig(null);
           }

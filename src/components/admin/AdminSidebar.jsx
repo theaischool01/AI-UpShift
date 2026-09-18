@@ -46,9 +46,9 @@ export default function AdminSidebar({ isOpen = false, onClose = () => {} }) {
       ],
     },
     {
-      title: 'Programs',
+      title: 'Program',
       items: [
-        { label: 'Courses', to: '/admin/courses', icon: BookOpen },
+        { label: 'Applied Tracks', to: '/admin/courses', icon: BookOpen },
       ],
     },
     {

@@ -191,23 +191,52 @@ export default function AddGigPage() {
       };
 
       if (editGigId) {
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from('gigs')
           .update(payload)
           .eq('id', editGigId)
           .select()
           .single();
 
-        if (error) throw error;
+        if (error && (error.message?.includes('track_id') || error.code === 'PGRST204')) {
+          const fallbackPayload = { ...payload, course_id: payload.track_id };
+          delete fallbackPayload.track_id;
+          const fallbackRes = await supabase
+            .from('gigs')
+            .update(fallbackPayload)
+            .eq('id', editGigId)
+            .select()
+            .single();
+          if (fallbackRes.error) throw fallbackRes.error;
+          data = fallbackRes.data;
+          error = null;
+        } else if (error) {
+          throw error;
+        }
+
         navigate('/admin/gigs');
       } else {
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from('gigs')
           .insert([payload])
           .select()
           .single();
 
-        if (error) throw error;
+        if (error && (error.message?.includes('track_id') || error.code === 'PGRST204')) {
+          const fallbackPayload = { ...payload, course_id: payload.track_id };
+          delete fallbackPayload.track_id;
+          const fallbackRes = await supabase
+            .from('gigs')
+            .insert([fallbackPayload])
+            .select()
+            .single();
+          if (fallbackRes.error) throw fallbackRes.error;
+          data = fallbackRes.data;
+          error = null;
+        } else if (error) {
+          throw error;
+        }
+
         setSuccessGig(data);
       }
     } catch (err) {

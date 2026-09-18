@@ -26,8 +26,8 @@ const routeMetadata = {
     subtitle: 'Upload CSV roster with automatic preview, validation, and batch creation.',
   },
   '/admin/courses': {
-    title: 'Courses',
-    subtitle: 'Flagship curriculum tracks overview and seat distributions.',
+    title: 'Applied Tracks',
+    subtitle: 'Manage the six applied specialization tracks inside the UpShift program.',
   },
   '/admin/gigs': {
     title: 'Gigs',

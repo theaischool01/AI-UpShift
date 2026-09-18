@@ -269,12 +269,27 @@ export default function BulkGigImportPage() {
     }));
 
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('gigs')
         .insert(payloadBatch)
         .select();
 
-      if (error) throw error;
+      if (error && (error.message?.includes('track_id') || error.code === 'PGRST204')) {
+        const fallbackBatch = payloadBatch.map(item => {
+          const fb = { ...item, course_id: item.track_id };
+          delete fb.track_id;
+          return fb;
+        });
+        const fallbackRes = await supabase
+          .from('gigs')
+          .insert(fallbackBatch)
+          .select();
+        if (fallbackRes.error) throw fallbackRes.error;
+        data = fallbackRes.data;
+        error = null;
+      } else if (error) {
+        throw error;
+      }
 
       setImportProgress({
         current: validRowsToCreate.length,

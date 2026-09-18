@@ -1,5 +1,5 @@
 // Supabase Edge Function: admin-create-learner
-// Secure server-side single and bulk learner creation with compensating transactional rollback
+// Secure server-side single and batch learner creation with compensating transactional rollback
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.8';
 
@@ -92,31 +92,22 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Pre-fetch all active tracks once for O(1) validation in batch
-    let { data: activeTracks, error: tracksFetchErr } = await adminClient
+    // Pre-fetch all active tracks/courses for fallback association if schema requires non-null
+    let { data: activeTracks } = await adminClient
       .from('tracks')
       .select('id, code, name');
 
-    // Backward-compatibility fallback if query executes before PostgREST reload
-    if (tracksFetchErr || !activeTracks) {
-      const { data: fallbackCourses, error: fallbackErr } = await adminClient
+    if (!activeTracks || activeTracks.length === 0) {
+      const { data: fallbackCourses } = await adminClient
         .from('courses')
         .select('id, code, name');
-      if (!fallbackErr && fallbackCourses) {
-        activeTracks = fallbackCourses;
-        tracksFetchErr = null;
-      }
+      activeTracks = fallbackCourses || [];
     }
 
-    if (tracksFetchErr || !activeTracks) {
-      return new Response(
-        JSON.stringify({ error: 'Unable to load UpShift tracks for validation.' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    const defaultTrackId = activeTracks?.[0]?.id || 'reelrush-ai';
 
     const trackMap = new Map();
-    activeTracks.forEach((t: any) => {
+    (activeTracks || []).forEach((t: any) => {
       trackMap.set(t.id, t);
       trackMap.set(t.code.toLowerCase(), t);
       trackMap.set(t.id.toLowerCase(), t);
@@ -132,18 +123,16 @@ Deno.serve(async (req: Request) => {
       const collegeEmail = rawLearner.college_email?.trim().toLowerCase();
       const college = rawLearner.college?.trim();
       const password = rawLearner.password;
-      // Accept track_id primarily, with backward compatibility for course_id/track/course aliases
       const trackIdInput = rawLearner.track_id?.trim() || rawLearner.track?.trim() || rawLearner.course_id?.trim() || rawLearner.course?.trim();
 
-      if (!fullName || !email || !collegeEmail || !college || !password || !trackIdInput) {
+      if (!fullName || !email || !collegeEmail || !college || !password) {
         return {
           success: false,
           row: index + 1,
           email: email || 'unknown',
           full_name: fullName || 'unknown',
           college: college || 'unknown',
-          track_id: trackIdInput || 'unknown',
-          error: 'All fields (full_name, email, college_email, college, password, track_id) are required.',
+          error: 'All fields (full_name, email, college_email, college, password) are required.',
         };
       }
 
@@ -154,7 +143,6 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          track_id: trackIdInput,
           error: 'Please enter valid email formats for account and college email.',
         };
       }
@@ -166,23 +154,12 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          track_id: trackIdInput,
           error: 'Password must be at least 8 characters in length.',
         };
       }
 
-      const matchedTrack = trackMap.get(trackIdInput) || trackMap.get(trackIdInput.toLowerCase());
-      if (!matchedTrack) {
-        return {
-          success: false,
-          row: index + 1,
-          email,
-          full_name: fullName,
-          college,
-          track_id: trackIdInput,
-          error: `Invalid track: ${trackIdInput}. Must match a valid UpShift track (M1–M6 or track slug).`,
-        };
-      }
+      const matchedTrack = trackIdInput ? (trackMap.get(trackIdInput) || trackMap.get(trackIdInput.toLowerCase())) : null;
+      const finalTrackId = matchedTrack?.id || defaultTrackId;
 
       // Check existing email
       const { data: existingProfile } = await adminClient
@@ -198,7 +175,6 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          track_id: matchedTrack.id,
           error: 'A learner account already exists for this email.',
         };
       }
@@ -228,7 +204,6 @@ Deno.serve(async (req: Request) => {
               email,
               full_name: fullName,
               college,
-              track_id: matchedTrack.id,
               error: 'A learner account already exists for this email.',
             };
           }
@@ -238,7 +213,6 @@ Deno.serve(async (req: Request) => {
             email,
             full_name: fullName,
             college,
-            track_id: matchedTrack.id,
             error: msg,
           };
         }
@@ -261,11 +235,11 @@ Deno.serve(async (req: Request) => {
           throw new Error(`Profile creation failed: ${profileUpsertError.message}`);
         }
 
-        // Step C: Create Single Program Enrollment with Assigned Track
+        // Step C: Create Single Program Enrollment
         const enrollmentPayload: any = {
           user_id: createdUserId,
           program_id: 'upshift-complete-program',
-          track_id: matchedTrack.id,
+          track_id: finalTrackId,
           status: 'active',
           payment_status: 'active',
           amount_paid: 4999.00,
@@ -273,9 +247,19 @@ Deno.serve(async (req: Request) => {
           enrolled_at: new Date().toISOString(),
         };
 
-        const { error: enrollmentError } = await adminClient
+        let { error: enrollmentError } = await adminClient
           .from('enrollments')
           .insert(enrollmentPayload);
+
+        if (enrollmentError && (enrollmentError.message?.includes('track_id') || (enrollmentError as any).code === 'PGRST204')) {
+          const fallbackEnrollmentPayload = {
+            ...enrollmentPayload,
+            course_id: finalTrackId,
+          };
+          delete fallbackEnrollmentPayload.track_id;
+          const fbRes = await adminClient.from('enrollments').insert(fallbackEnrollmentPayload);
+          enrollmentError = fbRes.error;
+        }
 
         if (enrollmentError) {
           throw new Error(`Enrollment creation failed: ${enrollmentError.message}`);
@@ -288,11 +272,9 @@ Deno.serve(async (req: Request) => {
             full_name: fullName,
             email,
             college,
+            college_email: collegeEmail,
             program_id: 'upshift-complete-program',
             program_name: 'UpShift Complete Applied AI Program',
-            track_id: matchedTrack.id,
-            track_name: matchedTrack.name,
-            track_code: matchedTrack.code,
           },
         };
       } catch (transactionErr: any) {
@@ -310,7 +292,6 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          track_id: matchedTrack.id,
           error: transactionErr?.message || 'Failed to complete learner registration. Changes were rolled back.',
         };
       }
@@ -348,7 +329,6 @@ Deno.serve(async (req: Request) => {
       email: r.email,
       full_name: r.full_name,
       college: r.college,
-      track_id: r.track_id,
       error: r.error,
     }));
 

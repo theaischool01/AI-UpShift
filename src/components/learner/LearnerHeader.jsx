@@ -8,7 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import UpShiftWordmark from '../common/UpShiftWordmark';
 
-export default function LearnerHeader({ assignedTrack = null, enrolledCourses = [] }) {
+export default function LearnerHeader() {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +19,6 @@ export default function LearnerHeader({ assignedTrack = null, enrolledCourses = 
 
   const learnerName = profile?.full_name || user?.user_metadata?.full_name || 'Learner';
   const college = profile?.college || user?.user_metadata?.college || '';
-  const currentTrack = assignedTrack || enrolledCourses[0] || null;
 
   return (
     <header className="learner-header" aria-label="Learner Marketplace Header">
@@ -46,23 +45,21 @@ export default function LearnerHeader({ assignedTrack = null, enrolledCourses = 
           </div>
         </Link>
 
-        {/* Assigned Track Badge */}
-        {currentTrack && (
-          <div className="hidden md:flex items-center gap-2 pl-4 border-l border-[#E5E7EB]">
-            <span
-              className="learner-badge-track"
-              style={{
-                backgroundColor: currentTrack.bg_color || 'rgba(227, 27, 35, 0.1)',
-                color: currentTrack.color || '#E31B23',
-                border: `1px solid ${currentTrack.color ? `${currentTrack.color}33` : 'rgba(227, 27, 35, 0.25)'}`,
-              }}
-              title={`Assigned UpShift Track: ${currentTrack.code} — ${currentTrack.name}`}
-            >
-              <Sparkles className="w-3 h-3" />
-              <span>{currentTrack.code} · {currentTrack.name}</span>
-            </span>
-          </div>
-        )}
+        {/* UpShift Program Badge */}
+        <div className="hidden md:flex items-center gap-2 pl-4 border-l border-[#E5E7EB]">
+          <span
+            className="learner-badge-track"
+            style={{
+              backgroundColor: 'rgba(227, 27, 35, 0.08)',
+              color: '#E31B23',
+              border: '1px solid rgba(227, 27, 35, 0.2)',
+            }}
+            title="Enrolled in UpShift Program"
+          >
+            <Sparkles className="w-3 h-3" />
+            <span>UpShift Program</span>
+          </span>
+        </div>
       </div>
 
       {/* Right: Learner Identity & Actions */}

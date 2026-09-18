@@ -246,7 +246,8 @@ export default function UserJourneySection() {
         {/* Automatic 2-Column Editorial Slider (No Orbit / No Controls) */}
         {/* ============================================================ */}
         <div
-          className="journey-testimonial-slider-card"
+          id="outcomes"
+          className="journey-testimonial-slider-card scroll-mt-28 md:scroll-mt-32"
           role="region"
           aria-label="Real UpShift Stories Testimonials"
         >

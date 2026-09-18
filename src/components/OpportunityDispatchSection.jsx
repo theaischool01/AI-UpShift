@@ -458,7 +458,19 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
   const rightColumnCards = processedCards.filter(c => c.column === 'right');
 
   const handleCardClick = (cardId) => {
-    setActiveCardId(prev => prev === cardId ? null : cardId);
+    setActiveCardId(prev => (prev === cardId ? null : cardId));
+  };
+
+  const handleCardMouseEnter = (cardId) => {
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      setActiveCardId(cardId);
+    }
+  };
+
+  const handleGridMouseLeave = () => {
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      setActiveCardId(null);
+    }
   };
 
   const handleApplyClick = (card, e) => {
@@ -488,12 +500,14 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
       <div
         key={card.id}
         className={`opp-wall-card ${isActive ? 'is-active' : ''}`}
-        onMouseEnter={() => setActiveCardId(card.id)}
+        onMouseEnter={() => handleCardMouseEnter(card.id)}
         onClick={() => handleCardClick(card.id)}
         style={{
           backgroundColor: isActive ? card.cardBgHover : card.cardBg,
           border: `1px solid ${isActive ? card.cardBorderHover : card.cardBorder}`,
           boxShadow: isActive ? card.shadow : '0 2px 8px rgba(0, 0, 0, 0.04)',
+          cursor: 'pointer',
+          pointerEvents: 'auto',
         }}
         role="button"
         tabIndex={0}
@@ -699,7 +713,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
         {/* 2-Column Asymmetric Interactive Card Wall */}
         <div 
           className="opp-wall-grid"
-          onMouseLeave={() => setActiveCardId(null)}
+          onMouseLeave={handleGridMouseLeave}
         >
           {/* Left Column (M1, M2, M3) */}
           <div className="opp-wall-column">

@@ -69,6 +69,7 @@ export default function LearnerDashboardPage() {
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
 
+      // 1. Primary Relational Query with tracks
       let query = supabase
         .from('gigs')
         .select(`
@@ -90,7 +91,7 @@ export default function LearnerDashboardPage() {
           )
         `, { count: 'exact' });
 
-      // 1. Track-Aware Filtering
+      // Track-Aware Filtering
       if (mode === 'recommended') {
         if (assignedTrack?.id) {
           const targetIds = [
@@ -100,8 +101,7 @@ export default function LearnerDashboardPage() {
             assignedTrack.code?.toLowerCase(),
             assignedTrack.code?.toUpperCase()
           ].filter(Boolean);
-          const uniqueTargetIds = Array.from(new Set(targetIds));
-          query = query.in('track_id', uniqueTargetIds);
+          query = query.in('track_id', Array.from(new Set(targetIds)));
         }
       } else {
         if (selectedTrack !== 'ALL') {
@@ -114,36 +114,43 @@ export default function LearnerDashboardPage() {
             matchedTrackObj?.code?.toLowerCase(),
             matchedTrackObj?.code?.toUpperCase()
           ].filter(Boolean);
-          const uniqueMatchIds = Array.from(new Set(matchIds));
-          query = query.in('track_id', uniqueMatchIds);
+          query = query.in('track_id', Array.from(new Set(matchIds)));
         }
       }
 
-      // 2. Search filtering
+      // Search filtering
       const trimmedSearch = searchQuery.trim();
       if (trimmedSearch) {
         query = query.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
       }
 
       // Order & Paginate
-      const { data, count, error: queryErr } = await query
+      let { data, count, error: queryErr } = await query
         .order('created_at', { ascending: false })
         .range(from, to);
 
       if (queryErr) {
-        console.warn('[LearnerDashboard] Relational query error, trying flat fallback:', queryErr);
-        // Fallback query
-        let flatQuery = supabase
+        console.warn('[LearnerDashboard] Relational tracks query failed, trying legacy courses fallback:', queryErr.message || queryErr);
+        
+        let legacyRelQuery = supabase
           .from('gigs')
           .select(`
             id,
             external_gig_id,
             title,
-            track_id,
+            course_id,
             short_description,
             payment_amount,
             origin_url,
-            created_at
+            created_at,
+            course:courses (
+              id,
+              code,
+              name,
+              category,
+              color,
+              bg_color
+            )
           `, { count: 'exact' });
 
         if (mode === 'recommended') {
@@ -155,29 +162,80 @@ export default function LearnerDashboardPage() {
               assignedTrack.code?.toLowerCase(),
               assignedTrack.code?.toUpperCase()
             ].filter(Boolean);
-            flatQuery = flatQuery.in('track_id', Array.from(new Set(targetIds)));
+            legacyRelQuery = legacyRelQuery.in('course_id', Array.from(new Set(targetIds)));
           }
         } else {
           if (selectedTrack !== 'ALL') {
-            flatQuery = flatQuery.in('track_id', [selectedTrack, selectedTrack.toLowerCase()]);
+            const matchedTrackObj = tracks.find(t => t.id === selectedTrack || t.code === selectedTrack);
+            const matchIds = [
+              selectedTrack,
+              selectedTrack.toLowerCase(),
+              matchedTrackObj?.id,
+              matchedTrackObj?.code,
+              matchedTrackObj?.code?.toLowerCase(),
+              matchedTrackObj?.code?.toUpperCase()
+            ].filter(Boolean);
+            legacyRelQuery = legacyRelQuery.in('course_id', Array.from(new Set(matchIds)));
           }
         }
 
         if (trimmedSearch) {
-          flatQuery = flatQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
+          legacyRelQuery = legacyRelQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
         }
 
-        const { data: flatData, count: flatCount, error: flatErr } = await flatQuery
+        const legacyRelRes = await legacyRelQuery
           .order('created_at', { ascending: false })
           .range(from, to);
 
-        if (flatErr) throw flatErr;
-        setGigs(flatData || []);
-        setTotalGigs(flatCount || 0);
-      } else {
-        setGigs(data || []);
-        setTotalGigs(count || 0);
+        if (!legacyRelRes.error && legacyRelRes.data) {
+          data = legacyRelRes.data.map(g => ({
+            ...g,
+            track_id: g.course_id,
+            track: g.course
+          }));
+          count = legacyRelRes.count;
+          queryErr = null;
+        } else {
+          console.warn('[LearnerDashboard] Relational legacy query failed, attempting flat query:', legacyRelRes.error?.message || legacyRelRes.error);
+          
+          let flatQuery = supabase
+            .from('gigs')
+            .select(`
+              id,
+              external_gig_id,
+              title,
+              short_description,
+              payment_amount,
+              origin_url,
+              created_at
+            `, { count: 'exact' });
+
+          if (trimmedSearch) {
+            flatQuery = flatQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
+          }
+
+          const flatRes = await flatQuery
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+          if (flatRes.error) {
+            console.error('[LearnerDashboard] Flat query error:', flatRes.error);
+            throw flatRes.error;
+          }
+
+          data = (flatRes.data || []).map(g => {
+            const trackMatch = tracks.find(t => t.id === g.track_id || t.id === g.course_id);
+            return {
+              ...g,
+              track: trackMatch || null
+            };
+          });
+          count = flatCount || data.length;
+        }
       }
+
+      setGigs(data || []);
+      setTotalGigs(count || 0);
     } catch (err) {
       console.error('[LearnerDashboard] Error fetching gigs:', err);
       setError('Unable to load commercial opportunities. Please refresh the page.');

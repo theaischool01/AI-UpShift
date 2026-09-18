@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, CheckCircle2, ArrowUpRight, Target, Sparkles, Layers, Briefcase, Users } from 'lucide-react';
 
 export default function ProgramDetailModal({ program, onClose }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -27,6 +29,16 @@ export default function ProgramDetailModal({ program, onClose }) {
     setTimeout(() => {
       onClose();
     }, 240);
+  };
+
+  const handleEnrollClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    onClose();
+    const trackParam = program.id || program.code?.toLowerCase();
+    navigate(`/enroll?track=${trackParam}`);
   };
 
   if (!program) return null;
@@ -205,21 +217,35 @@ export default function ProgramDetailModal({ program, onClose }) {
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
+                type="button"
                 onClick={handleClose}
-                className="btn btn-secondary btn-md w-full sm:w-auto"
-                style={{ backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#FFFFFF' }}
+                className="btn btn-secondary btn-md w-full sm:w-auto cursor-pointer"
+                style={{ backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#FFFFFF', cursor: 'pointer' }}
               >
                 Close Preview
               </button>
-              <a
-                href="#join"
-                onClick={handleClose}
-                className="btn btn-primary btn-md w-full sm:w-auto text-center"
-                style={{ backgroundColor: '#E31B23', borderRadius: '9999px', color: '#FFFFFF', fontWeight: '700' }}
+              <button
+                type="button"
+                onClick={handleEnrollClick}
+                className="btn btn-primary btn-md w-full sm:w-auto text-center cursor-pointer"
+                style={{ 
+                  backgroundColor: '#E31B23', 
+                  borderRadius: '9999px', 
+                  color: '#FFFFFF', 
+                  fontWeight: '700',
+                  border: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '10px 22px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(227, 27, 35, 0.4)'
+                }}
               >
                 <span>Enroll in This Track</span>
                 <ArrowUpRight size={16} className="btn-arrow" />
-              </a>
+              </button>
             </div>
           </div>
         </div>
