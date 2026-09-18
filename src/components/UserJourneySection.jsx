@@ -292,10 +292,6 @@ export default function UserJourneySection() {
 
               <div key={`meta-${activeStory}`} className="journey-testimonial-profile-meta">
                 <div className="journey-testimonial-pfp-name">{currentStory.name}</div>
-                <div className="journey-testimonial-pfp-rating">
-                  <span className="journey-testimonial-star-rating">★ {currentStory.rating}</span>
-                  {currentStory.date && <span className="journey-testimonial-date">on {currentStory.date}</span>}
-                </div>
               </div>
             </div>
 
