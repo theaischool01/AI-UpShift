@@ -13,6 +13,7 @@ import {
   Briefcase
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import UpShiftWordmark from '../../components/common/UpShiftWordmark';
 import './enroll.css';
 
 const STATUS_OPTIONS = [
@@ -170,7 +171,7 @@ export default function EnrollmentPage() {
           college: formData.college.trim(),
           course_degree: formData.courseDegree.trim(),
           branch: formData.branch.trim(),
-          primary_track: selectedGig?.course_id || courseParam || 'reelrush-ai',
+          primary_track: selectedGig?.track_id || selectedGig?.course_id || courseParam || 'reelrush-ai',
           program_enrolled: 'UpShift Complete Applied AI Program',
           price: 'UpShift Enrollment',
           submitted_at: new Date().toISOString(),
@@ -203,7 +204,8 @@ export default function EnrollmentPage() {
         college: formData.college.trim(),
         courseDegree: formData.courseDegree.trim(),
         branch: formData.branch.trim(),
-        courseId: selectedGig?.course_id || courseParam || 'reelrush-ai',
+        trackId: selectedGig?.track_id || selectedGig?.course_id || courseParam || 'reelrush-ai',
+        courseId: selectedGig?.track_id || selectedGig?.course_id || courseParam || 'reelrush-ai', // backward compatibility fallback
         password: formData.password,
         programId: 'upshift-complete-program',
         programName: 'UpShift Complete Applied AI Program',
@@ -234,7 +236,7 @@ export default function EnrollmentPage() {
             <div className="enroll-brand-text">
               <span className="enroll-brand-school">THE AI SCHOOL</span>
               <span className="enroll-brand-divider">/</span>
-              <span className="enroll-brand-name">UpShift</span>
+              <UpShiftWordmark theme="light" className="enroll-brand-name" />
             </div>
           </Link>
 

@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import UpShiftWordmark from '../common/UpShiftWordmark';
 
 export default function AdminSidebar({ isOpen = false, onClose = () => {} }) {
   const { user, profile, signOut, signingOut } = useAuth();
@@ -78,19 +79,17 @@ export default function AdminSidebar({ isOpen = false, onClose = () => {} }) {
       className={`admin-sidebar ${isOpen ? 'admin-sidebar-open' : ''}`}
       aria-label="Admin Navigation Sidebar"
     >
-      {/* 1. Sidebar Header / Product Branding (Strictly no browser-default link styling) */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0 bg-white">
+      {/* 1. Sidebar Header / Product Branding */}
+      <div className="admin-sidebar-header">
         <Link 
           to="/admin/dashboard" 
           onClick={onClose}
-          className="flex items-center gap-3 no-underline group select-none"
+          className="admin-sidebar-brand"
         >
-          {/* Explicit 40x40 Mascot Logo Container */}
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#111111] border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-xs">
+          <div className="admin-sidebar-avatar">
             <img 
               src="/assets/mascot/mascot_avatar.jpg" 
-              alt="UpShift Mascot" 
-              className="w-full h-full object-cover"
+              alt="UpShift" 
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 if (e.currentTarget.parentElement) {
@@ -98,31 +97,30 @@ export default function AdminSidebar({ isOpen = false, onClose = () => {} }) {
                   e.currentTarget.parentElement.style.backgroundColor = '#E31B23';
                   e.currentTarget.parentElement.style.color = '#FFFFFF';
                   e.currentTarget.parentElement.style.fontWeight = 'bold';
+                  e.currentTarget.parentElement.style.fontSize = '14px';
                 }
               }}
             />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[15px] font-extrabold tracking-tight text-[#111827] leading-none">
-              UPSHIFT
+          <div className="admin-sidebar-brand-text">
+            <span className="admin-sidebar-brand-title">
+              <UpShiftWordmark theme="light" />
             </span>
-            <span className="text-[10px] font-mono font-bold tracking-[0.14em] text-[#6B7280] uppercase mt-1">
-              Control Center
-            </span>
+            <span className="admin-sidebar-brand-sub">Control Center</span>
           </div>
         </Link>
 
-        {/* Separate Close Button for Mobile Drawer */}
+        {/* Close Button strictly for Mobile Drawer */}
         <button
           onClick={onClose}
-          className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          className="admin-btn-icon admin-mobile-only"
           aria-label="Close navigation drawer"
         >
-          <X size={18} />
+          <X size={16} />
         </button>
       </div>
 
-      {/* 2. Scrollable Navigation Section (Takes all remaining vertical space) */}
+      {/* 2. Scrollable Navigation Section */}
       <nav className="admin-sidebar-nav-container">
         {navSections.map((section) => (
           <div key={section.title} className="admin-nav-group">
@@ -166,20 +164,20 @@ export default function AdminSidebar({ isOpen = false, onClose = () => {} }) {
         ))}
       </nav>
 
-      {/* 3. Sidebar Footer / Administrator Profile Lockup (Permanently fixed at bottom) */}
-      <div className="p-3.5 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-white border border-gray-200/80 shadow-xs">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-red-50 text-[#E31B23] border border-red-200 flex items-center justify-center font-bold text-xs flex-shrink-0">
+      {/* 3. Sidebar Footer / Administrator Profile Lockup */}
+      <div className="admin-sidebar-footer">
+        <div className="admin-profile-card">
+          <div className="admin-profile-info">
+            <div className="admin-profile-badge">
               <ShieldCheck size={16} />
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-bold text-gray-900 truncate">
+            <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+              <span className="admin-profile-name">
                 {profile?.full_name || user?.email?.split('@')[0] || 'Administrator'}
-              </div>
-              <div className="text-[10px] font-mono text-gray-500 truncate">
+              </span>
+              <span className="admin-profile-role">
                 Administrator
-              </div>
+              </span>
             </div>
           </div>
 
@@ -187,10 +185,10 @@ export default function AdminSidebar({ isOpen = false, onClose = () => {} }) {
             onClick={handleSignOut}
             disabled={signingOut}
             title={signingOut ? "Signing Out..." : "Sign Out"}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-[#E31B23] hover:bg-red-50 disabled:opacity-50 transition-colors flex-shrink-0 cursor-pointer"
+            className="admin-btn-icon admin-btn-icon-danger"
             aria-label="Sign out of administrator workspace"
           >
-            <LogOut size={15} className={signingOut ? 'animate-spin' : ''} />
+            <LogOut size={14} className={signingOut ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>

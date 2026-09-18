@@ -1,254 +1,236 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  BookOpen, 
+  Sparkles, 
   Users, 
   Briefcase, 
-  CheckCircle2, 
   Loader2, 
-  AlertCircle, 
-  ExternalLink,
-  Layers,
-  Sparkles
+  AlertCircle,
+  ArrowRight
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Aggregated totals
-  const [stats, setStats] = useState({ totalCourses: 0, totalEnrollments: 0, totalGigs: 0 });
+  const [stats, setStats] = useState({ totalTracks: 0, totalEnrollments: 0, totalGigs: 0 });
 
-  const loadCoursesData = async () => {
+  const loadTracksData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // 4F.4 Avoid N+1 queries: Execute 3 bulk queries in parallel
-      const [coursesRes, enrollmentsRes, gigsRes] = await Promise.all([
+      const [tracksRes, enrollmentsRes, gigsRes] = await Promise.all([
         supabase
-          .from('courses')
+          .from('tracks')
           .select('id, code, name, category, tagline, color, bg_color, is_active, created_at')
           .order('code', { ascending: true }),
         supabase
           .from('enrollments')
-          .select('course_id'),
+          .select('track_id'),
         supabase
           .from('gigs')
-          .select('course_id')
+          .select('track_id')
       ]);
 
-      if (coursesRes.error) throw coursesRes.error;
-      if (enrollmentsRes.error) throw enrollmentsRes.error;
-      if (gigsRes.error) throw gigsRes.error;
+      let activeTracks = tracksRes.data;
+      if (tracksRes.error || !activeTracks) {
+        const fallbackRes = await supabase
+          .from('courses')
+          .select('id, code, name, category, tagline, color, bg_color, is_active, created_at')
+          .order('code', { ascending: true });
+        activeTracks = fallbackRes.data || [];
+      }
 
-      // In-memory aggregation
+      let activeEnrollments = enrollmentsRes.data;
+      if (enrollmentsRes.error || !activeEnrollments) {
+        const fallbackRes = await supabase
+          .from('enrollments')
+          .select('course_id');
+        activeEnrollments = (fallbackRes.data || []).map(e => ({
+          track_id: e.course_id
+        }));
+      }
+
+      let activeGigs = gigsRes.data;
+      if (gigsRes.error || !activeGigs) {
+        const fallbackRes = await supabase
+          .from('gigs')
+          .select('course_id');
+        activeGigs = (fallbackRes.data || []).map(g => ({
+          track_id: g.course_id
+        }));
+      }
+
       const enrollmentCounts = {};
-      (enrollmentsRes.data || []).forEach(e => {
-        if (e.course_id) {
-          enrollmentCounts[e.course_id] = (enrollmentCounts[e.course_id] || 0) + 1;
+      (activeEnrollments || []).forEach(e => {
+        if (e.track_id) {
+          enrollmentCounts[e.track_id] = (enrollmentCounts[e.track_id] || 0) + 1;
         }
       });
 
       const gigCounts = {};
-      (gigsRes.data || []).forEach(g => {
-        if (g.course_id) {
-          gigCounts[g.course_id] = (gigCounts[g.course_id] || 0) + 1;
+      (activeGigs || []).forEach(g => {
+        if (g.track_id) {
+          gigCounts[g.track_id] = (gigCounts[g.track_id] || 0) + 1;
         }
       });
 
-      const processedCourses = (coursesRes.data || []).map(course => ({
-        ...course,
-        studentCount: enrollmentCounts[course.id] || 0,
-        gigCount: gigCounts[course.id] || 0,
+      const processedTracks = (activeTracks || []).map(track => ({
+        ...track,
+        studentCount: enrollmentCounts[track.id] || 0,
+        gigCount: gigCounts[track.id] || 0,
       }));
 
-      setCourses(processedCourses);
+      setTracks(processedTracks);
       setStats({
-        totalCourses: processedCourses.length,
-        totalEnrollments: (enrollmentsRes.data || []).length,
-        totalGigs: (gigsRes.data || []).length,
+        totalTracks: processedTracks.length,
+        totalEnrollments: (activeEnrollments || []).length,
+        totalGigs: (activeGigs || []).length,
       });
     } catch (err) {
       console.error('[CoursesPage] Data load error:', err);
-      setError('Unable to load courses and metrics. Please try again.');
+      setError('Unable to load tracks and metrics. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCoursesData();
+    loadTracksData();
   }, []);
 
   return (
-    <div className="admin-page space-y-6">
+    <div className="admin-page">
       {/* Page Header */}
       <div className="admin-page-header">
-        <div>
-          <h1 className="flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-[#E31B23]" />
-            Courses
+        <div className="admin-page-title-group">
+          <h1 className="admin-page-title">
+            <Sparkles size={22} />
+            <span>UpShift Applied Tracks</span>
           </h1>
-          <p>
-            Manage and monitor the six flagship UpShift learning tracks.
+          <p className="admin-page-description">
+            Manage and monitor the six applied UpShift specializations and learner distributions.
           </p>
         </div>
 
         <div className="admin-page-actions">
           <Link
             to="/admin/students"
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-secondary"
           >
-            <Users className="w-4 h-4 text-gray-600" />
+            <Users size={14} />
             <span>Students Directory</span>
           </Link>
           <Link
             to="/admin/gigs"
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-secondary"
           >
-            <Briefcase className="w-4 h-4 text-gray-600" />
+            <Briefcase size={14} />
             <span>Gigs Directory</span>
           </Link>
         </div>
       </div>
 
       {/* Overview Stat Badges */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="admin-card p-4">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Active Curriculum Tracks</span>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalCourses}</p>
+      <div className="admin-grid-3">
+        <div className="admin-card admin-card-compact">
+          <span className="admin-stat-label">Active Applied Tracks</span>
+          <p className="admin-stat-value" style={{ margin: '4px 0 0 0' }}>{stats.totalTracks}</p>
         </div>
-        <div className="admin-card p-4">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Enrolled Learners</span>
-          <p className="text-2xl font-bold text-[#E31B23] mt-1">{stats.totalEnrollments}</p>
+        <div className="admin-card admin-card-compact">
+          <span className="admin-stat-label">Total Program Learners</span>
+          <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#E31B23' }}>{stats.totalEnrollments}</p>
         </div>
-        <div className="admin-card p-4">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Aggregated Gigs</span>
-          <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.totalGigs}</p>
+        <div className="admin-card admin-card-compact">
+          <span className="admin-stat-label">Total Commercial Gigs</span>
+          <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#059669' }}>{stats.totalGigs}</p>
         </div>
       </div>
 
-      {/* Courses Cards Grid */}
+      {/* Tracks Cards Grid */}
       {loading ? (
-        <div className="admin-card p-16 flex flex-col items-center justify-center gap-3 text-gray-500">
-          <Loader2 className="w-7 h-7 animate-spin text-[#E31B23]" />
-          <span className="text-xs font-medium">Loading flagship courses and metrics...</span>
+        <div className="admin-card" style={{ padding: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#6B7280' }}>
+          <Loader2 size={24} className="animate-spin" style={{ color: '#E31B23' }} />
+          <span style={{ fontSize: '13px', fontWeight: 500 }}>Loading applied tracks and metrics...</span>
         </div>
       ) : error ? (
-        <div className="admin-card p-12 text-center">
-          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-gray-900">{error}</p>
+        <div className="admin-card" style={{ padding: '36px', textAlign: 'center' }}>
+          <AlertCircle size={28} style={{ color: '#DC2626', margin: '0 auto 8px auto' }} />
+          <p style={{ fontSize: '14px', fontWeight: 700, color: '#111827', margin: '0 0 10px 0' }}>{error}</p>
           <button
-            onClick={loadCoursesData}
-            className="mt-3 text-xs font-semibold text-[#E31B23] hover:underline"
+            onClick={loadTracksData}
+            className="admin-btn admin-btn-sm admin-btn-secondary"
           >
             Retry Loading
           </button>
         </div>
-      ) : courses.length === 0 ? (
-        <div className="admin-card p-12 text-center text-gray-500">
-          <p className="text-sm font-semibold">No courses configured in the database.</p>
-        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {courses.map((course) => (
-            <div
-              key={course.id}
-              className="admin-card p-6 flex flex-col justify-between hover:border-gray-300 transition-all group"
-            >
-              <div>
-                {/* Track Code & Status Badge */}
-                <div className="flex items-center justify-between mb-3">
-                  <span 
-                    className="px-2.5 py-1 rounded-md text-xs font-mono font-bold tracking-wide"
-                    style={{
-                      backgroundColor: course.bg_color || '#FEF2F2',
-                      color: course.color || '#E31B23',
-                    }}
-                  >
-                    {course.code}
-                  </span>
+        <div className="admin-courses-grid">
+          {tracks.map((track) => {
+            const trackColor = track.color || '#E31B23';
 
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold ${
-                    course.is_active 
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                      : 'bg-gray-100 text-gray-500 border border-gray-200'
-                  }`}>
-                    {course.is_active ? (
-                      <>
-                        <CheckCircle2 className="w-3 h-3" />
-                        Active
-                      </>
-                    ) : (
-                      'Inactive'
-                    )}
-                  </span>
-                </div>
+            return (
+              <div key={track.id} className="admin-course-card">
+                <div>
+                  {/* Top Track Code + Category */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <span 
+                      style={{ 
+                        backgroundColor: `${trackColor}18`, 
+                        color: trackColor,
+                        border: `1px solid ${trackColor}35`,
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontFamily: 'monospace',
+                        fontWeight: 800,
+                        textTransform: 'uppercase'
+                      }}
+                    >
+                      {track.code}
+                    </span>
+                    <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#9CA3AF', textTransform: 'uppercase' }}>
+                      {track.category}
+                    </span>
+                  </div>
 
-                {/* Course Name & Category */}
-                <h3 className="text-base font-bold text-gray-900 group-hover:text-[#E31B23] transition-colors">
-                  {course.name}
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                  {course.category}
-                </p>
-
-                {/* Tagline */}
-                {course.tagline && (
-                  <p className="text-xs text-gray-600 mt-2.5 italic bg-gray-50 p-2 rounded-lg border border-gray-100">
-                    "{course.tagline}"
+                  {/* Track Title & Tagline */}
+                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#111827', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+                    {track.name}
+                  </h3>
+                  <p style={{ fontSize: '12.5px', color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+                    {track.tagline || 'Specialized hands-on commercial proof of work track.'}
                   </p>
-                )}
-              </div>
-
-              {/* Metrics & Quick Nav */}
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-gray-50 p-2.5 rounded-lg">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 block">
-                      Enrolled Learners
-                    </span>
-                    <span className="text-lg font-bold text-gray-900 flex items-center gap-1.5 mt-0.5">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      {course.studentCount}
-                    </span>
-                  </div>
-
-                  <div className="bg-gray-50 p-2.5 rounded-lg">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-400 block">
-                      Available Gigs
-                    </span>
-                    <span className="text-lg font-bold text-gray-900 flex items-center gap-1.5 mt-0.5">
-                      <Briefcase className="w-4 h-4 text-gray-400" />
-                      {course.gigCount}
-                    </span>
-                  </div>
                 </div>
 
-                {/* Filter quick links */}
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <Link
-                    to={`/admin/students?course=${course.id}`}
-                    className="hover:text-gray-900 font-medium flex items-center gap-1"
-                  >
-                    <span>View Learners</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
+                {/* Bottom Metric Badges */}
+                <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #F3F4F6' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', fontSize: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4B5563' }}>
+                      <Users size={14} style={{ color: '#6B7280' }} />
+                      <span>{track.studentCount} {track.studentCount === 1 ? 'Learner' : 'Learners'}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4B5563' }}>
+                      <Briefcase size={14} style={{ color: '#6B7280' }} />
+                      <span>{track.gigCount} {track.gigCount === 1 ? 'Gig' : 'Gigs'}</span>
+                    </div>
+                  </div>
 
                   <Link
-                    to={`/admin/gigs?course=${course.id}`}
-                    className="hover:text-gray-900 font-medium flex items-center gap-1"
+                    to={`/admin/students`}
+                    className="admin-btn admin-btn-sm admin-btn-secondary"
+                    style={{ width: '100%', justifyContent: 'center' }}
                   >
-                    <span>View Gigs</span>
-                    <ExternalLink className="w-3 h-3" />
+                    <span>View Track Students</span>
+                    <ArrowRight size={13} />
                   </Link>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

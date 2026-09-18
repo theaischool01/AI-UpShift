@@ -10,55 +10,52 @@ export default function AdminMetricCard({
 }) {
   if (isLoading) {
     return (
-      <div className="admin-card animate-pulse flex flex-col justify-between h-[150px] p-6">
-        <div className="flex items-center justify-between">
-          <div className="h-3.5 w-24 bg-gray-200 rounded" />
-          <div className="w-9 h-9 rounded-xl bg-gray-100" />
+      <div className="admin-metric-card" style={{ opacity: 0.6 }}>
+        <div className="admin-metric-card-top">
+          <div style={{ width: '80px', height: '14px', backgroundColor: '#E5E7EB', borderRadius: '4px' }} />
+          <div style={{ width: '32px', height: '32px', backgroundColor: '#F3F4F6', borderRadius: '8px' }} />
         </div>
-        <div className="my-1">
-          <div className="h-8 w-24 bg-gray-200 rounded mb-2" />
-          <div className="h-3 w-36 bg-gray-100 rounded" />
+        <div>
+          <div style={{ width: '60px', height: '28px', backgroundColor: '#E5E7EB', borderRadius: '6px', marginBottom: '8px' }} />
+          <div style={{ width: '120px', height: '12px', backgroundColor: '#F3F4F6', borderRadius: '4px' }} />
         </div>
       </div>
     );
   }
 
-  // Determine font size based on value length (numbers get 32px, longer course/college strings get 22-24px with natural wrap)
   const isNumeric = typeof value === 'number' || (typeof value === 'string' && /^\d+$/.test(value));
 
   return (
-    <div className="admin-card hover:border-gray-300 transition-all flex flex-col justify-between h-[150px] p-6 group relative overflow-hidden">
+    <div className="admin-metric-card">
       {/* Top row: Label and Icon */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] font-mono font-bold tracking-wider text-gray-500 uppercase truncate">
+      <div className="admin-metric-card-top">
+        <span className="admin-metric-card-label">
           {title}
         </span>
         {Icon && (
           <div 
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0"
+            className="admin-metric-card-icon"
             style={{ 
               backgroundColor: `${accentColor}12`, 
               color: accentColor,
               border: `1px solid ${accentColor}25` 
             }}
           >
-            <Icon size={18} strokeWidth={2.2} />
+            <Icon size={16} strokeWidth={2.2} />
           </div>
         )}
       </div>
 
-      {/* Metric value and description with natural wrapping */}
-      <div className="min-w-0">
+      {/* Metric value and description */}
+      <div>
         <div 
-          className={`font-extrabold text-gray-900 tracking-tight leading-tight mb-1 ${
-            isNumeric ? 'text-3xl sm:text-[32px]' : 'text-lg sm:text-[20px] line-clamp-2'
-          }`}
+          className={`admin-metric-card-value ${!isNumeric ? 'admin-metric-card-value-text' : ''}`}
           title={typeof value === 'string' ? value : undefined}
         >
           {value}
         </div>
         {subtitle && (
-          <p className="text-xs text-gray-500 truncate m-0">
+          <p className="admin-metric-card-sub">
             {subtitle}
           </p>
         )}

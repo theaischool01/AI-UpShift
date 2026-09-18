@@ -10,13 +10,10 @@ import {
   Loader2, 
   ArrowLeft, 
   AlertTriangle,
-  Briefcase,
-  RefreshCw,
-  Globe
+  Briefcase
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
-// Robust CSV parser handling quotes, commas within quotes, CRLF/LF
 function parseCSV(text) {
   const lines = [];
   let currentField = '';
@@ -64,111 +61,68 @@ function parseCSV(text) {
   return lines;
 }
 
-function isValidHttpUrl(str) {
-  try {
-    const parsed = new URL(str);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
 export default function BulkGigImportPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
-  // Curriculum courses from database
-  const [courses, setCourses] = useState([]);
-  const [courseMap, setCourseMap] = useState(new Map());
-  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [tracks, setTracks] = useState([]);
+  const [trackMap, setTrackMap] = useState(new Map());
+  const [loadingTracks, setLoadingTracks] = useState(true);
 
-  // File state
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [parseError, setParseError] = useState(null);
 
-  // Parsed rows
   const [previewRows, setPreviewRows] = useState([]);
   const [allValidatedRows, setAllValidatedRows] = useState([]);
-  const [counts, setCounts] = useState({ total: 0, valid: 0, invalid: 0, duplicates: 0 });
+  const [counts, setCounts] = useState({ total: 0, valid: 0, invalid: 0 });
 
-  // Import state
   const [isImporting, setIsImporting] = useState(false);
-  const [importProgress, setImportProgress] = useState({ current: 0, total: 0, inserted: 0, updated: 0, failed: 0 });
+  const [importProgress, setImportProgress] = useState({ current: 0, total: 0, created: 0, failed: 0 });
   const [importComplete, setImportComplete] = useState(false);
   const [importFailures, setImportFailures] = useState([]);
 
-  // Load courses
   useEffect(() => {
-    async function loadCourses() {
+    async function loadTracks() {
       try {
-        const { data, error } = await supabase
-          .from('courses')
+        let { data, error } = await supabase
+          .from('tracks')
           .select('id, code, name, category')
           .order('code', { ascending: true });
 
-        if (error) throw error;
-        setCourses(data || []);
+        if (error) {
+          const fallbackRes = await supabase
+            .from('courses')
+            .select('id, code, name, category')
+            .order('code', { ascending: true });
+          if (fallbackRes.error) throw error;
+          data = fallbackRes.data;
+        }
+
+        setTracks(data || []);
 
         const map = new Map();
-        (data || []).forEach(c => {
-          map.set(c.id.toLowerCase(), c);
-          map.set(c.code.toLowerCase(), c);
-          map.set(c.id, c);
+        (data || []).forEach(t => {
+          map.set(t.id.toLowerCase(), t);
+          map.set(t.code.toLowerCase(), t);
+          map.set(t.id, t);
+          map.set(t.code, t);
         });
-        setCourseMap(map);
+        setTrackMap(map);
       } catch (err) {
-        console.warn('[BulkGigImport] Failed to fetch courses:', err);
+        console.warn('[BulkGigImport] Failed to fetch tracks:', err);
       } finally {
-        setLoadingCourses(false);
+        setLoadingTracks(false);
       }
     }
-    loadCourses();
+    loadTracks();
   }, []);
 
-  // 4E.1 Download CSV Template
   const handleDownloadTemplate = () => {
-    const headers = [
-      'external_gig_id',
-      'title',
-      'course_id',
-      'payment_amount',
-      'short_description',
-      'long_description',
-      'origin_site',
-      'origin_url',
-      'organization',
-      'location',
-      'engagement_type'
-    ];
-
+    const headers = ['title', 'track_id', 'payment_amount', 'origin_url', 'short_description', 'overview', 'responsibilities', 'deliverables', 'requirements', 'proof_spec'];
     const sampleRows = [
-      [
-        'UP-TEST-M1-001',
-        'AI Short-Form Video Editor',
-        'reelrush-ai',
-        '$25/hr',
-        'Create short-form AI video content',
-        'We are seeking an expert short-form video producer familiar with automated AI video pipelines to generate commercial reels. Deliverables include final 4K renders, voiceover sync, and hook testing.',
-        'Contra',
-        'https://example.com',
-        'Example Studio',
-        'Remote',
-        'Freelance'
-      ],
-      [
-        'UP-TEST-M6-001',
-        'Full-Stack AI Agent Handler & Workflow Integrator',
-        'agenthandlers',
-        '$500/project',
-        'Deploy custom multi-agent orchestrations for client customer support automation.',
-        'Client requires an experienced AI builder to construct autonomous AgentHandler workflows utilizing modern LLM tool calling, persistent memory, and API integrations.',
-        'Contra',
-        'https://contra.com/opportunity/8419-ai-agent-architect',
-        'Nexus AI Labs',
-        'Remote (Worldwide)',
-        'Freelance'
-      ]
+      ['AI Reels Content Producer', 'M1', '$45 / hr', 'https://www.upwork.com/jobs/~0111', 'Produce scroll-stopping reels using AI workflows.', 'Develop recurring short-form video content.', 'Script AI scenes||Edit reels', '15 production assets', 'Composition skills', 'Public video portfolio link'],
+      ['Brand Asset Generator', 'M2', '$600 fixed', 'https://www.upwork.com/jobs/~0222', 'Generate commercial image assets.', 'Create high-res visuals.', 'Prompt engineering||Color matching', '20 hero visuals', 'Midjourney experience', 'Behance portfolio link']
     ];
 
     const csvContent = [
@@ -180,400 +134,175 @@ export default function BulkGigImportPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'gigs_template.csv');
+    link.setAttribute('download', 'upshift_gig_roster_template.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  // Process CSV content
-  const processCSVContent = (content) => {
-    setParseError(null);
-    setImportComplete(false);
-    setImportFailures([]);
-
-    const parsedLines = parseCSV(content);
-    if (parsedLines.length === 0) {
-      setParseError('The uploaded CSV file is empty.');
-      return;
-    }
-
-    const rawHeaders = parsedLines[0].map(h => h.trim().toLowerCase());
-
-    const required = [
-      'external_gig_id',
-      'title',
-      'course_id',
-      'payment_amount',
-      'short_description',
-      'long_description',
-      'origin_site',
-      'origin_url'
-    ];
-
-    const missing = required.filter(r => !rawHeaders.includes(r));
-    if (missing.length > 0) {
-      setParseError(`Missing required columns: ${missing.join(', ')}. Please use the template.`);
-      return;
-    }
-
-    const dataLines = parsedLines.slice(1);
-    if (dataLines.length === 0) {
-      setParseError('CSV contains headers but no gig data rows.');
-      return;
-    }
-
-    const colIdx = {
-      external_gig_id: rawHeaders.indexOf('external_gig_id'),
-      title: rawHeaders.indexOf('title'),
-      course_id: rawHeaders.indexOf('course_id'),
-      payment_amount: rawHeaders.indexOf('payment_amount'),
-      short_description: rawHeaders.indexOf('short_description'),
-      long_description: rawHeaders.indexOf('long_description'),
-      origin_site: rawHeaders.indexOf('origin_site'),
-      origin_url: rawHeaders.indexOf('origin_url'),
-      organization: rawHeaders.indexOf('organization'),
-      location: rawHeaders.indexOf('location'),
-      engagement_type: rawHeaders.indexOf('engagement_type'),
-    };
-
-    const seenExternalIds = new Set();
-    const validated = [];
-    let validCount = 0;
-    let invalidCount = 0;
-    let duplicateCount = 0;
-
-    dataLines.forEach((line, index) => {
-      const rowNumber = index + 2;
-      const externalGigId = (line[colIdx.external_gig_id] || '').trim();
-      const title = (line[colIdx.title] || '').trim();
-      const rawCourse = (line[colIdx.course_id] || '').trim();
-      const paymentAmount = colIdx.payment_amount !== -1 ? (line[colIdx.payment_amount] || '').trim() : '';
-      const shortDesc = (line[colIdx.short_description] || '').trim();
-      const longDesc = (line[colIdx.long_description] || '').trim();
-      const originSite = (line[colIdx.origin_site] || '').trim();
-      const originUrl = (line[colIdx.origin_url] || '').trim();
-      const organization = colIdx.organization !== -1 ? (line[colIdx.organization] || '').trim() : '';
-      const location = colIdx.location !== -1 ? (line[colIdx.location] || '').trim() : 'Remote';
-      const engagementType = colIdx.engagement_type !== -1 ? (line[colIdx.engagement_type] || '').trim() : 'Contract';
-
-      const errors = [];
-
-      if (!externalGigId) errors.push('Missing external_gig_id');
-      if (!title) errors.push('Missing title');
-      if (!paymentAmount) {
-        errors.push('Payment amount is required');
-      } else if (paymentAmount.length > 80) {
-        errors.push('Payment amount cannot exceed 80 characters');
-      }
-      if (!shortDesc) errors.push('Missing short_description');
-      if (!longDesc) errors.push('Missing long_description');
-      if (!originSite) errors.push('Missing origin_site');
-
-      if (!originUrl) {
-        errors.push('Missing origin_url');
-      } else if (!isValidHttpUrl(originUrl)) {
-        errors.push('Invalid URL (must start with http:// or https://)');
-      }
-
-      // Course track resolution
-      let matchedCourse = null;
-      if (!rawCourse) {
-        errors.push('Missing course_id');
-      } else {
-        matchedCourse = courseMap.get(rawCourse.toLowerCase()) || courseMap.get(rawCourse);
-        if (!matchedCourse) {
-          errors.push(`Invalid course_id: "${rawCourse}"`);
-        }
-      }
-
-      // Duplicate external_gig_id inside the file
-      let isDuplicate = false;
-      if (externalGigId && seenExternalIds.has(externalGigId)) {
-        errors.push('Duplicate external_gig_id in import file');
-        isDuplicate = true;
-        duplicateCount++;
-      } else if (externalGigId) {
-        seenExternalIds.add(externalGigId);
-      }
-
-      const isValid = errors.length === 0;
-      if (isValid) {
-        validCount++;
-      } else if (!isDuplicate) {
-        invalidCount++;
-      }
-
-      validated.push({
-        rowNumber,
-        externalGigId,
-        title,
-        matchedCourse,
-        rawCourse,
-        paymentAmount,
-        shortDesc,
-        longDesc,
-        originSite,
-        originUrl,
-        organization,
-        location,
-        engagementType,
-        isValid,
-        errors,
-      });
-    });
-
-    setCounts({
-      total: dataLines.length,
-      valid: validCount,
-      invalid: invalidCount,
-      duplicates: duplicateCount,
-    });
-
-    setAllValidatedRows(validated);
-    setPreviewRows(validated.slice(0, 100)); // Memory-safe bounded preview
-  };
-
-  const handleFileSelect = (selectedFile) => {
+  const processCSVFile = async (selectedFile) => {
     if (!selectedFile) return;
 
-    if (!selectedFile.name.endsWith('.csv') && selectedFile.type !== 'text/csv') {
-      setParseError('Please upload a CSV file.');
-      setFile(null);
+    if (!selectedFile.name.toLowerCase().endsWith('.csv')) {
+      setParseError('Please upload a standard CSV (.csv) file.');
       return;
     }
 
     setFile(selectedFile);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target.result;
-      processCSVContent(content);
-    };
-    reader.onerror = () => {
-      setParseError('Failed to read file from disk.');
-    };
-    reader.readAsText(selectedFile);
-  };
-
-  const handleClearFile = () => {
-    setFile(null);
     setParseError(null);
-    setPreviewRows([]);
-    setAllValidatedRows([]);
-    setCounts({ total: 0, valid: 0, invalid: 0, duplicates: 0 });
     setImportComplete(false);
     setImportFailures([]);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files[0]);
-    }
-  };
-
-  // 4E.6 - 4E.8 Bulk UPSERT in batches of 100
-  const handleExecuteImport = async () => {
-    if (isImporting || counts.valid === 0) return;
-
-    const validRows = allValidatedRows.filter(r => r.isValid);
-    if (validRows.length === 0) return;
-
-    setIsImporting(true);
-    setImportComplete(false);
-    setImportFailures([]);
-
-    const BATCH_SIZE = 100;
-    let insertedAccumulator = 0;
-    let updatedAccumulator = 0;
-    let failedAccumulator = 0;
-    const failureList = [];
-
-    setImportProgress({
-      current: 0,
-      total: validRows.length,
-      inserted: 0,
-      updated: 0,
-      failed: 0,
-    });
 
     try {
-      for (let i = 0; i < validRows.length; i += BATCH_SIZE) {
-        const chunk = validRows.slice(i, i + BATCH_SIZE);
-        const externalIds = chunk.map(r => r.externalGigId);
+      const text = await selectedFile.text();
+      const parsedMatrix = parseCSV(text);
 
-        // Pre-check which IDs already exist in database to differentiate Insert vs Update
-        let existingIdSet = new Set();
-        try {
-          const { data: existingGigs } = await supabase
-            .from('gigs')
-            .select('external_gig_id')
-            .in('external_gig_id', externalIds);
-          
-          if (existingGigs) {
-            existingGigs.forEach(g => existingIdSet.add(g.external_gig_id));
-          }
-        } catch {
-          // If check fails, we still proceed with upsert
+      if (parsedMatrix.length < 2) {
+        setParseError('The uploaded CSV is empty or missing a header row.');
+        return;
+      }
+
+      const rawHeaders = parsedMatrix[0].map(h => h.toLowerCase().trim().replace(/[\s\-]+/g, '_'));
+      const colMap = {
+        title: rawHeaders.findIndex(h => h === 'title' || h === 'gig_title' || h === 'opportunity_title'),
+        track: rawHeaders.findIndex(h => h === 'track_id' || h === 'track' || h === 'course_id' || h === 'course'),
+        rate: rawHeaders.findIndex(h => h === 'payment_amount' || h === 'rate' || h === 'compensation'),
+        originUrl: rawHeaders.findIndex(h => h === 'origin_url' || h === 'url' || h === 'apply_url' || h === 'link'),
+        shortDesc: rawHeaders.findIndex(h => h === 'short_description' || h === 'summary'),
+        overview: rawHeaders.findIndex(h => h === 'overview' || h === 'description'),
+        responsibilities: rawHeaders.findIndex(h => h === 'responsibilities'),
+        deliverables: rawHeaders.findIndex(h => h === 'deliverables'),
+        requirements: rawHeaders.findIndex(h => h === 'requirements'),
+        proofSpec: rawHeaders.findIndex(h => h === 'proof_spec' || h === 'required_proof'),
+      };
+
+      if (colMap.title === -1 || colMap.track === -1 || colMap.originUrl === -1) {
+        setParseError('Missing mandatory CSV columns: title, track_id, origin_url.');
+        return;
+      }
+
+      const validatedList = [];
+      let validCount = 0;
+      let invalidCount = 0;
+
+      for (let idx = 1; idx < parsedMatrix.length; idx++) {
+        const row = parsedMatrix[idx];
+        if (row.length === 0 || row.every(c => c.length === 0)) continue;
+
+        const title = row[colMap.title] || '';
+        const rawTrack = row[colMap.track] || '';
+        const paymentAmount = colMap.rate !== -1 ? row[colMap.rate] || '' : '';
+        const originUrl = row[colMap.originUrl] || '';
+        const shortDescription = colMap.shortDesc !== -1 ? row[colMap.shortDesc] || '' : '';
+        const overview = colMap.overview !== -1 ? row[colMap.overview] || '' : '';
+        const rawResp = colMap.responsibilities !== -1 ? row[colMap.responsibilities] || '' : '';
+        const rawDeliv = colMap.deliverables !== -1 ? row[colMap.deliverables] || '' : '';
+        const rawReq = colMap.requirements !== -1 ? row[colMap.requirements] || '' : '';
+        const proofSpec = colMap.proofSpec !== -1 ? row[colMap.proofSpec] || '' : '';
+
+        const rowErrors = [];
+
+        if (!title) rowErrors.push('Missing Title');
+        if (!originUrl) rowErrors.push('Missing Origin URL');
+
+        const matchedTrack = trackMap.get(rawTrack.toLowerCase()) || trackMap.get(rawTrack);
+        if (!matchedTrack) {
+          rowErrors.push(`Unrecognized Track: "${rawTrack}"`);
         }
 
-        const batchPayload = chunk.map(r => ({
-          external_gig_id: r.externalGigId,
-          title: r.title,
-          course_id: r.matchedCourse ? r.matchedCourse.id : r.rawCourse,
-          payment_amount: r.paymentAmount,
-          short_description: r.shortDesc,
-          long_description: r.longDesc,
-          origin_site: r.originSite,
-          origin_url: r.originUrl,
-          organization: r.organization || null,
-          location: r.location || 'Remote',
-          engagement_type: r.engagementType || 'Contract',
-        }));
+        const isValid = rowErrors.length === 0;
+        if (isValid) validCount++;
+        else invalidCount++;
 
-        // PostgREST Upsert on external_gig_id
-        let { data: upsertData, error: upsertError } = await supabase
-          .from('gigs')
-          .upsert(batchPayload, { onConflict: 'external_gig_id' })
-          .select('id, external_gig_id');
+        const parseList = (str) => str ? str.split('||').map(s => s.trim()).filter(Boolean) : [];
 
-        // If payment_amount column is unavailable, STOP and report clear actionable error (NO SILENT DATA REMOVAL)
-        if (upsertError && (upsertError.code === 'PGRST204' || upsertError.code === '42703' || upsertError.message?.toLowerCase().includes('payment_amount'))) {
-          const schemaErrorMsg = 'Payment field is not available in the database. Apply the latest database migration before importing gigs.';
-          chunk.forEach(r => {
-            failureList.push({
-              row: r.rowNumber,
-              external_gig_id: r.externalGigId,
-              title: r.title,
-              course_id: r.rawCourse,
-              payment_amount: r.paymentAmount,
-              origin_site: r.originSite,
-              error: schemaErrorMsg,
-            });
-          });
-          failedAccumulator += chunk.length;
-          break; // Stop importing remaining chunks immediately
-        }
-
-        if (upsertError) {
-          chunk.forEach(r => {
-            failureList.push({
-              row: r.rowNumber,
-              external_gig_id: r.externalGigId,
-              title: r.title,
-              course_id: r.rawCourse,
-              payment_amount: r.paymentAmount,
-              origin_site: r.originSite,
-              error: upsertError.message || 'Database upsert failed',
-            });
-          });
-          failedAccumulator += chunk.length;
-        } else {
-          // Count inserts vs updates
-          let chunkInserted = 0;
-          let chunkUpdated = 0;
-          chunk.forEach(r => {
-            if (existingIdSet.has(r.externalGigId)) {
-              chunkUpdated++;
-            } else {
-              chunkInserted++;
-            }
-          });
-          insertedAccumulator += chunkInserted;
-          updatedAccumulator += chunkUpdated;
-        }
-
-        setImportProgress({
-          current: Math.min(i + BATCH_SIZE, validRows.length),
-          total: validRows.length,
-          inserted: insertedAccumulator,
-          updated: updatedAccumulator,
-          failed: failedAccumulator,
+        validatedList.push({
+          rowNumber: idx + 1,
+          title,
+          trackId: matchedTrack?.id || rawTrack,
+          trackCode: matchedTrack?.code || rawTrack,
+          paymentAmount,
+          originUrl,
+          shortDescription,
+          overview,
+          responsibilities: parseList(rawResp),
+          deliverables: parseList(rawDeliv),
+          requirements: parseList(rawReq),
+          proofSpec,
+          isValid,
+          errors: rowErrors,
         });
       }
+
+      setAllValidatedRows(validatedList);
+      setPreviewRows(validatedList.slice(0, 100));
+      setCounts({
+        total: validatedList.length,
+        valid: validCount,
+        invalid: invalidCount,
+      });
     } catch (err) {
-      console.error('[BulkGigImport] Batch upsert exception:', err);
-    } finally {
-      setIsImporting(false);
-      setImportComplete(true);
-      setImportFailures(failureList);
+      console.error('[BulkGigImport] Parse error:', err);
+      setParseError('Unable to process CSV file.');
     }
   };
 
-  // 4E.9 Download Error Report
-  const handleDownloadErrorReport = () => {
-    const headers = ['row', 'external_gig_id', 'title', 'course_id', 'payment_amount', 'origin_site', 'error'];
+  const handleExecuteBatchImport = async () => {
+    const validRowsToCreate = allValidatedRows.filter(r => r.isValid);
+    if (validRowsToCreate.length === 0 || isImporting) return;
 
-    const allErrors = [
-      ...allValidatedRows.filter(r => !r.isValid).map(r => ({
-        row: r.rowNumber,
-        external_gig_id: r.externalGigId,
-        title: r.title,
-        course_id: r.rawCourse,
-        payment_amount: r.paymentAmount,
-        origin_site: r.originSite,
-        error: r.errors.join('; '),
-      })),
-      ...importFailures
-    ];
+    setIsImporting(true);
+    setImportProgress({ current: 0, total: validRowsToCreate.length, created: 0, failed: 0 });
 
-    const csvRows = [
-      headers.join(','),
-      ...allErrors.map(e => [
-        e.row,
-        `"${(e.external_gig_id || '').replace(/"/g, '""')}"`,
-        `"${(e.title || '').replace(/"/g, '""')}"`,
-        `"${(e.course_id || '').replace(/"/g, '""')}"`,
-        `"${(e.payment_amount || '').replace(/"/g, '""')}"`,
-        `"${(e.origin_site || '').replace(/"/g, '""')}"`,
-        `"${(e.error || '').replace(/"/g, '""')}"`,
-      ].join(','))
-    ];
+    const payloadBatch = validRowsToCreate.map(r => ({
+      title: r.title,
+      track_id: r.trackId,
+      payment_amount: r.paymentAmount || null,
+      origin_url: r.originUrl,
+      short_description: r.shortDescription || null,
+      overview: r.overview || null,
+      responsibilities: r.responsibilities,
+      deliverables: r.deliverables,
+      requirements: r.requirements,
+      proof_spec: r.proofSpec || null,
+    }));
 
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'gig_import_errors.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      const { data, error } = await supabase
+        .from('gigs')
+        .insert(payloadBatch)
+        .select();
+
+      if (error) throw error;
+
+      setImportProgress({
+        current: validRowsToCreate.length,
+        total: validRowsToCreate.length,
+        created: (data || []).length,
+        failed: 0,
+      });
+      setImportComplete(true);
+    } catch (err) {
+      console.error('[BulkGigImport] Insert error:', err);
+      setImportFailures([{ row: 0, error: err.message || 'Database error during batch insert' }]);
+      setImportComplete(true);
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   return (
-    <div className="admin-page space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-        <Link to="/admin/gigs" className="hover:text-gray-900 transition-colors">Gigs</Link>
-        <span>/</span>
-        <span className="text-gray-900 font-semibold">Bulk Import</span>
-      </div>
-
+    <div className="admin-page admin-page-medium">
       {/* Page Header */}
       <div className="admin-page-header">
-        <div>
-          <h1 className="flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-[#E31B23]" />
-            Bulk Gig CSV Import
+        <div className="admin-page-title-group">
+          <h1 className="admin-page-title">
+            <Briefcase size={22} />
+            <span>Bulk Opportunity CSV Import</span>
           </h1>
-          <p>
-            Upload and upsert external opportunities. Existing external IDs will be updated; new IDs will be inserted.
+          <p className="admin-page-description">
+            Upload multiple commercial opportunities via CSV assigned to UpShift tracks.
           </p>
         </div>
 
@@ -581,338 +310,264 @@ export default function BulkGigImportPage() {
           <button
             type="button"
             onClick={handleDownloadTemplate}
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-secondary"
             title="Download CSV format template"
           >
-            <Download className="w-4 h-4 text-gray-600" />
-            <span>Download CSV Template</span>
+            <Download size={14} />
+            <span>Download Template</span>
           </button>
 
           <Link
             to="/admin/gigs"
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-secondary"
           >
-            <ArrowLeft className="w-4 h-4 text-gray-600" />
-            <span>Back to Gigs</span>
+            <ArrowLeft size={14} />
+            <span>Back to Opportunities</span>
           </Link>
         </div>
       </div>
 
-      {/* Upload Zone */}
-      <div className="admin-card p-6">
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
-            isDragging 
-              ? 'border-[#E31B23] bg-red-50/40' 
-              : file 
-              ? 'border-emerald-300 bg-emerald-50/20' 
-              : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'
-          }`}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            onChange={(e) => handleFileSelect(e.target.files[0])}
-            className="hidden"
-            id="gig-csv-file-input"
-          />
+      {/* Parse Error Banner */}
+      {parseError && (
+        <div role="alert" className="admin-alert admin-alert-danger">
+          <div className="admin-alert-content">
+            <AlertCircle size={16} />
+            <span>{parseError}</span>
+          </div>
+          <button
+            onClick={() => setParseError(null)}
+            className="admin-btn admin-btn-sm admin-btn-secondary"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
-          {!file ? (
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-[#E31B23]">
-                <UploadCloud className="w-6 h-6" />
+      {/* Upload Dropzone */}
+      {!file && (
+        <div className="admin-card">
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processCSVFile(e.dataTransfer.files[0]);
+              }
+            }}
+            onClick={() => fileInputRef.current?.click()}
+            className={`admin-dropzone ${isDragging ? 'is-dragging' : ''}`}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  processCSVFile(e.target.files[0]);
+                }
+              }}
+              style={{ display: 'none' }}
+            />
+            <div className="admin-dropzone-icon">
+              <UploadCloud size={24} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#111827', margin: '0 0 4px 0' }}>
+                Drag & Drop Opportunity CSV File
+              </h3>
+              <p style={{ fontSize: '12.5px', color: '#6B7280', margin: 0 }}>
+                or click to browse (.csv format)
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* File Loaded Preview & Validation Stage */}
+      {file && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* File Meta Card */}
+          <div className="admin-card admin-card-compact" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#FEF2F2', color: '#E31B23', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FileText size={18} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">
-                  <label 
-                    htmlFor="gig-csv-file-input" 
-                    className="text-[#E31B23] hover:underline cursor-pointer"
-                  >
-                    Click to choose file
-                  </label>{' '}
-                  or drag and drop
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Supported format: standard comma-separated .CSV (batches of 100 records)
-                </p>
+                <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#111827', margin: 0 }}>
+                  {file.name}
+                </h4>
+                <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#6B7280' }}>
+                  {(file.size / 1024).toFixed(1)} KB · {counts.total} rows
+                </span>
               </div>
             </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-3 bg-white rounded-lg border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5" />
+
+            {!isImporting && !importComplete && (
+              <button
+                onClick={() => {
+                  setFile(null);
+                  setPreviewRows([]);
+                  setAllValidatedRows([]);
+                  setCounts({ total: 0, valid: 0, invalid: 0 });
+                  setParseError(null);
+                  setImportComplete(false);
+                  setImportFailures([]);
+                }}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+              >
+                <Trash2 size={13} />
+                <span>Change File</span>
+              </button>
+            )}
+          </div>
+
+          {/* Validation Counters */}
+          <div className="admin-stats-grid">
+            <div className="admin-stat-box">
+              <span className="admin-stat-label">Total Rows</span>
+              <span className="admin-stat-value">{counts.total}</span>
+            </div>
+            <div className="admin-stat-box">
+              <span className="admin-stat-label" style={{ color: '#059669' }}>Valid Opportunities</span>
+              <span className="admin-stat-value" style={{ color: '#059669' }}>{counts.valid}</span>
+            </div>
+            <div className="admin-stat-box">
+              <span className="admin-stat-label" style={{ color: '#DC2626' }}>Invalid Rows</span>
+              <span className="admin-stat-value" style={{ color: '#DC2626' }}>{counts.invalid}</span>
+            </div>
+          </div>
+
+          {/* Import Complete Card */}
+          {importComplete && (
+            <div className="admin-card" style={{ backgroundColor: '#F0FDF4', borderColor: '#BBF7D0', padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <CheckCircle2 size={20} />
                 </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-gray-900">{file.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {(file.size / 1024).toFixed(1)} KB &bull; {counts.total} rows detected
+                <div>
+                  <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#111827', margin: '0 0 4px 0' }}>
+                    Batch Import Completed
+                  </h3>
+                  <p style={{ fontSize: '12.5px', color: '#4B5563', margin: 0, lineHeight: 1.5 }}>
+                    Successfully imported <strong>{importProgress.created}</strong> opportunities into UpShift tracks.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="gig-csv-file-input"
-                  className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer"
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Link
+                  to="/admin/gigs"
+                  className="admin-btn admin-btn-primary"
                 >
-                  Change File
-                </label>
+                  <Briefcase size={14} />
+                  <span>View All Opportunities</span>
+                </Link>
+
                 <button
-                  type="button"
-                  onClick={handleClearFile}
-                  disabled={isImporting}
-                  className="p-1.5 text-gray-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors"
-                  title="Remove file"
+                  onClick={() => {
+                    setFile(null);
+                    setPreviewRows([]);
+                    setAllValidatedRows([]);
+                    setCounts({ total: 0, valid: 0, invalid: 0 });
+                    setParseError(null);
+                    setImportComplete(false);
+                    setImportFailures([]);
+                  }}
+                  className="admin-btn admin-btn-secondary"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <span>Import Another File</span>
                 </button>
               </div>
             </div>
           )}
-        </div>
 
-        {parseError && (
-          <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-800">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div className="text-xs space-y-1">
-              <p className="font-semibold text-sm text-red-900">CSV Validation Error</p>
-              <p>{parseError}</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Validation Summary & Execution */}
-      {file && !parseError && (
-        <div className="space-y-6">
-          {/* Summary Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Rows</span>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{counts.total}</p>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <span className="text-xs font-medium text-emerald-600 uppercase tracking-wider">Valid Rows</span>
-              <p className="text-2xl font-bold text-emerald-600 mt-1">{counts.valid}</p>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <span className="text-xs font-medium text-amber-600 uppercase tracking-wider">Invalid Rows</span>
-              <p className="text-2xl font-bold text-amber-600 mt-1">{counts.invalid}</p>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <span className="text-xs font-medium text-red-600 uppercase tracking-wider">Duplicate IDs in File</span>
-              <p className="text-2xl font-bold text-red-600 mt-1">{counts.duplicates}</p>
-            </div>
-          </div>
-
-          {/* Import Progress Banner */}
-          {isImporting && (
-            <div className="admin-card p-6 border-[#E31B23]/30 bg-red-50/20">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 text-[#E31B23] animate-spin" />
-                  <span className="text-sm font-semibold text-gray-900">
-                    Importing gigs... {importProgress.current} / {importProgress.total}
-                  </span>
-                </div>
-                <span className="text-xs font-mono font-medium text-gray-600">
-                  {Math.round((importProgress.current / (importProgress.total || 1)) * 100)}%
+          {/* Validation Table Preview */}
+          {!importComplete && (
+            <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 20px', borderBottom: '1px solid #E5E7EB', backgroundColor: '#FAFAFA' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#111827', textTransform: 'uppercase', fontFamily: 'monospace' }}>
+                  Opportunity Pre-Validation Preview ({Math.min(100, allValidatedRows.length)} of {allValidatedRows.length} rows)
                 </span>
               </div>
-              
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="bg-[#E31B23] h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${(importProgress.current / (importProgress.total || 1)) * 100}%` }}
-                />
+
+              <div className="admin-table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Status</th>
+                      <th>Opportunity Title</th>
+                      <th>Track Code</th>
+                      <th>Compensation</th>
+                      <th>Issues</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previewRows.map((r) => (
+                      <tr key={r.rowNumber} style={{ backgroundColor: r.isValid ? 'transparent' : '#FEF2F2' }}>
+                        <td style={{ fontFamily: 'monospace', color: '#9CA3AF' }}>{r.rowNumber}</td>
+                        <td>
+                          {r.isValid ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#047857', fontWeight: 700, fontSize: '11px', fontFamily: 'monospace' }}>
+                              <CheckCircle2 size={12} /> Valid
+                            </span>
+                          ) : (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#B91C1C', fontWeight: 700, fontSize: '11px', fontFamily: 'monospace' }}>
+                              <AlertTriangle size={12} /> Invalid
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ fontWeight: 600 }}>{r.title || '—'}</td>
+                        <td>
+                          <span style={{ padding: '2px 5px', borderRadius: '4px', fontSize: '10.5px', fontFamily: 'monospace', fontWeight: 700, backgroundColor: '#F3F4F6' }}>
+                            {r.trackCode}
+                          </span>
+                        </td>
+                        <td style={{ fontFamily: 'monospace' }}>{r.paymentAmount || '—'}</td>
+                        <td>
+                          {r.errors.length > 0 ? (
+                            <span style={{ color: '#DC2626', fontSize: '11px', fontWeight: 500 }}>
+                              {r.errors.join('; ')}
+                            </span>
+                          ) : (
+                            <span style={{ color: '#10B981', fontSize: '11px' }}>Ready</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
-              <div className="flex items-center gap-6 mt-3 text-xs text-gray-600">
-                <span>Inserted: <strong className="text-emerald-600">{importProgress.inserted}</strong></span>
-                <span>Updated: <strong className="text-blue-600">{importProgress.updated}</strong></span>
-                <span>Failed: <strong className="text-red-600">{importProgress.failed}</strong></span>
-                <span>Remaining: <strong className="text-gray-900">{importProgress.total - importProgress.current}</strong></span>
-              </div>
-            </div>
-          )}
-
-          {/* Import Complete Banner */}
-          {importComplete && (
-            <div className="admin-card p-6 border-emerald-200 bg-emerald-50/20">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="text-base font-bold text-gray-900">Import Complete</h3>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Inserted: <strong className="text-emerald-700">{importProgress.inserted}</strong> &bull; Updated: <strong className="text-blue-700">{importProgress.updated}</strong> &bull; Failed: <strong className="text-red-700">{importProgress.failed + counts.invalid + counts.duplicates}</strong>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {(importProgress.failed > 0 || counts.invalid > 0 || counts.duplicates > 0) && (
-                    <button
-                      type="button"
-                      onClick={handleDownloadErrorReport}
-                      className="px-3.5 py-2 text-xs font-semibold text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors flex items-center gap-1.5"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Error Report
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleClearFile}
-                    className="admin-btn-secondary"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    Import Another File
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => navigate('/admin/gigs')}
-                    className="px-4 py-2 text-xs font-semibold text-white bg-[#111827] hover:bg-black rounded-lg transition-colors"
-                  >
-                    View Gigs Board
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Execution Bar */}
-          {!importComplete && (
-            <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl">
-              <div className="text-xs text-gray-500">
-                {counts.valid > 0 ? (
-                  <span>Ready to upsert <strong>{counts.valid}</strong> opportunity records in batches of 100.</span>
-                ) : (
-                  <span className="text-amber-600">No valid records found to import. Please resolve the errors below.</span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                {(counts.invalid > 0 || counts.duplicates > 0) && (
-                  <button
-                    type="button"
-                    onClick={handleDownloadErrorReport}
-                    className="admin-btn-secondary text-red-700 hover:bg-red-50"
-                  >
-                    <Download className="w-4 h-4 text-red-600" />
-                    Export Validation Errors
-                  </button>
-                )}
+              {/* Action Bar */}
+              <div style={{ padding: '16px 20px', borderTop: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FAFAFA' }}>
+                <span style={{ fontSize: '12.5px', color: '#6B7280' }}>
+                  {counts.valid} valid opportunities ready for creation.
+                </span>
 
                 <button
                   type="button"
-                  onClick={handleExecuteImport}
-                  disabled={isImporting || counts.valid === 0}
-                  className="admin-btn-primary"
+                  onClick={handleExecuteBatchImport}
+                  disabled={counts.valid === 0 || isImporting}
+                  className="admin-btn admin-btn-primary"
                 >
                   {isImporting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Upserting Gigs...</span>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Importing batch...</span>
                     </>
                   ) : (
                     <>
-                      <Briefcase className="w-4 h-4" />
-                      <span>Upsert {counts.valid} Gigs</span>
+                      <UploadCloud size={14} />
+                      <span>Create {counts.valid} Opportunities</span>
                     </>
                   )}
                 </button>
               </div>
             </div>
           )}
-
-          {/* Preview Table */}
-          <div className="admin-card overflow-hidden p-0">
-            <div className="p-4 border-b border-gray-200 bg-gray-50/70 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">Validation Preview</h3>
-                <p className="text-xs text-gray-500">
-                  Showing {Math.min(previewRows.length, 100)} of {counts.total} rows.
-                </p>
-              </div>
-              <span className="text-xs font-mono text-gray-400 bg-white px-2 py-1 border border-gray-200 rounded">
-                Memory-Safe Window
-              </span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-gray-600">
-                <thead className="bg-gray-50 border-b border-gray-200 font-semibold text-gray-700">
-                  <tr>
-                    <th className="py-3 px-4 w-16">Row</th>
-                    <th className="py-3 px-4">Gig ID</th>
-                    <th className="py-3 px-4">Title</th>
-                    <th className="py-3 px-4">Course</th>
-                    <th className="py-3 px-4">Payment</th>
-                    <th className="py-3 px-4">Origin Site</th>
-                    <th className="py-3 px-4">Validation</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {previewRows.map((row) => (
-                    <tr 
-                      key={row.rowNumber} 
-                      className={`hover:bg-gray-50/60 transition-colors ${!row.isValid ? 'bg-amber-50/30' : ''}`}
-                    >
-                      <td className="py-3 px-4 font-mono text-gray-400">#{row.rowNumber}</td>
-                      <td className="py-3 px-4 font-mono text-gray-900 font-medium">{row.externalGigId || '—'}</td>
-                      <td className="py-3 px-4 font-medium text-gray-900 max-w-xs truncate" title={row.title}>
-                        {row.title || '—'}
-                      </td>
-                      <td className="py-3 px-4">
-                        {row.matchedCourse ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 text-gray-800">
-                            {row.matchedCourse.code} &bull; {row.matchedCourse.name}
-                          </span>
-                        ) : (
-                          <span className="font-mono text-amber-700">{row.rawCourse || '—'}</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 font-semibold text-gray-900 whitespace-nowrap">
-                        {row.paymentAmount || '—'}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center gap-1 text-[11px] text-gray-700">
-                          <Globe className="w-3 h-3 text-gray-400" />
-                          {row.originSite || '—'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {row.isValid ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3" />
-                            VALID
-                          </span>
-                        ) : (
-                          <div className="flex flex-col gap-0.5">
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 w-fit">
-                              <AlertTriangle className="w-3 h-3" />
-                              INVALID
-                            </span>
-                            <span className="text-[10px] text-amber-800 font-medium">
-                              {row.errors.join(', ')}
-                            </span>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       )}
     </div>

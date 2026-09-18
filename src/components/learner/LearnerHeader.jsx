@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Briefcase, 
   LogOut, 
   Globe, 
-  GraduationCap, 
-  BookOpen, 
-  User,
-  Sparkles,
-  Layers
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../lib/supabaseClient';
+import UpShiftWordmark from '../common/UpShiftWordmark';
 
-export default function LearnerHeader({ enrolledCourses = [] }) {
+export default function LearnerHeader({ assignedTrack = null, enrolledCourses = [] }) {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -24,6 +19,7 @@ export default function LearnerHeader({ enrolledCourses = [] }) {
 
   const learnerName = profile?.full_name || user?.user_metadata?.full_name || 'Learner';
   const college = profile?.college || user?.user_metadata?.college || '';
+  const currentTrack = assignedTrack || enrolledCourses[0] || null;
 
   return (
     <header className="learner-header" aria-label="Learner Marketplace Header">
@@ -42,7 +38,7 @@ export default function LearnerHeader({ enrolledCourses = [] }) {
           </div>
           <div className="flex flex-col">
             <span className="text-[15px] font-extrabold tracking-tight text-[#111827] leading-none">
-              UpShift
+              <UpShiftWordmark theme="light" />
             </span>
             <span className="text-[10px] font-mono font-bold tracking-[0.14em] text-[#6B7280] uppercase mt-1">
               Opportunities
@@ -50,24 +46,21 @@ export default function LearnerHeader({ enrolledCourses = [] }) {
           </div>
         </Link>
 
-        {/* Learner Track Badges */}
-        {enrolledCourses.length > 0 && (
+        {/* Assigned Track Badge */}
+        {currentTrack && (
           <div className="hidden md:flex items-center gap-2 pl-4 border-l border-[#E5E7EB]">
-            {enrolledCourses.map((c) => (
-              <span
-                key={c.id}
-                className="learner-badge-track"
-                style={{
-                  backgroundColor: c.bg_color || 'rgba(227, 27, 35, 0.1)',
-                  color: c.color || '#E31B23',
-                  border: `1px solid ${c.color ? `${c.color}33` : 'rgba(227, 27, 35, 0.25)'}`,
-                }}
-                title={`Enrolled Track: ${c.code} — ${c.name}`}
-              >
-                <Sparkles className="w-3 h-3" />
-                <span>{c.code} · {c.name}</span>
-              </span>
-            ))}
+            <span
+              className="learner-badge-track"
+              style={{
+                backgroundColor: currentTrack.bg_color || 'rgba(227, 27, 35, 0.1)',
+                color: currentTrack.color || '#E31B23',
+                border: `1px solid ${currentTrack.color ? `${currentTrack.color}33` : 'rgba(227, 27, 35, 0.25)'}`,
+              }}
+              title={`Assigned UpShift Track: ${currentTrack.code} — ${currentTrack.name}`}
+            >
+              <Sparkles className="w-3 h-3" />
+              <span>{currentTrack.code} · {currentTrack.name}</span>
+            </span>
           </div>
         )}
       </div>
@@ -97,18 +90,17 @@ export default function LearnerHeader({ enrolledCourses = [] }) {
           className="learner-btn-secondary hidden lg:inline-flex"
           title="Visit public website"
         >
-          <Globe className="w-4 h-4 text-[#4B5563]" />
-          <span>Public Site</span>
+          <Globe className="w-3.5 h-3.5" />
+          <span>Home</span>
         </Link>
 
-        {/* Sign Out */}
+        {/* Sign Out Button */}
         <button
-          type="button"
           onClick={handleSignOut}
-          className="learner-btn-secondary hover:text-[#E31B23] hover:border-[#FECACA]"
+          className="learner-btn-secondary"
           title="Sign out of UpShift"
         >
-          <LogOut className="w-4 h-4 text-[#4B5563]" />
+          <LogOut className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Sign Out</span>
         </button>
       </div>

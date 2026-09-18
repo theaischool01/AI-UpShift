@@ -38,14 +38,22 @@ export default function AdminLayout() {
           isRefreshing={isRefreshing}
         />
 
-        <main className="flex-1 min-w-0">
+        <main className="admin-main-content">
           <AdminErrorBoundary>
             <Outlet context={{ refreshTrigger, isRefreshing, setIsRefreshing }} />
           </AdminErrorBoundary>
         </main>
 
-        <footer className="border-t border-gray-200 py-5 text-center text-xs font-mono text-gray-400 bg-white">
-          UPSHIFT CONTROL CENTER · ADMIN WORKSPACE · PHASE 6
+        <footer style={{ 
+          borderTop: '1px solid #E5E7EB', 
+          padding: '16px 24px', 
+          textAlign: 'center', 
+          fontSize: '11px', 
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', 
+          color: '#9CA3AF', 
+          backgroundColor: '#FFFFFF' 
+        }}>
+          UPSHIFT CONTROL CENTER · ADMIN WORKSPACE
         </footer>
       </div>
     </div>

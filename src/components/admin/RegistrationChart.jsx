@@ -1,16 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Calendar, TrendingUp } from 'lucide-react';
 
 export default function RegistrationChart({ enrollments = [], isLoading = false }) {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
-  // Aggregate enrollments by calendar day (robust 7-day window based on actual enrollment activity)
+  // Aggregate enrollments by calendar day (7-day window based on actual enrollment activity)
   const chartData = useMemo(() => {
     if (!enrollments || enrollments.length === 0) {
       return [];
     }
 
-    // Map counts by local date string (YYYY-MM-DD)
     const countsByDate = {};
     enrollments.forEach((e) => {
       if (!e.enrolled_at) return;
@@ -71,122 +68,111 @@ export default function RegistrationChart({ enrollments = [], isLoading = false 
 
   if (isLoading) {
     return (
-      <div className="admin-card animate-pulse flex flex-col justify-between h-[300px]">
-        <div className="h-5 w-44 bg-gray-200 rounded mb-4" />
-        <div className="h-44 w-full bg-gray-100 rounded-xl" />
-        <div className="h-4 w-56 bg-gray-100 rounded mt-4" />
+      <div className="admin-card" style={{ minHeight: '320px', opacity: 0.6 }}>
+        <div style={{ width: '160px', height: '18px', backgroundColor: '#E5E7EB', borderRadius: '4px', marginBottom: '16px' }} />
+        <div style={{ height: '180px', backgroundColor: '#F9FAFB', borderRadius: '10px' }} />
       </div>
     );
   }
 
   return (
-    <div className="admin-card flex flex-col justify-between">
+    <div className="admin-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-        <div>
-          <div className="flex items-center gap-1.5 mb-1 text-[11px] font-mono text-[#E31B23] uppercase font-bold tracking-wider">
+      <div className="admin-card-header">
+        <div className="admin-card-header-left">
+          <span className="admin-card-eyebrow">
             <TrendingUp size={13} />
             <span>Velocity · Activity</span>
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight m-0">
+          </span>
+          <h3 className="admin-card-title">
             Registrations Over Time
           </h3>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs font-mono text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200 self-start sm:self-auto">
-          <Calendar size={13} />
-          <span>{chartData.length > 0 ? `${chartData.length}-Day Activity Window` : 'Awaiting Activity'}</span>
-        </div>
+        <span className="admin-card-badge">
+          <Calendar size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: '-1px' }} />
+          {chartData.length > 0 ? `${chartData.length}-Day Window` : 'Awaiting Activity'}
+        </span>
       </div>
 
       {/* Chart Canvas Area */}
       {chartData.length === 0 ? (
-        <div className="h-44 flex flex-col items-center justify-center text-center p-6 border border-dashed border-gray-200 rounded-xl bg-gray-50/50">
-          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mb-2">
-            <Calendar size={18} />
-          </div>
-          <p className="text-sm font-semibold text-gray-700 mb-0.5">
+        <div style={{
+          height: '180px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '24px',
+          border: '1px dashed #E5E7EB',
+          borderRadius: '10px',
+          backgroundColor: '#FAFAFA'
+        }}>
+          <Calendar size={22} style={{ color: '#9CA3AF', marginBottom: '8px' }} />
+          <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#374151', margin: '0 0 4px 0' }}>
             No registration timeline data yet
           </p>
-          <p className="text-xs text-gray-500 font-mono">
+          <p style={{ fontSize: '11.5px', color: '#9CA3AF', fontFamily: 'monospace', margin: 0 }}>
             Registration events will dynamically populate this chart as students enroll.
           </p>
         </div>
       ) : (
         <div>
           {/* Main Visual Bar Stage with Y-Axis and Gridlines */}
-          <div className="relative h-44 w-full pt-6 pb-6 pl-8 pr-2 flex items-end">
+          <div className="admin-chart-stage-container">
             {/* Background Reference Gridlines */}
-            <div className="absolute inset-x-8 top-6 bottom-6 flex flex-col justify-between pointer-events-none border-l border-gray-200">
+            <div className="admin-chart-gridlines">
               {/* Max level */}
-              <div className="border-b border-dashed border-gray-200/80 w-full relative">
-                <span className="absolute -left-7 -top-2 text-[10px] font-mono font-semibold text-gray-400">
+              <div className="admin-chart-gridline">
+                <span className="admin-chart-axis-label">
                   {maxCount}
                 </span>
               </div>
               {/* Mid level */}
-              <div className="border-b border-dashed border-gray-200/80 w-full relative">
-                <span className="absolute -left-7 -top-2 text-[10px] font-mono font-semibold text-gray-400">
+              <div className="admin-chart-gridline">
+                <span className="admin-chart-axis-label">
                   {Math.round(maxCount / 2)}
                 </span>
               </div>
               {/* Baseline */}
-              <div className="border-b border-gray-300 w-full relative">
-                <span className="absolute -left-7 -top-2 text-[10px] font-mono font-semibold text-gray-400">
+              <div className="admin-chart-gridline admin-chart-gridline-solid">
+                <span className="admin-chart-axis-label">
                   0
                 </span>
               </div>
             </div>
 
             {/* Bar Columns */}
-            <div className="relative z-10 w-full h-full flex items-end justify-between gap-2 sm:gap-4">
-              {chartData.map((item, idx) => {
+            <div className="admin-chart-columns-wrapper">
+              {chartData.map((item) => {
                 const heightPercent = maxCount > 0 
-                  ? Math.max((item.count / maxCount) * 100, item.count > 0 ? 15 : 0)
+                  ? Math.max((item.count / maxCount) * 100, item.count > 0 ? 18 : 0)
                   : 0;
-                const isHovered = hoveredIndex === idx;
 
                 return (
-                  <div
-                    key={item.date}
-                    className="flex-1 flex flex-col items-center h-full justify-end group relative cursor-pointer"
-                    onMouseEnter={() => setHoveredIndex(idx)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
+                  <div key={item.date} className="admin-chart-column">
                     {/* Floating Value Pill */}
-                    <div 
-                      className={`mb-1.5 transition-all text-xs font-mono font-bold ${
-                        item.count > 0 
-                          ? (isHovered ? 'text-[#E31B23] scale-110' : 'text-gray-900') 
-                          : 'text-gray-300'
-                      }`}
-                    >
-                      {item.count}
+                    <div className="admin-chart-value-pill">
+                      {item.count > 0 ? item.count : '0'}
                     </div>
 
                     {/* Bar Pill */}
-                    <div className="w-full max-w-[36px] flex items-end justify-center" style={{ height: '78%' }}>
+                    <div className="admin-chart-bar-slot">
                       {item.count > 0 ? (
                         <div
-                          className="w-full rounded-t-lg transition-all duration-300 relative shadow-xs"
-                          style={{
-                            height: `${heightPercent}%`,
-                            backgroundColor: isHovered ? '#B90E1B' : '#E31B23',
-                          }}
+                          className="admin-chart-bar"
+                          style={{ height: `${heightPercent}%` }}
                         >
-                          <div className="absolute inset-x-0 top-0 h-1 bg-white/30 rounded-t-lg" />
+                          <div className="admin-chart-bar-cap" />
                         </div>
                       ) : (
-                        <div className="w-full h-1 bg-gray-200 rounded-full" />
+                        <div className="admin-chart-empty-bar" />
                       )}
                     </div>
 
                     {/* Bottom Date Label */}
-                    <span 
-                      className={`absolute -bottom-5 text-[11px] font-mono tracking-tight transition-colors whitespace-nowrap ${
-                        isHovered ? 'text-[#111827] font-bold' : 'text-[#6B7280]'
-                      }`}
-                    >
+                    <span className="admin-chart-date-label">
                       {item.label}
                     </span>
                   </div>
@@ -196,9 +182,9 @@ export default function RegistrationChart({ enrollments = [], isLoading = false 
           </div>
 
           {/* Footer Metainfo */}
-          <div className="mt-7 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-mono text-gray-500">
+          <div className="admin-chart-footer">
             <span>Aggregated by enrollment timestamp</span>
-            <span>Total in window: <strong className="text-gray-900 font-bold">{totalInWindow}</strong></span>
+            <span>Total in window: <strong style={{ color: '#111827' }}>{totalInWindow}</strong></span>
           </div>
         </div>
       )}

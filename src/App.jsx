@@ -159,7 +159,7 @@ function PublicHomePage() {
         onClose={() => setIsRegistrationOpen(false)} 
       />
 
-      {/* Global Minimal Brand Footer */}
+      {/* UpShift Minimal Interactive Brand Footer */}
       <Footer onNavigate={handleNavigate} />
     </div>
   );

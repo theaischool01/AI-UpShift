@@ -5,15 +5,18 @@ export default function RecentRegistrationsTable({
   enrollments = [],
   learnersMap = {},
   coursesMap = {},
+  tracksMap = {},
   isLoading = false,
 }) {
+  const activeTracksMap = Object.keys(tracksMap).length > 0 ? tracksMap : coursesMap;
+
   if (isLoading) {
     return (
-      <div className="admin-card animate-pulse">
-        <div className="h-5 w-48 bg-gray-200 rounded mb-4" />
-        <div className="space-y-2">
+      <div className="admin-card" style={{ opacity: 0.6 }}>
+        <div style={{ width: '160px', height: '18px', backgroundColor: '#E5E7EB', borderRadius: '4px', marginBottom: '16px' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
+            <div key={i} style={{ height: '42px', backgroundColor: '#F9FAFB', borderRadius: '8px' }} />
           ))}
         </div>
       </div>
@@ -40,136 +43,194 @@ export default function RecentRegistrationsTable({
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'ui-monospace, monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#ECFDF5',
+            color: '#047857',
+            border: '1px solid #A7F3D0'
+          }}>
+            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10B981' }} />
             Active
           </span>
         );
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'ui-monospace, monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#EFF6FF',
+            color: '#1D4ED8',
+            border: '1px solid #BFDBFE'
+          }}>
             <CheckCircle2 size={11} />
             Completed
           </span>
         );
       case 'dropped':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-red-50 text-red-700 border border-red-200">
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'ui-monospace, monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#FEF2F2',
+            color: '#B91C1C',
+            border: '1px solid #FECACA'
+          }}>
             <AlertCircle size={11} />
             Dropped
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-gray-100 text-gray-700 border border-gray-200">
-            {status || 'Active'}
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'ui-monospace, monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#F3F4F6',
+            color: '#4B5563'
+          }}>
+            {status || 'Unknown'}
           </span>
         );
     }
   };
 
   return (
-    <div className="admin-card">
-      {/* Table Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+    <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
+      {/* Header */}
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FAFAFA' }}>
         <div>
-          <div className="flex items-center gap-1.5 mb-1 text-[11px] font-mono text-[#E31B23] uppercase font-bold tracking-wider">
-            <GraduationCap size={13} />
-            <span>Learner Roster</span>
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight m-0">
-            Recent Registrations
-          </h3>
+          <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#111827', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            Recent UpShift Registrations
+          </h4>
+          <p style={{ fontSize: '11.5px', color: '#6B7280', margin: '2px 0 0 0' }}>
+            Latest learners provisioned into the UpShift Program
+          </p>
         </div>
-
-        <span className="text-xs font-mono text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200 self-start sm:self-auto">
-          Showing {recentItems.length} most recent
-        </span>
       </div>
 
       {recentItems.length === 0 ? (
-        /* Empty State */
-        <div className="py-12 text-center border border-dashed border-gray-200 rounded-xl bg-gray-50/50 px-4">
-          <div className="w-10 h-10 rounded-full bg-gray-100 mx-auto flex items-center justify-center text-gray-400 mb-2">
-            <Users size={18} />
-          </div>
-          <h4 className="text-sm font-bold text-gray-900 mb-0.5 uppercase tracking-wide">
-            No Learner Registrations Yet
-          </h4>
-          <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-            Registered students and their enrolled flagship courses will appear here in chronological order once enrollments are created.
+        <div style={{ padding: '36px 20px', textAlign: 'center', color: '#6B7280' }}>
+          <Users size={24} style={{ margin: '0 auto 8px auto', opacity: 0.4 }} />
+          <p style={{ fontSize: '13px', fontWeight: 600, color: '#374151', margin: '0 0 2px 0' }}>
+            No registrations recorded yet
+          </p>
+          <p style={{ fontSize: '12px', margin: 0 }}>
+            New student enrollments will appear here automatically.
           </p>
         </div>
       ) : (
-        /* Normalized Data Table */
-        <div className="admin-table-wrapper">
+        <div className="admin-table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
           <table className="admin-table">
             <thead>
               <tr>
-                <th className="py-3 px-4">Student</th>
-                <th className="py-3 px-4">College</th>
-                <th className="py-3 px-4">College Email</th>
-                <th className="py-3 px-4">Course</th>
-                <th className="py-3 px-4">Registered</th>
-                <th className="py-3 px-4 text-right">Status</th>
+                <th>Student</th>
+                <th>College / University</th>
+                <th>Assigned Track</th>
+                <th>Enrolled Date</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {recentItems.map((item) => {
-                const learner = learnersMap[item.user_id] || {};
-                const course = coursesMap[item.course_id] || {};
-                const studentName = learner.full_name || learner.email || 'Anonymous Student';
-                const courseColor = course.color || '#E31B23';
+              {recentItems.map((enrollment) => {
+                const learner = learnersMap[enrollment.user_id] || {};
+                const trackId = enrollment.track_id || enrollment.course_id;
+                const track = activeTracksMap[trackId] || {};
+                const accentColor = track.color || '#E31B23';
 
                 return (
-                  <tr key={item.id}>
-                    {/* Student Column */}
-                    <td className="py-3 px-4">
-                      <div className="font-bold text-gray-900 text-xs">
-                        {studentName}
-                      </div>
-                      <div className="text-[11px] font-mono text-gray-400 mt-0.5">
-                        {learner.email}
-                      </div>
-                    </td>
-
-                    {/* College Column */}
-                    <td className="py-3 px-4 text-gray-700 text-xs">
-                      {learner.college || '—'}
-                    </td>
-
-                    {/* College Email Column */}
-                    <td className="py-3 px-4 font-mono text-gray-500 text-[11px]">
-                      {learner.college_email || '—'}
-                    </td>
-
-                    {/* Course Column */}
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1.5">
-                        <span 
-                          className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase shrink-0"
-                          style={{ 
-                            backgroundColor: `${courseColor}15`, 
-                            color: courseColor,
-                            border: `1px solid ${courseColor}30`
-                          }}
-                        >
-                          {course.code || 'M'}
-                        </span>
-                        <span className="font-medium text-gray-800 truncate max-w-[180px] text-xs">
-                          {course.name || item.course_id}
-                        </span>
+                  <tr key={enrollment.id}>
+                    {/* Student Info */}
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ 
+                          width: '26px', 
+                          height: '26px', 
+                          borderRadius: '50%', 
+                          backgroundColor: '#F3F4F6', 
+                          color: '#374151',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          flexShrink: 0
+                        }}>
+                          {(learner.full_name || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: 700, color: '#111827', fontSize: '13px', display: 'block' }}>
+                            {learner.full_name || 'Unknown Learner'}
+                          </span>
+                          <span style={{ fontSize: '11px', color: '#6B7280', fontFamily: 'monospace' }}>
+                            {learner.email || '—'}
+                          </span>
+                        </div>
                       </div>
                     </td>
 
-                    {/* Registered Date Column */}
-                    <td className="py-3 px-4 font-mono text-gray-500 text-xs whitespace-nowrap">
-                      {formatDate(item.enrolled_at)}
+                    {/* College */}
+                    <td>
+                      <span style={{ fontSize: '12.5px', color: '#374151' }}>
+                        {learner.college || '—'}
+                      </span>
                     </td>
 
-                    {/* Status Column */}
-                    <td className="py-3 px-4 text-right whitespace-nowrap">
-                      {getStatusBadge(item.status)}
+                    {/* Assigned Track */}
+                    <td>
+                      <span style={{ 
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '2px 7px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        backgroundColor: `${accentColor}15`,
+                        color: accentColor,
+                        border: `1px solid ${accentColor}30`,
+                        fontFamily: 'monospace'
+                      }}>
+                        {track.code ? `${track.code} · ` : ''}{track.name || trackId || '—'}
+                      </span>
+                    </td>
+
+                    {/* Enrolled Date */}
+                    <td>
+                      <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'monospace' }}>
+                        {formatDate(enrollment.enrolled_at)}
+                      </span>
+                    </td>
+
+                    {/* Status */}
+                    <td>
+                      {getStatusBadge(enrollment.status)}
                     </td>
                   </tr>
                 );

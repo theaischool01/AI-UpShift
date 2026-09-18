@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { 
   Users, 
-  BookOpen, 
+  Sparkles, 
   Award, 
   GraduationCap, 
   AlertCircle 
@@ -17,7 +17,7 @@ export default function AdminDashboardPage() {
   const { refreshTrigger, setIsRefreshing } = useOutletContext() || {};
 
   const [learners, setLearners] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -27,33 +27,53 @@ export default function AdminDashboardPage() {
     setErrorMessage(null);
 
     try {
-      const [profilesRes, coursesRes, enrollmentsRes] = await Promise.all([
+      const [profilesRes, tracksRes, enrollmentsRes] = await Promise.all([
         // 1. Fetch only learner profiles (strictly exclude admins)
         supabase
           .from('profiles')
           .select('id, full_name, email, college, college_email, role, created_at')
           .eq('role', 'learner'),
 
-        // 2. Fetch all 6 seeded courses
+        // 2. Fetch all 6 seeded tracks
         supabase
-          .from('courses')
+          .from('tracks')
           .select('id, code, name, category, color, bg_color')
           .order('code', { ascending: true }),
 
         // 3. Fetch all enrollments sorted by enrolled_at desc
         supabase
           .from('enrollments')
-          .select('id, user_id, course_id, enrolled_at, status')
+          .select('id, user_id, track_id, enrolled_at, status')
           .order('enrolled_at', { ascending: false }),
       ]);
 
+      // Fallback if tracks table rename is in progress
+      let activeTracks = tracksRes.data;
+      if (tracksRes.error || !activeTracks) {
+        const fallbackRes = await supabase
+          .from('courses')
+          .select('id, code, name, category, color, bg_color')
+          .order('code', { ascending: true });
+        activeTracks = fallbackRes.data || [];
+      }
+
+      let activeEnrollments = enrollmentsRes.data;
+      if (enrollmentsRes.error || !activeEnrollments) {
+        const fallbackRes = await supabase
+          .from('enrollments')
+          .select('id, user_id, course_id, enrolled_at, status')
+          .order('enrolled_at', { ascending: false });
+        activeEnrollments = (fallbackRes.data || []).map(e => ({
+          ...e,
+          track_id: e.course_id
+        }));
+      }
+
       if (profilesRes.error) throw profilesRes.error;
-      if (coursesRes.error) throw coursesRes.error;
-      if (enrollmentsRes.error) throw enrollmentsRes.error;
 
       setLearners(profilesRes.data || []);
-      setCourses(coursesRes.data || []);
-      setEnrollments(enrollmentsRes.data || []);
+      setTracks(activeTracks || []);
+      setEnrollments(activeEnrollments || []);
     } catch (err) {
       console.error('[UpShift Admin Dashboard] Data fetch error:', err);
       setErrorMessage('Unable to load dashboard data. Please refresh and try again.');
@@ -84,55 +104,58 @@ export default function AdminDashboardPage() {
     return map;
   }, [learners]);
 
-  const coursesMap = useMemo(() => {
+  const tracksMap = useMemo(() => {
     const map = {};
-    courses.forEach((c) => {
-      map[c.id] = c;
+    tracks.forEach((t) => {
+      map[t.id] = t;
     });
     return map;
-  }, [courses]);
+  }, [tracks]);
 
   // Metric 1: Total Students (only role = 'learner')
   const totalStudents = learners.length;
 
-  // Metric 2: Total Registrations (enrollments count)
+  // Metric 2: Total Program Registrations
   const totalRegistrations = enrollments.length;
 
-  // Metric 3: Most Popular Course
-  const topCourseInfo = useMemo(() => {
-    if (enrollments.length === 0 || courses.length === 0) {
+  // Metric 3: Most Popular Track
+  const topTrackInfo = useMemo(() => {
+    if (enrollments.length === 0 || tracks.length === 0) {
       return { name: 'None yet', subtitle: 'Awaiting first enrollment' };
     }
 
     const counts = {};
     enrollments.forEach((e) => {
-      counts[e.course_id] = (counts[e.course_id] || 0) + 1;
+      const tid = e.track_id || e.course_id;
+      if (tid) {
+        counts[tid] = (counts[tid] || 0) + 1;
+      }
     });
 
     let maxId = null;
     let maxCount = 0;
 
-    Object.entries(counts).forEach(([courseId, count]) => {
+    Object.entries(counts).forEach(([trackId, count]) => {
       if (count > maxCount) {
         maxCount = count;
-        maxId = courseId;
+        maxId = trackId;
       }
     });
 
     if (!maxId || maxCount === 0) {
-      return { name: 'None yet', subtitle: 'Awaiting enrollments' };
+      return { name: 'None yet', subtitle: 'Awaiting track assignments' };
     }
 
-    const foundCourse = courses.find((c) => c.id === maxId);
-    const courseCode = foundCourse?.code ? `${foundCourse.code} · ` : '';
-    const courseName = foundCourse?.name || maxId;
+    const foundTrack = tracks.find((t) => t.id === maxId || t.code === maxId);
+    const trackCode = foundTrack?.code ? `${foundTrack.code} · ` : '';
+    const trackName = foundTrack?.name || maxId;
 
     const percentage = Math.round((maxCount / enrollments.length) * 100);
     return {
-      name: `${courseCode}${courseName}`,
+      name: `${trackCode}${trackName}`,
       subtitle: `${maxCount} ${maxCount === 1 ? 'enrollment' : 'enrollments'} (${percentage}%)`
     };
-  }, [enrollments, courses]);
+  }, [enrollments, tracks]);
 
   // Metric 4: Top College
   const topCollegeInfo = useMemo(() => {
@@ -158,109 +181,109 @@ export default function AdminDashboardPage() {
 
     return {
       name: topName,
-      subtitle: `${topCount} registered ${topCount === 1 ? 'student' : 'students'}`
+      subtitle: `${topCount} ${topCount === 1 ? 'student' : 'students'} (${Math.round((topCount / learners.length) * 100)}%)`
     };
   }, [learners]);
 
   return (
-    <div className="admin-page space-y-7">
-      {/* Error State Banner */}
+    <div className="admin-page">
+      {/* Normalized Header */}
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">
+            <span>Program Overview</span>
+          </h1>
+          <p className="admin-page-description">
+            Live cohort analytics, track distributions, and institutional enrollment metrics.
+          </p>
+        </div>
+      </div>
+
+      {/* Error Alert */}
       {errorMessage && (
-        <div 
-          role="alert" 
-          className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center justify-between gap-4 text-left"
+        <div
+          role="alert"
+          className="admin-alert admin-alert-danger"
         >
-          <div className="flex items-center gap-2.5">
-            <AlertCircle size={17} className="text-[#E31B23] flex-shrink-0" />
-            <p className="text-xs sm:text-sm text-red-800 font-medium">
-              {errorMessage}
-            </p>
+          <div className="admin-alert-content">
+            <AlertCircle size={16} />
+            <span>{errorMessage}</span>
           </div>
           <button
             onClick={fetchDashboardData}
-            className="admin-btn-secondary text-xs"
+            className="admin-btn admin-btn-sm admin-btn-secondary"
           >
             Retry
           </button>
         </div>
       )}
 
-      {/* ============================================================ */}
-      {/* 1. REQUIRED METRIC CARDS (4 Required Metrics)                */}
-      {/* ============================================================ */}
-      <section aria-label="Key Registration Metrics">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {/* Metric 1: Total Students (role = 'learner') */}
-          <AdminMetricCard
-            title="Total Students"
-            value={totalStudents}
-            subtitle="Registered learner accounts"
-            icon={Users}
-            accentColor="#E31B23"
-            isLoading={isLoading}
-          />
+      {/* Four KPI Metrics Grid */}
+      <div className="admin-metrics-grid">
+        <AdminMetricCard
+          title="Total Students"
+          value={isLoading ? '—' : totalStudents}
+          subtitle="Unique learner profiles"
+          icon={Users}
+          color="#E31B23"
+          isLoading={isLoading}
+        />
 
-          {/* Metric 2: Total Registrations (enrollments) */}
-          <AdminMetricCard
-            title="Total Registrations"
-            value={totalRegistrations}
-            subtitle="Track course enrollments"
-            icon={BookOpen}
-            accentColor="#2563EB"
-            isLoading={isLoading}
-          />
+        <AdminMetricCard
+          title="Program Registrations"
+          value={isLoading ? '—' : totalRegistrations}
+          subtitle="UpShift admissions"
+          icon={Award}
+          color="#059669"
+          isLoading={isLoading}
+        />
 
-          {/* Metric 3: Most Popular Course */}
-          <AdminMetricCard
-            title="Top Course"
-            value={topCourseInfo.name}
-            subtitle={topCourseInfo.subtitle}
-            icon={Award}
-            accentColor="#059669"
-            isLoading={isLoading}
-          />
+        <AdminMetricCard
+          title="Top Track"
+          value={isLoading ? '—' : topTrackInfo.name}
+          subtitle={isLoading ? '' : topTrackInfo.subtitle}
+          icon={Sparkles}
+          color="#4F46E5"
+          isLoading={isLoading}
+        />
 
-          {/* Metric 4: Top College */}
-          <AdminMetricCard
-            title="Top College"
-            value={topCollegeInfo.name}
-            subtitle={topCollegeInfo.subtitle}
-            icon={GraduationCap}
-            accentColor="#EA580C"
-            isLoading={isLoading}
+        <AdminMetricCard
+          title="Top College"
+          value={isLoading ? '—' : topCollegeInfo.name}
+          subtitle={isLoading ? '' : topCollegeInfo.subtitle}
+          icon={GraduationCap}
+          color="#D97706"
+          isLoading={isLoading}
+        />
+      </div>
+
+      {/* Middle Analytics Grid: Registration Velocity & Track Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 2 Cols: Registration Velocity Chart */}
+        <div className="lg:col-span-2">
+          <RegistrationChart 
+            enrollments={enrollments} 
+            isLoading={isLoading} 
           />
         </div>
-      </section>
 
-      {/* ============================================================ */}
-      {/* 2. REGISTRATION ACTIVITY & COURSE DISTRIBUTION               */}
-      {/* ============================================================ */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-7">
-        {/* Registrations Over Time */}
-        <RegistrationChart
-          enrollments={enrollments}
-          isLoading={isLoading}
-        />
+        {/* 1 Col: Track Distribution Breakdown */}
+        <div className="lg:col-span-1">
+          <CourseDistribution 
+            courses={tracks} 
+            enrollments={enrollments} 
+            isLoading={isLoading} 
+          />
+        </div>
+      </div>
 
-        {/* Registrations by Course (All 6 Flagship Tracks) */}
-        <CourseDistribution
-          courses={courses}
-          enrollments={enrollments}
-          isLoading={isLoading}
-        />
-      </section>
-
-      {/* ============================================================ */}
-      {/* 3. RECENT STUDENT REGISTRATIONS TABLE                        */}
-      {/* ============================================================ */}
-      <section>
-        <RecentRegistrationsTable
-          enrollments={enrollments}
-          learnersMap={learnersMap}
-          coursesMap={coursesMap}
-          isLoading={isLoading}
-        />
-      </section>
+      {/* Bottom Table: Recent Registrations Roster */}
+      <RecentRegistrationsTable
+        enrollments={enrollments}
+        learnersMap={learnersMap}
+        coursesMap={tracksMap}
+        isLoading={isLoading}
+      />
     </div>
   );
 }

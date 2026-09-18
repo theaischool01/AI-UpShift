@@ -31,41 +31,41 @@ export default function AdminComingSoonPage({ title = 'Feature Workspace' }) {
   const IconComponent = iconMap[title] || Clock;
 
   return (
-    <div className="admin-page space-y-6">
+    <div className="admin-page admin-page-compact">
       {/* Back Link */}
       <div>
         <Link 
-          to="/admin/dashboard"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+          to="/admin/dashboard" 
+          className="admin-btn admin-btn-sm admin-btn-secondary"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={13} />
           <span>Back to Dashboard Overview</span>
         </Link>
       </div>
 
       {/* Main Feature Status Card */}
-      <div className="admin-card text-center py-16 px-6 max-w-2xl mx-auto border border-gray-200 shadow-xs">
-        <div className="w-14 h-14 rounded-2xl bg-red-50 text-[#E31B23] border border-red-100 mx-auto flex items-center justify-center mb-5">
-          <IconComponent size={26} strokeWidth={2.2} />
+      <div className="admin-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#FEF2F2', color: '#E31B23', border: '1px solid #FECACA', margin: '0 auto 16px auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <IconComponent size={24} strokeWidth={2.2} />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider text-[#E31B23] bg-red-50 border border-red-100 uppercase mb-3">
+        <span className="admin-card-eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
           <Sparkles size={12} />
           <span>Coming in Next Phase</span>
-        </div>
+        </span>
 
-        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-2">
+        <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
           {title}
         </h2>
 
-        <p className="text-sm text-gray-500 font-normal max-w-md mx-auto leading-relaxed mb-8">
-          This workspace is being prepared for the next UpShift admin phase. Functional workflows will be integrated in subsequent phases.
+        <p style={{ fontSize: '13px', color: '#6B7280', maxWidth: '420px', margin: '0 auto 24px auto', lineHeight: 1.5 }}>
+          This workspace is being prepared for the next UpShift administrative phase.
         </p>
 
-        <div className="flex items-center justify-center gap-3">
+        <div>
           <Link
             to="/admin/dashboard"
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-primary"
           >
             Return to Dashboard
           </Link>

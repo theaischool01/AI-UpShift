@@ -74,33 +74,33 @@ export default function AdminHeader({
   return (
     <header className="admin-header" aria-label="Admin Page Header">
       {/* Left: Mobile Trigger & Dynamic Page Title */}
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="admin-header-left">
         <button
           onClick={onToggleMobileMenu}
-          className="lg:hidden p-2 -ml-1 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex-shrink-0"
+          className="admin-btn-icon admin-mobile-only"
           aria-label="Open navigation menu"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
 
-        <div className="min-w-0">
-          <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 tracking-tight leading-tight truncate">
+        <div className="admin-header-title-block">
+          <h1 className="admin-header-title">
             {currentMeta.title}
           </h1>
-          <p className="hidden sm:block text-xs text-gray-500 truncate mt-0.5">
+          <p className="admin-header-subtitle">
             {currentMeta.subtitle}
           </p>
         </div>
       </div>
 
       {/* Right: Status & Actions */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <div className="admin-header-actions">
         {/* Connection Status Badge */}
         <div 
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200"
+          className="admin-status-pill admin-desktop-only"
           title="Supabase PostgreSQL Live Connection Active"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="admin-status-dot" />
           <span>Live Connected</span>
         </div>
 
@@ -108,20 +108,20 @@ export default function AdminHeader({
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="admin-btn-secondary"
+          className="admin-btn admin-btn-secondary"
           title="Refresh current data"
         >
-          <RefreshCw size={13} className={isRefreshing ? 'animate-spin' : ''} />
-          <span className="hidden sm:inline">Refresh</span>
+          <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+          <span className="admin-desktop-only">Refresh</span>
         </button>
 
         {/* Public Site Link */}
         <Link
           to="/"
-          className="admin-btn-secondary hidden sm:inline-flex"
+          className="admin-btn admin-btn-secondary admin-desktop-only"
           title="Open Public UpShift Homepage"
         >
-          <Globe size={13} />
+          <Globe size={14} />
           <span>Public Site</span>
         </Link>
 
@@ -129,11 +129,11 @@ export default function AdminHeader({
         <button
           onClick={handleSignOut}
           disabled={signingOut}
-          className="admin-btn-secondary hover:text-[#E31B23] hover:border-red-200 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="admin-btn admin-btn-secondary"
           title="Sign Out of Administrator Account"
         >
-          <LogOut size={13} className={signingOut ? 'animate-spin' : ''} />
-          <span className="hidden sm:inline">{signingOut ? 'Signing Out...' : 'Sign Out'}</span>
+          <LogOut size={14} className={signingOut ? 'animate-spin' : ''} />
+          <span className="admin-desktop-only">{signingOut ? 'Signing Out...' : 'Sign Out'}</span>
         </button>
       </div>
     </header>

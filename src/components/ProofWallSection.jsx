@@ -474,7 +474,7 @@ export default function ProofWallSection() {
   return (
     <section 
       id="proof" 
-      className="section bg-[#FAF8F5] text-[#111111] relative scroll-mt-28 md:scroll-mt-32 pt-24 pb-20 md:pt-28 md:pb-28"
+      className="section bg-[#FAF8F5] text-[#111111] relative scroll-mt-28 md:scroll-mt-32 pt-5 pb-10 md:pt-6 md:pb-12"
     >
       {/* Subtle Drafting Grid on Studio Surface */}
       <div className="absolute inset-0 pointer-events-none opacity-5 bg-[radial-gradient(rgba(0,0,0,0.15)_1px,transparent_1px)] [background-size:20px_20px]" />
@@ -489,7 +489,7 @@ export default function ProofWallSection() {
         }}
       >
         {/* Section Header with Supporting Builder Mascot */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-14 lg:mb-16 gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 lg:mb-10 gap-8">
           <div className="max-w-2xl">
             <span className="eyebrow mb-3 inline-flex items-center gap-2 text-[#E31B23]">
               <span className="eyebrow-dot" style={{ backgroundColor: '#059669' }} />

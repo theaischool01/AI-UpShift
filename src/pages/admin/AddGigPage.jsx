@@ -6,42 +6,37 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Loader2, 
-  Globe, 
-  Building, 
-  MapPin, 
-  Clock, 
-  FileText, 
-  Hash, 
-  ExternalLink 
+  Plus, 
+  Trash2, 
+  ListChecks, 
+  Target, 
+  ShieldCheck 
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '../../context/AuthContext';
 
 export default function AddGigPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const editGigId = searchParams.get('id'); // If id exists, it's Edit mode
-
-  const { session } = useAuth();
+  const editGigId = searchParams.get('id');
 
   // Form input state
   const [formData, setFormData] = useState({
     externalGigId: '',
     title: '',
-    courseId: '',
-    shortDescription: '',
-    longDescription: '',
-    originSite: '',
-    originUrl: '',
-    organization: '',
+    trackId: '',
     paymentAmount: '',
-    location: 'Remote',
-    engagementType: 'Contract',
+    shortDescription: '',
+    overview: '',
+    responsibilities: [''],
+    deliverables: [''],
+    requirements: [''],
+    proofSpec: '',
+    originUrl: '',
   });
 
-  // Courses loaded from database
-  const [courses, setCourses] = useState([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
+  // Tracks loaded from database
+  const [tracks, setTracks] = useState([]);
+  const [loadingTracks, setLoadingTracks] = useState(true);
 
   // Edit load state
   const [loadingInitial, setLoadingInitial] = useState(Boolean(editGigId));
@@ -53,24 +48,32 @@ export default function AddGigPage() {
   const [submitError, setSubmitError] = useState(null);
   const [successGig, setSuccessGig] = useState(null);
 
-  // Load courses
+  // Load tracks
   useEffect(() => {
-    async function loadCourses() {
+    async function loadTracks() {
       try {
-        const { data, error } = await supabase
-          .from('courses')
+        let { data, error } = await supabase
+          .from('tracks')
           .select('id, code, name, category')
           .order('code', { ascending: true });
 
-        if (error) throw error;
-        setCourses(data || []);
+        if (error) {
+          const fallbackRes = await supabase
+            .from('courses')
+            .select('id, code, name, category')
+            .order('code', { ascending: true });
+          if (fallbackRes.error) throw error;
+          data = fallbackRes.data;
+        }
+
+        setTracks(data || []);
       } catch (err) {
-        console.warn('[AddGigPage] Failed to fetch courses:', err);
+        console.warn('[AddGigPage] Failed to fetch tracks:', err);
       } finally {
-        setLoadingCourses(false);
+        setLoadingTracks(false);
       }
     }
-    loadCourses();
+    loadTracks();
   }, []);
 
   // If in edit mode, fetch existing gig
@@ -88,112 +91,106 @@ export default function AddGigPage() {
 
         if (error) throw error;
         if (data) {
+          const respList = Array.isArray(data.responsibilities) && data.responsibilities.length > 0
+            ? data.responsibilities
+            : (typeof data.responsibilities === 'string' ? data.responsibilities.split('\n').filter(Boolean) : ['']);
+
+          const delivList = Array.isArray(data.deliverables) && data.deliverables.length > 0
+            ? data.deliverables
+            : (typeof data.deliverables === 'string' ? data.deliverables.split('\n').filter(Boolean) : ['']);
+
+          const reqList = Array.isArray(data.requirements) && data.requirements.length > 0
+            ? data.requirements
+            : (typeof data.requirements === 'string' ? data.requirements.split('\n').filter(Boolean) : ['']);
+
           setFormData({
             externalGigId: data.external_gig_id || '',
             title: data.title || '',
-            courseId: data.course_id || '',
-            shortDescription: data.short_description || '',
-            longDescription: data.long_description || '',
-            originSite: data.origin_site || '',
-            originUrl: data.origin_url || '',
-            organization: data.organization || '',
+            trackId: data.track_id || data.course_id || '',
             paymentAmount: data.payment_amount || '',
-            location: data.location || 'Remote',
-            engagementType: data.engagement_type || 'Contract',
+            shortDescription: data.short_description || '',
+            overview: data.overview || '',
+            responsibilities: respList.length > 0 ? respList : [''],
+            deliverables: delivList.length > 0 ? delivList : [''],
+            requirements: reqList.length > 0 ? reqList : [''],
+            proofSpec: data.proof_spec || '',
+            originUrl: data.origin_url || '',
           });
         }
       } catch (err) {
-        setInitialLoadError('Unable to load gig for editing.');
+        setInitialLoadError('Unable to load opportunity for editing.');
       } finally {
         setLoadingInitial(false);
       }
     }
+
     loadGig();
   }, [editGigId]);
 
-  // URL security validator: strictly accepts HTTP or HTTPS
-  const isValidHttpUrl = (str) => {
-    try {
-      const parsed = new URL(str);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
-    }
-  };
-
-  const validate = () => {
-    const newErrors = {};
-
-    if (!formData.title.trim()) {
-      newErrors.title = 'Gig title is required.';
-    }
-
-    if (!formData.courseId) {
-      newErrors.courseId = 'Please assign a relevant learning track.';
-    }
-
-    if (!formData.paymentAmount.trim()) {
-      newErrors.paymentAmount = 'Payment amount is required.';
-    } else if (formData.paymentAmount.trim().length > 80) {
-      newErrors.paymentAmount = 'Payment amount cannot exceed 80 characters.';
-    }
-
-    if (!formData.shortDescription.trim()) {
-      newErrors.shortDescription = 'Short card description is required.';
-    }
-
-    if (!formData.longDescription.trim()) {
-      newErrors.longDescription = 'Detailed description is required.';
-    }
-
-    if (!formData.originSite.trim()) {
-      newErrors.originSite = 'Origin platform name is required (e.g. Upwork, Contra, Wellfound).';
-    }
-
-    if (!formData.originUrl.trim()) {
-      newErrors.originUrl = 'External application URL is required.';
-    } else if (!isValidHttpUrl(formData.originUrl.trim())) {
-      newErrors.originUrl = 'Must be a valid HTTP or HTTPS web URL (e.g. https://...).';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  // Handle single field change
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: null }));
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
-    if (submitError) setSubmitError(null);
+  };
+
+  // Dynamic list manipulation
+  const handleListChange = (field, index, value) => {
+    const list = [...formData[field]];
+    list[index] = value;
+    setFormData(prev => ({ ...prev, [field]: list }));
+  };
+
+  const handleAddListItem = (field) => {
+    setFormData(prev => ({ ...prev, [field]: [...prev[field], ''] }));
+  };
+
+  const handleRemoveListItem = (field, index) => {
+    const list = formData[field].filter((_, i) => i !== index);
+    setFormData(prev => ({ ...prev, [field]: list.length > 0 ? list : [''] }));
+  };
+
+  // Form Validation
+  const validateForm = () => {
+    const errs = {};
+    if (!formData.title.trim()) errs.title = 'Opportunity title is required.';
+    if (!formData.trackId) errs.trackId = 'Please select an associated UpShift track.';
+    if (!formData.originUrl.trim()) {
+      errs.originUrl = 'External apply origin URL is required.';
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
-
-    if (!validate()) return;
+    if (!validateForm() || isSubmitting) return;
 
     setIsSubmitting(true);
     setSubmitError(null);
 
-    const payload = {
-      external_gig_id: formData.externalGigId.trim() || null,
-      title: formData.title.trim(),
-      course_id: formData.courseId,
-      payment_amount: formData.paymentAmount.trim(),
-      short_description: formData.shortDescription.trim(),
-      long_description: formData.longDescription.trim(),
-      origin_site: formData.originSite.trim(),
-      origin_url: formData.originUrl.trim(),
-      organization: formData.organization.trim() || null,
-      location: formData.location.trim() || 'Remote',
-      engagement_type: formData.engagementType.trim() || null,
-    };
-
     try {
+      const cleanResponsibilities = formData.responsibilities.map(r => r.trim()).filter(Boolean);
+      const cleanDeliverables = formData.deliverables.map(d => d.trim()).filter(Boolean);
+      const cleanRequirements = formData.requirements.map(r => r.trim()).filter(Boolean);
+
+      const payload = {
+        external_gig_id: formData.externalGigId.trim() || null,
+        title: formData.title.trim(),
+        track_id: formData.trackId,
+        payment_amount: formData.paymentAmount.trim() || null,
+        short_description: formData.shortDescription.trim() || null,
+        overview: formData.overview.trim() || null,
+        responsibilities: cleanResponsibilities,
+        deliverables: cleanDeliverables,
+        requirements: cleanRequirements,
+        proof_spec: formData.proofSpec.trim() || null,
+        origin_url: formData.originUrl.trim(),
+      };
+
       if (editGigId) {
-        // UPDATE existing gig
         const { data, error } = await supabase
           .from('gigs')
           .update(payload)
@@ -201,422 +198,412 @@ export default function AddGigPage() {
           .select()
           .single();
 
-        if (error) {
-          if (error.code === 'PGRST204' || error.code === '42703' || error.message?.toLowerCase().includes('payment_amount')) {
-            throw new Error('Payment field is not available in the database. Apply the latest database migration before saving gigs.');
-          }
-          if (error.code === '23505' && error.message.includes('external_gig_id')) {
-            throw new Error(`A gig with External ID "${payload.external_gig_id}" already exists.`);
-          }
-          throw error;
-        }
-
-        setSuccessGig(data);
+        if (error) throw error;
+        navigate('/admin/gigs');
       } else {
-        // INSERT new gig
         const { data, error } = await supabase
           .from('gigs')
-          .insert(payload)
+          .insert([payload])
           .select()
           .single();
 
-        if (error) {
-          if (error.code === 'PGRST204' || error.code === '42703' || error.message?.toLowerCase().includes('payment_amount')) {
-            throw new Error('Payment field is not available in the database. Apply the latest database migration before saving gigs.');
-          }
-          if (error.code === '23505' && error.message.includes('external_gig_id')) {
-            throw new Error(`A gig with External ID "${payload.external_gig_id}" already exists.`);
-          }
-          throw error;
-        }
-
+        if (error) throw error;
         setSuccessGig(data);
       }
     } catch (err) {
-      setSubmitError(err.message || 'Failed to save opportunity. Please try again.');
+      console.error('[AddGigPage] Submit error:', err);
+      setSubmitError(err.message || 'Unable to save opportunity record.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleResetForm = () => {
-    setFormData({
-      externalGigId: '',
-      title: '',
-      courseId: '',
-      shortDescription: '',
-      longDescription: '',
-      originSite: '',
-      originUrl: '',
-      organization: '',
-      paymentAmount: '',
-      location: 'Remote',
-      engagementType: 'Contract',
-    });
-    setErrors({});
-    setSubmitError(null);
-    setSuccessGig(null);
-  };
-
   if (loadingInitial) {
     return (
-      <div className="p-12 text-center text-gray-500 flex flex-col items-center gap-3">
-        <Loader2 className="w-8 h-8 text-[#E31B23] animate-spin" />
-        <span className="text-sm">Loading opportunity details...</span>
-      </div>
-    );
-  }
-
-  if (initialLoadError) {
-    return (
-      <div className="p-8 max-w-2xl mx-auto">
-        <div className="admin-card p-6 border-red-200 bg-red-50 text-red-900 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="text-sm font-semibold">Error Loading Opportunity</h3>
-            <p className="text-xs text-red-700 mt-1">{initialLoadError}</p>
-            <Link to="/admin/gigs" className="mt-3 inline-block text-xs font-semibold text-red-800 underline">
-              Return to Gigs Directory
-            </Link>
-          </div>
-        </div>
+      <div className="admin-page admin-page-compact" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+        <Loader2 size={24} className="animate-spin" style={{ color: '#E31B23' }} />
       </div>
     );
   }
 
   return (
-    <div className="admin-page max-w-4xl space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-        <Link to="/admin/gigs" className="hover:text-gray-900 transition-colors">Gigs</Link>
-        <span>/</span>
-        <span className="text-gray-900 font-semibold">{editGigId ? 'Edit Gig' : 'Add Gig'}</span>
-      </div>
-
-      {/* Header */}
+    <div className="admin-page admin-page-compact">
+      {/* Page Header */}
       <div className="admin-page-header">
-        <div>
-          <h1 className="flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-[#E31B23]" />
-            {editGigId ? 'Edit Opportunity' : 'Add New Opportunity'}
+        <div className="admin-page-title-group">
+          <h1 className="admin-page-title">
+            <Briefcase size={22} />
+            <span>{editGigId ? 'Edit Opportunity' : 'Add Opportunity'}</span>
           </h1>
-          <p>
-            Store external commercial projects and gigs for UpShift learners to explore and apply to on origin platforms.
+          <p className="admin-page-description">
+            Create or modify an applied opportunity record assigned to an UpShift track.
           </p>
         </div>
 
         <div className="admin-page-actions">
-          <Link to="/admin/gigs" className="admin-btn-secondary">
-            <ArrowLeft className="w-4 h-4 text-gray-600" />
-            <span>Back to Gigs</span>
+          <Link
+            to="/admin/gigs"
+            className="admin-btn admin-btn-secondary"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to Opportunities</span>
           </Link>
         </div>
       </div>
 
-      {/* Success Notification Banner */}
-      {successGig && (
-        <div className="admin-card p-6 border-emerald-200 bg-emerald-50/40">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-base font-bold text-gray-900">
-                  {editGigId ? 'Opportunity Updated Successfully' : 'Opportunity Created Successfully'}
-                </h3>
-                <p className="text-xs text-gray-600 mt-1">
-                  <strong>{successGig.title}</strong> is now live on the UpShift opportunity board.
-                </p>
+      {initialLoadError && (
+        <div role="alert" className="admin-alert admin-alert-danger">
+          <div className="admin-alert-content">
+            <AlertCircle size={16} />
+            <span>{initialLoadError}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Success Banner (when creating new) */}
+      {successGig && !editGigId ? (
+        <div className="admin-card" style={{ backgroundColor: '#F0FDF4', borderColor: '#BBF7D0', padding: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '16px' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <CheckCircle2 size={20} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#111827', margin: '0 0 4px 0' }}>
+                Opportunity Created Successfully
+              </h3>
+              <p style={{ fontSize: '12.5px', color: '#4B5563', margin: 0, lineHeight: 1.5 }}>
+                <strong>{successGig.title}</strong> is now live for learners enrolled in the assigned track.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Link
+              to="/admin/gigs"
+              className="admin-btn admin-btn-primary"
+            >
+              <Briefcase size={14} />
+              <span>View All Opportunities</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSuccessGig(null);
+                setFormData({
+                  externalGigId: '',
+                  title: '',
+                  trackId: '',
+                  paymentAmount: '',
+                  shortDescription: '',
+                  overview: '',
+                  responsibilities: [''],
+                  deliverables: [''],
+                  requirements: [''],
+                  proofSpec: '',
+                  originUrl: '',
+                });
+              }}
+              className="admin-btn admin-btn-secondary"
+            >
+              <span>Add Another Opportunity</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Form Card */
+        <div className="admin-card">
+          {submitError && (
+            <div role="alert" className="admin-alert admin-alert-danger" style={{ marginBottom: '20px' }}>
+              <div className="admin-alert-content">
+                <AlertCircle size={16} />
+                <span>{submitError}</span>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Opportunity Title */}
+            <div className="admin-form-group">
+              <label htmlFor="title" className="admin-form-label">
+                Opportunity Title <span className="admin-form-req">*</span>
+              </label>
+              <input
+                id="title"
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleChange('title', e.target.value)}
+                placeholder="e.g. AI Video Editor & Reel Producer"
+                className={`admin-input ${errors.title ? 'has-error' : ''}`}
+                disabled={isSubmitting}
+              />
+              {errors.title && (
+                <p className="admin-form-error">{errors.title}</p>
+              )}
+            </div>
+
+            {/* Track & Compensation Grid */}
+            <div className="admin-form-grid">
+              <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="trackId" className="admin-form-label">
+                  UpShift Track <span className="admin-form-req">*</span>
+                </label>
+                <select
+                  id="trackId"
+                  value={formData.trackId}
+                  onChange={(e) => handleChange('trackId', e.target.value)}
+                  className={`admin-select ${errors.trackId ? 'has-error' : ''}`}
+                  disabled={loadingTracks || isSubmitting}
+                >
+                  <option value="">Select track...</option>
+                  {tracks.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.code} — {t.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.trackId && (
+                  <p className="admin-form-error">{errors.trackId}</p>
+                )}
+              </div>
+
+              <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="paymentAmount" className="admin-form-label">
+                  Rate / Compensation <span className="admin-form-optional">(Optional)</span>
+                </label>
+                <input
+                  id="paymentAmount"
+                  type="text"
+                  value={formData.paymentAmount}
+                  onChange={(e) => handleChange('paymentAmount', e.target.value)}
+                  placeholder="e.g. $45 / hr or $600 fixed"
+                  className="admin-input"
+                  disabled={isSubmitting}
+                />
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              {!editGigId && (
-                <button
-                  type="button"
-                  onClick={handleResetForm}
-                  className="admin-btn-secondary"
-                >
-                  Add Another Gig
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => navigate('/admin/gigs')}
-                className="px-4 py-2 text-xs font-semibold text-white bg-[#111827] hover:bg-black rounded-lg transition-colors"
-              >
-                View Gigs Directory
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Form Error Banner */}
-      {submitError && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-800">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div className="text-xs">
-            <p className="font-semibold text-sm text-red-900">Unable to save opportunity</p>
-            <p className="mt-0.5">{submitError}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Form Card */}
-      {/* Form Card */}
-      <form onSubmit={handleSubmit} className="admin-card space-y-6">
-        {/* Section 1: Core Identification */}
-        <div>
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
-            <Briefcase className="w-4 h-4 text-[#E31B23]" />
-            Opportunity Overview
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Title */}
-            <div className="admin-form-group md:col-span-2">
-              <label htmlFor="gigTitle" className="admin-form-label">
-                Opportunity Title <span className="text-[#E31B23]">*</span>
-              </label>
-              <input
-                id="gigTitle"
-                type="text"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                placeholder="e.g. AI Video Editor for Short-Form Reel Campaign"
-                className={`admin-input ${errors.title ? 'border-red-400' : ''}`}
-              />
-              {errors.title && <p className="text-[11px] text-red-600 mt-1">{errors.title}</p>}
-            </div>
-
-            {/* Curriculum Course Track */}
-            <div className="admin-form-group">
-              <label htmlFor="courseId" className="admin-form-label">
-                Relevant Curriculum Track <span className="text-[#E31B23]">*</span>
-              </label>
-              <select
-                id="courseId"
-                value={formData.courseId}
-                onChange={(e) => handleInputChange('courseId', e.target.value)}
-                disabled={loadingCourses}
-                className={`admin-select ${errors.courseId ? 'border-red-400' : ''}`}
-              >
-                <option value="">Select track...</option>
-                {courses.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.code} — {c.name} ({c.category})
-                  </option>
-                ))}
-              </select>
-              {errors.courseId && <p className="text-[11px] text-red-600 mt-1">{errors.courseId}</p>}
-            </div>
-
-            {/* External Gig ID */}
-            <div className="admin-form-group">
-              <label htmlFor="externalGigId" className="admin-form-label">
-                External Gig ID <span className="admin-form-label-optional">(Optional)</span>
-              </label>
-              <input
-                id="externalGigId"
-                type="text"
-                value={formData.externalGigId}
-                onChange={(e) => handleInputChange('externalGigId', e.target.value)}
-                placeholder="e.g. UPW-98231 or CONTRA-441"
-                className="admin-input font-mono"
-              />
-              <span className="admin-form-helper">
-                Optional — used as deduplication key.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: External Origin & Application Gateway */}
-        <div>
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
-            <Globe className="w-4 h-4 text-[#E31B23]" />
-            Origin Platform & Apply Gateway
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Origin Site Name */}
-            <div className="admin-form-group">
-              <label htmlFor="originSite" className="admin-form-label">
-                Origin Platform Name <span className="text-[#E31B23]">*</span>
-              </label>
-              <input
-                id="originSite"
-                type="text"
-                value={formData.originSite}
-                onChange={(e) => handleInputChange('originSite', e.target.value)}
-                placeholder="e.g. Upwork, Contra, Wellfound, LinkedIn"
-                className={`admin-input ${errors.originSite ? 'border-red-400' : ''}`}
-              />
-              {errors.originSite && <p className="text-[11px] text-red-600 mt-1">{errors.originSite}</p>}
-            </div>
-
-            {/* Origin URL */}
+            {/* Apply Gateway Origin URL */}
             <div className="admin-form-group">
               <label htmlFor="originUrl" className="admin-form-label">
-                External Apply URL <span className="text-[#E31B23]">*</span>
+                Apply Gateway Origin URL <span className="admin-form-req">*</span>
               </label>
               <input
                 id="originUrl"
-                type="url"
+                type="text"
                 value={formData.originUrl}
-                onChange={(e) => handleInputChange('originUrl', e.target.value)}
-                placeholder="https://contra.com/opportunity/..."
-                className={`admin-input ${errors.originUrl ? 'border-red-400' : ''}`}
+                onChange={(e) => handleChange('originUrl', e.target.value)}
+                placeholder="e.g. https://www.upwork.com/jobs/~0123456"
+                className={`admin-input ${errors.originUrl ? 'has-error' : ''}`}
+                disabled={isSubmitting}
               />
-              {errors.originUrl && <p className="text-[11px] text-red-600 mt-1">{errors.originUrl}</p>}
+              {errors.originUrl && (
+                <p className="admin-form-error">{errors.originUrl}</p>
+              )}
             </div>
 
-            {/* Organization / Client */}
-            <div className="admin-form-group">
-              <label htmlFor="organization" className="admin-form-label">
-                Organization / Client Name <span className="admin-form-label-optional">(Optional)</span>
-              </label>
-              <input
-                id="organization"
-                type="text"
-                value={formData.organization}
-                onChange={(e) => handleInputChange('organization', e.target.value)}
-                placeholder="e.g. Velocity Media Labs"
-                className="admin-input"
-              />
-            </div>
-
-            {/* Payment Amount */}
-            <div className="admin-form-group">
-              <label htmlFor="paymentAmount" className="admin-form-label">
-                Payment Amount <span className="text-[#E31B23]">*</span>
-              </label>
-              <input
-                id="paymentAmount"
-                type="text"
-                value={formData.paymentAmount}
-                onChange={(e) => handleInputChange('paymentAmount', e.target.value)}
-                placeholder="e.g. $25/hr or $500/project"
-                maxLength={80}
-                className={`admin-input ${errors.paymentAmount ? 'border-red-400' : ''}`}
-              />
-              <span className="admin-form-helper">
-                Flexible compensation (e.g. $25/hr, $500/project, $20–35/hr). Max 80 chars.
-              </span>
-              {errors.paymentAmount && <p className="text-[11px] text-red-600 mt-1">{errors.paymentAmount}</p>}
-            </div>
-
-            {/* Location */}
-            <div className="admin-form-group">
-              <label htmlFor="location" className="admin-form-label">
-                Location
-              </label>
-              <input
-                id="location"
-                type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="Remote / Bangalore"
-                className="admin-input"
-              />
-            </div>
-
-            {/* Engagement Type */}
-            <div className="admin-form-group">
-              <label htmlFor="engagementType" className="admin-form-label">
-                Engagement Type
-              </label>
-              <select
-                id="engagementType"
-                value={formData.engagementType}
-                onChange={(e) => handleInputChange('engagementType', e.target.value)}
-                className="admin-select"
-              >
-                <option value="Contract">Contract</option>
-                <option value="Freelance">Freelance</option>
-                <option value="Part-Time">Part-Time</option>
-                <option value="Full-Time">Full-Time</option>
-                <option value="Bounty / Fixed">Bounty / Fixed</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: Descriptions */}
-        <div>
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#E31B23]" />
-            Opportunity Descriptions
-          </h2>
-
-          <div className="space-y-4">
             {/* Short Description */}
             <div className="admin-form-group">
               <label htmlFor="shortDescription" className="admin-form-label">
-                Short Summary Snippet <span className="text-[#E31B23]">*</span>
+                Short Summary / Overview <span className="admin-form-optional">(Snippet)</span>
               </label>
-              <textarea
+              <input
                 id="shortDescription"
-                rows={2}
+                type="text"
                 value={formData.shortDescription}
-                onChange={(e) => handleInputChange('shortDescription', e.target.value)}
-                placeholder="Produce 15 viral AI reels for an upcoming tech launch using modern synthesis workflows."
-                className={`admin-textarea ${errors.shortDescription ? 'border-red-400' : ''}`}
-                style={{ minHeight: '80px' }}
+                onChange={(e) => handleChange('shortDescription', e.target.value)}
+                placeholder="Produce scroll-stopping reels using AI video workflows."
+                className="admin-input"
+                disabled={isSubmitting}
               />
-              <span className="admin-form-helper">
-                Displayed on opportunity browse cards (1–2 concise sentences).
-              </span>
-              {errors.shortDescription && <p className="text-[11px] text-red-600 mt-1">{errors.shortDescription}</p>}
             </div>
 
-            {/* Long Description */}
+            {/* Full Role Overview / Description */}
             <div className="admin-form-group">
-              <label htmlFor="longDescription" className="admin-form-label">
-                Detailed Opportunity Scope <span className="text-[#E31B23]">*</span>
+              <label htmlFor="overview" className="admin-form-label">
+                About the Role <span className="admin-form-optional">(Full Description)</span>
               </label>
               <textarea
-                id="longDescription"
-                rows={5}
-                value={formData.longDescription}
-                onChange={(e) => handleInputChange('longDescription', e.target.value)}
-                placeholder="Full deliverables, project timeline, tool prerequisites, and application instructions..."
-                className={`admin-textarea ${errors.longDescription ? 'border-red-400' : ''}`}
-                style={{ minHeight: '130px' }}
+                id="overview"
+                value={formData.overview}
+                onChange={(e) => handleChange('overview', e.target.value)}
+                placeholder="Detailed description of the opportunity scope, project objectives, and creative workflow."
+                className="admin-textarea"
+                rows={4}
+                disabled={isSubmitting}
               />
-              <span className="admin-form-helper">
-                Complete role background, expectations, deliverables, and origin apply instructions.
-              </span>
-              {errors.longDescription && <p className="text-[11px] text-red-600 mt-1">{errors.longDescription}</p>}
             </div>
-          </div>
-        </div>
 
-        {/* Action Controls */}
-        <div className="admin-form-actions">
-          <Link to="/admin/gigs" className="admin-btn-secondary">
-            Cancel
-          </Link>
+            {/* Dynamic Responsibilities */}
+            <div className="admin-form-group">
+              <label className="admin-form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ListChecks size={15} style={{ color: '#E31B23' }} />
+                <span>Responsibilities</span>
+              </label>
+              <div className="admin-dynamic-list">
+                {formData.responsibilities.map((item, idx) => (
+                  <div key={idx} className="admin-dynamic-list-row">
+                    <input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleListChange('responsibilities', idx, e.target.value)}
+                      placeholder={`Responsibility item #${idx + 1}`}
+                      className="admin-input"
+                      disabled={isSubmitting}
+                    />
+                    {formData.responsibilities.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveListItem('responsibilities', idx)}
+                        className="admin-btn-icon admin-btn-icon-danger"
+                        title="Remove item"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAddListItem('responsibilities')}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+                style={{ marginTop: '8px' }}
+              >
+                <Plus size={12} />
+                <span>Add Responsibility</span>
+              </button>
+            </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="admin-btn-primary"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Saving Opportunity...</span>
-              </>
-            ) : (
-              <>
-                <Briefcase className="w-4 h-4" />
-                <span>{editGigId ? 'Update Opportunity' : 'Publish Opportunity'}</span>
-              </>
-            )}
-          </button>
+            {/* Dynamic Deliverables */}
+            <div className="admin-form-group">
+              <label className="admin-form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Target size={15} style={{ color: '#E31B23' }} />
+                <span>Key Deliverables</span>
+              </label>
+              <div className="admin-dynamic-list">
+                {formData.deliverables.map((item, idx) => (
+                  <div key={idx} className="admin-dynamic-list-row">
+                    <input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleListChange('deliverables', idx, e.target.value)}
+                      placeholder={`Deliverable item #${idx + 1}`}
+                      className="admin-input"
+                      disabled={isSubmitting}
+                    />
+                    {formData.deliverables.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveListItem('deliverables', idx)}
+                        className="admin-btn-icon admin-btn-icon-danger"
+                        title="Remove item"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAddListItem('deliverables')}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+                style={{ marginTop: '8px' }}
+              >
+                <Plus size={12} />
+                <span>Add Deliverable</span>
+              </button>
+            </div>
+
+            {/* Dynamic Requirements */}
+            <div className="admin-form-group">
+              <label className="admin-form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircle2 size={15} style={{ color: '#E31B23' }} />
+                <span>Requirements</span>
+              </label>
+              <div className="admin-dynamic-list">
+                {formData.requirements.map((item, idx) => (
+                  <div key={idx} className="admin-dynamic-list-row">
+                    <input
+                      type="text"
+                      value={item}
+                      onChange={(e) => handleListChange('requirements', idx, e.target.value)}
+                      placeholder={`Requirement item #${idx + 1}`}
+                      className="admin-input"
+                      disabled={isSubmitting}
+                    />
+                    {formData.requirements.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveListItem('requirements', idx)}
+                        className="admin-btn-icon admin-btn-icon-danger"
+                        title="Remove item"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAddListItem('requirements')}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+                style={{ marginTop: '8px' }}
+              >
+                <Plus size={12} />
+                <span>Add Requirement</span>
+              </button>
+            </div>
+
+            {/* Proof Specification */}
+            <div className="admin-form-group">
+              <label htmlFor="proofSpec" className="admin-form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ShieldCheck size={15} style={{ color: '#E31B23' }} />
+                <span>Required Proof-of-Work Artifact <span className="admin-form-optional">(Verification Link)</span></span>
+              </label>
+              <input
+                id="proofSpec"
+                type="text"
+                value={formData.proofSpec}
+                onChange={(e) => handleChange('proofSpec', e.target.value)}
+                placeholder="e.g. Public Google Drive link with 3 sample video reels"
+                className="admin-input"
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Form Actions */}
+            <div className="admin-form-actions">
+              <Link
+                to="/admin/gigs"
+                className="admin-btn admin-btn-secondary"
+              >
+                Cancel
+              </Link>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="admin-btn admin-btn-primary"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <Briefcase size={14} />
+                    <span>{editGigId ? 'Save Opportunity' : 'Publish Opportunity'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      )}
     </div>
   );
 }

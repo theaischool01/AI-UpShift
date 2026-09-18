@@ -92,7 +92,8 @@ export async function verifyRazorpayPayment({
         current_year: learnerData.currentYear,
         graduation_year: learnerData.graduationYear,
         heard_from: learnerData.heardFrom,
-        course_id: learnerData.courseId,
+        track_id: learnerData.trackId || learnerData.courseId || 'reelrush-ai',
+        course_id: learnerData.trackId || learnerData.courseId || 'reelrush-ai',
       },
     };
 

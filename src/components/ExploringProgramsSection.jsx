@@ -272,15 +272,6 @@ export default function ExploringProgramsSection() {
           </svg>
         </div>
 
-        {/* Bottom Right Vertical Micro-Focus: SILVER, BLACK, SILVER, RED */}
-        <div className="editorial-bottom-right">
-          <span className="font-semibold" style={{ color: '#71757A' }}>CAREERS</span>
-          <span className="font-semibold" style={{ color: '#111111' }}>VENTURES</span>
-          <span className="font-semibold" style={{ color: '#71757A' }}>BUSINESSES</span>
-          <span className="font-bold" style={{ color: '#E31B23' }}>IMPACT</span>
-          <div className="w-6 h-0.5 bg-[#E31B23] mt-1" />
-        </div>
-
         {/* Main Heading Area */}
         <div className="max-w-3xl mx-auto text-center mb-6 md:mb-8 lg:mb-10">
           <h2 className="font-heading text-2xl sm:text-3xl lg:text-[40px] font-bold text-[#111111] tracking-tight leading-tight mb-2.5">

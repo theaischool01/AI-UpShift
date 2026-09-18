@@ -1,28 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext, Link } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { 
   Briefcase, 
   Sparkles, 
-  Layers, 
   ChevronLeft, 
   ChevronRight, 
   Loader2, 
-  AlertCircle,
-  BookOpen
+  AlertCircle
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import OpportunityCard from '../../components/learner/OpportunityCard';
 import OpportunityFilters from '../../components/learner/OpportunityFilters';
 
 export default function LearnerDashboardPage() {
-  const { enrolledCourses = [], loadingEnrollments } = useOutletContext() || {};
+  const context = useOutletContext() || {};
+  const assignedTrack = context.assignedTrack || context.enrolledCourses?.[0] || null;
 
   // Filter & Search states
   const [mode, setMode] = useState('recommended'); // 'recommended' | 'all'
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('ALL');
-  const [selectedOrigin, setSelectedOrigin] = useState('ALL');
-  const [selectedEngagement, setSelectedEngagement] = useState('ALL');
+  const [selectedTrack, setSelectedTrack] = useState('ALL');
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -34,40 +31,36 @@ export default function LearnerDashboardPage() {
   const [loadingGigs, setLoadingGigs] = useState(true);
   const [error, setError] = useState(null);
 
-  // Metadata dropdown options
-  const [courses, setCourses] = useState([]);
-  const [originSites, setOriginSites] = useState([]);
-  const [engagementTypes, setEngagementTypes] = useState([]);
+  // Tracks dropdown options
+  const [tracks, setTracks] = useState([]);
 
-  // Load courses & distinct filters once
+  // Load tracks for filter dropdown
   useEffect(() => {
-    async function loadMetadata() {
+    async function loadTracks() {
       try {
-        const { data: coursesData } = await supabase
-          .from('courses')
+        let { data: tracksData, error } = await supabase
+          .from('tracks')
           .select('id, code, name')
           .order('code', { ascending: true });
-        setCourses(coursesData || []);
 
-        const { data: gigsMeta } = await supabase
-          .from('gigs')
-          .select('origin_site, engagement_type');
-        
-        if (gigsMeta) {
-          const uniqueOrigins = Array.from(new Set(gigsMeta.map(g => g.origin_site).filter(Boolean))).sort();
-          setOriginSites(uniqueOrigins);
-
-          const uniqueEngagements = Array.from(new Set(gigsMeta.map(g => g.engagement_type).filter(Boolean))).sort();
-          setEngagementTypes(uniqueEngagements);
+        if (error) {
+          const fallbackRes = await supabase
+            .from('courses')
+            .select('id, code, name')
+            .order('code', { ascending: true });
+          if (fallbackRes.error) throw error;
+          tracksData = fallbackRes.data;
         }
+
+        setTracks(tracksData || []);
       } catch (err) {
-        console.warn('[LearnerDashboard] Error loading filter metadata:', err);
+        console.warn('[LearnerDashboard] Error loading tracks:', err);
       }
     }
-    loadMetadata();
+    loadTracks();
   }, []);
 
-  // Primary server-side query with relational course join
+  // Primary server-side query with relational track join and resilient fallback
   const fetchGigs = useCallback(async () => {
     setLoadingGigs(true);
     setError(null);
@@ -82,15 +75,12 @@ export default function LearnerDashboardPage() {
           id,
           external_gig_id,
           title,
-          course_id,
+          track_id,
           short_description,
-          origin_site,
-          organization,
           payment_amount,
-          location,
-          engagement_type,
+          origin_url,
           created_at,
-          course:courses (
+          track:tracks (
             id,
             code,
             name,
@@ -100,30 +90,39 @@ export default function LearnerDashboardPage() {
           )
         `, { count: 'exact' });
 
-      // 1. Course-Aware Filtering
+      // 1. Track-Aware Filtering
       if (mode === 'recommended') {
-        if (enrolledCourses.length > 0) {
-          const enrolledIds = enrolledCourses.map(c => c.id);
-          query = query.in('course_id', enrolledIds);
+        if (assignedTrack?.id) {
+          const targetIds = [
+            assignedTrack.id,
+            assignedTrack.id?.toLowerCase(),
+            assignedTrack.code,
+            assignedTrack.code?.toLowerCase(),
+            assignedTrack.code?.toUpperCase()
+          ].filter(Boolean);
+          const uniqueTargetIds = Array.from(new Set(targetIds));
+          query = query.in('track_id', uniqueTargetIds);
         }
       } else {
-        if (selectedCourse !== 'ALL') {
-          query = query.eq('course_id', selectedCourse);
+        if (selectedTrack !== 'ALL') {
+          const matchedTrackObj = tracks.find(t => t.id === selectedTrack || t.code === selectedTrack);
+          const matchIds = [
+            selectedTrack,
+            selectedTrack.toLowerCase(),
+            matchedTrackObj?.id,
+            matchedTrackObj?.code,
+            matchedTrackObj?.code?.toLowerCase(),
+            matchedTrackObj?.code?.toUpperCase()
+          ].filter(Boolean);
+          const uniqueMatchIds = Array.from(new Set(matchIds));
+          query = query.in('track_id', uniqueMatchIds);
         }
       }
 
       // 2. Search filtering
       const trimmedSearch = searchQuery.trim();
       if (trimmedSearch) {
-        query = query.or(`title.ilike.%${trimmedSearch}%,origin_site.ilike.%${trimmedSearch}%,organization.ilike.%${trimmedSearch}%`);
-      }
-
-      // 3. Platform & Engagement filters
-      if (selectedOrigin !== 'ALL') {
-        query = query.eq('origin_site', selectedOrigin);
-      }
-      if (selectedEngagement !== 'ALL') {
-        query = query.eq('engagement_type', selectedEngagement);
+        query = query.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
       }
 
       // Order & Paginate
@@ -131,228 +130,222 @@ export default function LearnerDashboardPage() {
         .order('created_at', { ascending: false })
         .range(from, to);
 
-      if (queryErr) throw queryErr;
+      if (queryErr) {
+        console.warn('[LearnerDashboard] Relational query error, trying flat fallback:', queryErr);
+        // Fallback query
+        let flatQuery = supabase
+          .from('gigs')
+          .select(`
+            id,
+            external_gig_id,
+            title,
+            track_id,
+            short_description,
+            payment_amount,
+            origin_url,
+            created_at
+          `, { count: 'exact' });
 
-      setGigs(data || []);
-      setTotalGigs(count || 0);
-    } catch (err) {
-      console.error('[LearnerDashboard] Fetch opportunities error:', err);
-      if (err.code === '42703' || err.code === 'PGRST204' || err.message?.toLowerCase().includes('payment_amount')) {
-        setError('Database schema error: payment_amount field unavailable. Please apply the latest database migration.');
+        if (mode === 'recommended') {
+          if (assignedTrack?.id) {
+            const targetIds = [
+              assignedTrack.id,
+              assignedTrack.id?.toLowerCase(),
+              assignedTrack.code,
+              assignedTrack.code?.toLowerCase(),
+              assignedTrack.code?.toUpperCase()
+            ].filter(Boolean);
+            flatQuery = flatQuery.in('track_id', Array.from(new Set(targetIds)));
+          }
+        } else {
+          if (selectedTrack !== 'ALL') {
+            flatQuery = flatQuery.in('track_id', [selectedTrack, selectedTrack.toLowerCase()]);
+          }
+        }
+
+        if (trimmedSearch) {
+          flatQuery = flatQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
+        }
+
+        const { data: flatData, count: flatCount, error: flatErr } = await flatQuery
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (flatErr) throw flatErr;
+        setGigs(flatData || []);
+        setTotalGigs(flatCount || 0);
       } else {
-        setError('Unable to load opportunities. Please try again.');
+        setGigs(data || []);
+        setTotalGigs(count || 0);
       }
+    } catch (err) {
+      console.error('[LearnerDashboard] Error fetching gigs:', err);
+      setError('Unable to load commercial opportunities. Please refresh the page.');
     } finally {
       setLoadingGigs(false);
     }
-  }, [page, pageSize, mode, searchQuery, selectedCourse, selectedOrigin, selectedEngagement, enrolledCourses]);
+  }, [mode, searchQuery, selectedTrack, page, pageSize, assignedTrack]);
 
   useEffect(() => {
     fetchGigs();
   }, [fetchGigs]);
 
-  const handleFilterChange = () => {
-    setPage(1);
-  };
-
-  const totalPages = Math.ceil(totalGigs / pageSize) || 1;
-  const startRow = totalGigs === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endRow = Math.min(page * pageSize, totalGigs);
+  const totalPages = Math.max(1, Math.ceil(totalGigs / pageSize));
 
   return (
     <div className="space-y-6">
-      {/* Compact Editorial Visual Band with Point-Out Fox Mascot */}
-      <div className="learner-editorial-band">
-        <div className="learner-editorial-content">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="learner-badge-track bg-[#FFF1F1] text-[#E31B23] border border-[#FECACA]">
-              <Sparkles className="w-3 h-3" />
-              <span>Opportunity Board</span>
-            </span>
-          </div>
-
-          <h1 className="learner-editorial-title">
-            Opportunities
-          </h1>
-
-          <p className="learner-editorial-desc">
-            Discover real AI work aligned with your UpShift track. Apply directly on external originating platforms.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
-            <div className="learner-editorial-highlight">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E31B23]" />
-              <span>Real Work · Real Proof · Real Opportunities</span>
+      {/* Top Welcome Card */}
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#E31B23] text-xs font-semibold mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>UpShift Applied Opportunities</span>
             </div>
-
-            {enrolledCourses.length > 0 && (
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#374151] bg-[#F3F4F6] border border-[#E5E7EB] px-3 py-1 rounded-md">
-                <span className="text-[#6B7280]">Your Track:</span>
-                <span>{enrolledCourses.map(c => `${c.code} · ${c.name}`).join(', ')}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right: Point-Out Fox Visual */}
-        <div className="learner-editorial-fox-wrap">
-          <img
-            src="/assets/mascot/mascot_pointing_cutout.png"
-            alt="UpShift fox mascot"
-            className="learner-editorial-fox-img"
-          />
-        </div>
-      </div>
-
-      {/* Filter Controls (Tabs, Search, Dropdowns) */}
-      <OpportunityFilters
-        mode={mode}
-        setMode={setMode}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedCourse={selectedCourse}
-        setSelectedCourse={setSelectedCourse}
-        selectedOrigin={selectedOrigin}
-        setSelectedOrigin={setSelectedOrigin}
-        selectedEngagement={selectedEngagement}
-        setSelectedEngagement={setSelectedEngagement}
-        courses={courses}
-        originSites={originSites}
-        engagementTypes={engagementTypes}
-        enrolledCourses={enrolledCourses}
-        onFilterChange={handleFilterChange}
-      />
-
-      {/* Opportunity Grid / Loading / Empty / Error */}
-      {loadingGigs ? (
-        /* Skeleton Grid Loading State */
-        <div className="learner-grid">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="learner-card p-6 h-64 animate-pulse flex flex-col justify-between bg-white border border-[#E5E7EB]">
-              <div className="space-y-3">
-                <div className="w-24 h-4 bg-gray-200 rounded" />
-                <div className="w-3/4 h-6 bg-gray-200 rounded" />
-                <div className="w-1/2 h-3 bg-gray-100 rounded" />
-                <div className="space-y-1.5 pt-2">
-                  <div className="w-full h-3 bg-gray-100 rounded" />
-                  <div className="w-5/6 h-3 bg-gray-100 rounded" />
-                </div>
-              </div>
-              <div className="w-20 h-4 bg-gray-200 rounded" />
-            </div>
-          ))}
-        </div>
-      ) : error ? (
-        /* Error State */
-        <div className="learner-card p-12 text-center max-w-md mx-auto bg-white border border-[#E5E7EB]">
-          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-[#111827]">Unable to load opportunities</h3>
-          <p className="text-xs text-[#6B7280] mt-1 mb-4">{error}</p>
-          <button
-            type="button"
-            onClick={fetchGigs}
-            className="learner-btn-secondary text-xs"
-          >
-            Retry Loading
-          </button>
-        </div>
-      ) : gigs.length === 0 ? (
-        /* Empty State */
-        <div className="learner-card p-16 text-center max-w-lg mx-auto bg-white border border-[#E5E7EB]">
-          <div className="w-12 h-12 rounded-2xl bg-[#FFF1F1] border border-[#FECACA] text-[#E31B23] flex items-center justify-center mx-auto mb-4">
-            <Briefcase className="w-6 h-6" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight m-0">
+              Commercial Opportunity Board
+            </h1>
+            <p className="text-xs sm:text-sm text-[#6B7280] mt-1 max-w-2xl">
+              {assignedTrack ? (
+                <>
+                  You are assigned to the <strong>{assignedTrack.code} · {assignedTrack.name}</strong> track. Build and apply for vetted freelance and contract briefs.
+                </>
+              ) : (
+                'Explore and apply for vetted freelance and contract briefs across UpShift tracks.'
+              )}
+            </p>
           </div>
 
-          {mode === 'recommended' ? (
-            <div>
-              <h3 className="text-base font-bold text-[#111827]">
-                NO OPPORTUNITIES FOR YOUR TRACK YET
-              </h3>
-              <p className="text-xs text-[#4B5563] mt-2 leading-relaxed max-w-md mx-auto">
-                There are currently no opportunities mapped to your enrolled track. Switch to browse opportunities across all flagship tracks.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('all');
-                  setPage(1);
+          {assignedTrack && (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] self-start md:self-auto">
+              <div 
+                className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
+                style={{
+                  backgroundColor: assignedTrack.bg_color || 'rgba(227, 27, 35, 0.1)',
+                  color: assignedTrack.color || '#E31B23',
                 }}
-                className="learner-btn-primary mt-6"
               >
-                Browse All Opportunities
-              </button>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-base font-bold text-[#111827]">
-                NO OPPORTUNITIES YET
-              </h3>
-              <p className="text-xs text-[#4B5563] mt-2 leading-relaxed max-w-md mx-auto">
-                New opportunities will appear here as the UpShift opportunity board is updated.
-              </p>
+                {assignedTrack.code}
+              </div>
+              <div className="text-left">
+                <span className="text-[11px] font-mono text-[#6B7280] uppercase tracking-wider block">
+                  Assigned Track
+                </span>
+                <span className="text-sm font-bold text-[#111827]">
+                  {assignedTrack.name}
+                </span>
+              </div>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Filter Toolbar */}
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-6 shadow-xs">
+        <OpportunityFilters
+          mode={mode}
+          setMode={(newMode) => {
+            setMode(newMode);
+            setPage(1);
+          }}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedTrack={selectedTrack}
+          setSelectedTrack={setSelectedTrack}
+          tracks={tracks}
+          assignedTrack={assignedTrack}
+          onFilterChange={() => setPage(1)}
+        />
+      </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div role="alert" className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center justify-between text-xs sm:text-sm">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#E31B23] flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={fetchGigs}
+            className="px-3 py-1 rounded-md bg-white border border-red-200 text-xs font-semibold text-red-900 hover:bg-red-50"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Opportunity Grid */}
+      {loadingGigs ? (
+        <div className="p-16 flex flex-col items-center justify-center gap-3 text-gray-500">
+          <Loader2 className="w-7 h-7 animate-spin text-[#E31B23]" />
+          <span className="text-xs sm:text-sm font-medium">Loading opportunities...</span>
+        </div>
+      ) : gigs.length === 0 ? (
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-12 text-center">
+          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mx-auto mb-3">
+            <Briefcase className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-gray-900 mb-1">
+            No Opportunities Found
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto mb-4">
+            {mode === 'recommended' && assignedTrack
+              ? `There are currently no active opportunities tagged specifically for your assigned track (${assignedTrack.code} · ${assignedTrack.name}). Switch to "All Opportunities" to view all available briefs.`
+              : 'No opportunities match your search criteria. Try clearing your search or track filter.'}
+          </p>
+          {mode === 'recommended' && (
+            <button
+              onClick={() => {
+                setMode('all');
+                setPage(1);
+              }}
+              className="learner-btn-primary inline-flex items-center gap-1.5"
+            >
+              <span>Explore All Opportunities</span>
+            </button>
+          )}
+        </div>
       ) : (
-        <div className="space-y-8">
-          {/* Opportunities Cards Grid */}
-          <div className="learner-grid">
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {gigs.map((gig) => (
               <OpportunityCard key={gig.id} gig={gig} />
             ))}
           </div>
 
-          {/* Pagination Controls */}
-          <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4B5563]">
-            <div>
-              Showing <strong className="text-[#111827]">{startRow}</strong>–<strong className="text-[#111827]">{endRow}</strong> of <strong className="text-[#111827]">{totalGigs}</strong> opportunities
-            </div>
+          {/* Pagination Footer */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-[#E5E7EB]">
+              <span className="text-xs font-mono text-gray-500">
+                Showing {((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, totalGigs)} of {totalGigs} opportunities
+              </span>
 
-            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <span>Per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setPage(1);
-                  }}
-                  className="px-2.5 py-1 text-xs border border-[#D1D5DB] rounded-lg bg-white text-[#111827] focus:outline-none focus:border-[#E31B23]"
-                >
-                  <option value={24}>24</option>
-                  <option value={48}>48</option>
-                  <option value={72}>72</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-1.5">
                 <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                  className="p-1.5 rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-gray-50 hover:text-[#111827] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  title="Previous page"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="p-2 rounded-lg border border-[#E5E7EB] bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:pointer-events-none"
+                  aria-label="Previous Page"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <span className="px-2 font-mono font-semibold text-[#111827]">
+                <span className="text-xs font-mono font-semibold px-2">
                   {page} / {totalPages}
                 </span>
 
                 <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  className="p-1.5 rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-gray-50 hover:text-[#111827] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                  title="Next page"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="p-2 rounded-lg border border-[#E5E7EB] bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:pointer-events-none"
+                  aria-label="Next Page"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );

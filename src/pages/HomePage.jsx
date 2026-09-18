@@ -100,147 +100,99 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       <section id="hero" className="hero-section bg-[#0a0a0a] text-white relative scroll-mt-28 md:scroll-mt-32">
         {/* Subtle Ambient Brand Atmosphere */}
         <div className="hero-ambient-glow hero-glow-1" />
-        {/* Dark Crimson / Red Radial Atmospheric Glow (from prompt) */}
+        {/* Dark Crimson / Red Radial Atmospheric Glow */}
         <div className="hero-glow-2" />
         <div className="hero-grid-pattern" />
 
-        {/* Decorative Element 1 (Top Right of Hero): A Bigger You with Red Squiggle */}
-        <div 
-          style={{
-            position: 'absolute',
-            top: '110px',
-            right: 'clamp(20px, 5vw, 60px)',
-            zIndex: 20,
-            pointerEvents: 'none',
-            userSelect: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            textAlign: 'right'
-          }}
-        >
-          <span 
-            style={{
-              fontFamily: 'Caveat, cursive',
-              fontSize: 'clamp(24px, 2.8vw, 36px)',
-              fontWeight: 700,
-              color: '#FFFFFF',
-              lineHeight: 1,
-              transform: 'rotate(-7deg)',
-              display: 'block'
-            }}
-          >
-            A Bigger<br />You
-          </span>
-          <svg style={{ width: '60px', height: '12px', marginTop: '3px' }} viewBox="0 0 80 16" fill="none">
-            <path d="M 5 8 Q 40 14, 75 4" stroke="#E31B23" strokeWidth="2.8" strokeLinecap="round" />
-          </svg>
-        </div>
-
-        {/* Decorative Element 3 (Right Side Vertical Labels): CAREERS / VENTURES / BUSINESSES / IMPACT */}
-        <div 
-          style={{
-            position: 'absolute',
-            bottom: '50px',
-            right: 'clamp(20px, 4vw, 50px)',
-            zIndex: 20,
-            pointerEvents: 'none',
-            userSelect: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            textAlign: 'right',
-            fontFamily: 'monospace',
-            fontSize: '11px',
-            letterSpacing: '0.18em',
-            color: 'rgba(255, 255, 255, 0.45)',
-            textTransform: 'uppercase'
-          }}
-        >
-          <span style={{ marginBottom: '4px' }}>CAREERS</span>
-          <span style={{ marginBottom: '4px' }}>VENTURES</span>
-          <span style={{ marginBottom: '4px' }}>BUSINESSES</span>
-          <span style={{ color: '#E31B23', fontWeight: 700 }}>IMPACT</span>
-          <div style={{ width: '22px', height: '2px', backgroundColor: '#E31B23', marginTop: '4px' }} />
-        </div>
-
         <div className="container relative z-10">
           <div className="hero-layout">
-            {/* Left Content Column (54%) */}
+            {/* Left Content Column */}
             <div className="hero-left-content">
 
-              {/* Editorial Headline with Forced Line Breaks */}
-              <h1 className="hero-title font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] mb-4">
-                <span style={{ color: '#FFFFFF' }}>YOU KNOW AI.</span><br />
-                <span style={{ color: '#FFFFFF' }}>NOW SHOW WHAT YOU</span><br />
-                <span style={{ color: '#E31B23' }}>CAN DO WITH IT.</span>
+              {/* Editorial Headline with EXACTLY 3 lines */}
+              <h1 className="hero-title font-extrabold text-3xl sm:text-5xl lg:text-[52px] xl:text-[58px] tracking-tight leading-[1.08] mb-5">
+                <span className="block" style={{ color: '#FFFFFF' }}>YOU KNOW AI.</span>
+                <span className="block" style={{ color: '#FFFFFF' }}>NOW TURN IT INTO</span>
+                <span className="block" style={{ color: '#E31B23' }}>SOMETHING REAL.</span>
               </h1>
 
               {/* Supporting Paragraph */}
-              <p className="hero-desc text-white/70">
-                AI-UpShift helps you build real AI skills, create proof of work, and unlock opportunities to earn.
+              <p className="hero-desc text-white/80 text-base sm:text-lg max-w-[540px] leading-relaxed mb-8">
+                Build practical AI capabilities, create real outcomes and open new paths to work, business and growth.
               </p>
 
-              {/* Action CTAs (Exactly 2 Buttons) */}
+              {/* Action CTAs: How UpShift Works (Red Primary) + Explore Programs (Secondary) */}
               <div className="hero-cta-group flex items-center gap-3.5 flex-wrap">
                 <button
-                  onClick={() => scrollToSection('programs')}
+                  onClick={() => scrollToSection('how-it-works')}
                   className="btn btn-primary group"
                   style={{
                     backgroundColor: '#E31B23',
                     borderRadius: '9999px',
                     color: '#FFFFFF',
                     fontWeight: '700',
-                    fontSize: '15px',
-                    padding: '0 26px',
-                    height: '48px',
+                    fontSize: '14px',
+                    padding: '0 24px',
+                    height: '46px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    boxShadow: '0 4px 14px rgba(227, 27, 35, 0.4)'
+                    boxShadow: '0 4px 14px rgba(227, 27, 35, 0.4)',
+                    textDecoration: 'none',
+                    letterSpacing: '0.02em',
+                    border: 'none',
+                    cursor: 'pointer'
                   }}
                 >
-                  <span>Explore the Programs</span>
-                  <ArrowRight size={17} className="btn-arrow" />
+                  <span>HOW UPSHIFT WORKS</span>
+                  <ArrowRight size={16} className="btn-arrow" />
                 </button>
                 <button
-                  onClick={() => scrollToSection('how-it-works')}
+                  onClick={() => scrollToSection('programs')}
                   className="btn btn-secondary"
                   style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
                     color: '#FFFFFF',
                     borderRadius: '9999px',
                     fontWeight: '600',
-                    fontSize: '15px',
+                    fontSize: '14px',
                     padding: '0 24px',
-                    height: '48px',
+                    height: '46px',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <span>See How Upshift Works</span>
+                  <span>EXPLORE PROGRAMS</span>
                   <ArrowDown size={15} />
                 </button>
               </div>
-
-              {/* Decorative Element 2 (Bottom Left of Hero): SAME PEOPLE. A BRIGHTER TOMORROW. */}
-              <div className="mt-8 text-[11px] font-mono text-white/40 tracking-[0.2em] leading-relaxed uppercase select-none">
-                SAME PEOPLE.<br />A BRIGHTER TOMORROW.
-              </div>
             </div>
 
-            {/* Right Mascot Column (46% - Anchored to Bottom & Scaled ~1.5x) */}
+            {/* Right Mascot Column (Dominant on Right, Anchored to bottom) */}
             <div className="hero-right-mascot">
+              {/* Handwritten "A Bigger You" Badge */}
+              <div className="hero-tagline-script" aria-hidden="true">
+                <div className="hero-tagline-text">
+                  <span className="block">A Bigger</span>
+                  <span className="block">You</span>
+                </div>
+                <svg className="hero-tagline-curve" viewBox="0 0 56 10" fill="none">
+                  <path d="M2 4C18 9 38 9 54 2.5" stroke="#E31B23" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
+
               <div className="hero-mascot-frame">
-                {/* Stage Conic Spotlight Beam from Prompt */}
+                {/* Stage Conic Spotlight Beam */}
                 <div className="hero-spotlight-cone" />
                 <div className="hero-spotlight-core" />
                 <div className="hero-mascot-glow" />
                 <img
                   src="/assets/mascot/mascot_pointing_cutout.png"
-                  alt="Upshift Mascot Pointing"
+                  alt="Upshift Mascot"
                   className="hero-mascot-img"
                   loading="eager"
                 />
@@ -255,8 +207,8 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* 2. PROGRAMS CIRCLE SECTION (Fox + Circular Badges)          */}
       {/* ============================================================ */}
       <div id="programs" className="relative scroll-mt-28 md:scroll-mt-32 bg-[#FAF8F5]">
-        {/* Dedicated 96px-128px clean empty breathing space between Hero and Programs */}
-        <div className="w-full h-24 sm:h-28 md:h-32 lg:h-36 bg-[#FAF8F5]" aria-hidden="true" />
+        {/* Controlled subtle breathing space between Hero and Programs */}
+        <div className="w-full h-10 sm:h-12 md:h-14 bg-[#FAF8F5]" aria-hidden="true" />
         <ExploringProgramsSection />
       </div>
 
@@ -290,21 +242,6 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
             programs={PROGRAMS_DATA} 
             onSelectProgram={onSelectProgram} 
           />
-
-          {/* Editorial Micro-Copy Lower Anchor */}
-          <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-white/10 select-none">
-            <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] sm:text-[11px] tracking-[0.18em] uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E31B23]" />
-              <span>KNOW AI. THEN SHOW WHAT YOU CAN DO WITH IT.</span>
-            </div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.04] text-white/80 font-mono text-[10px] sm:text-[11px] font-semibold tracking-wider">
-              <span>SKILL</span>
-              <span className="text-[#E31B23]">→</span>
-              <span>PROOF</span>
-              <span className="text-[#E31B23]">→</span>
-              <span className="text-white font-bold">OPPORTUNITY</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -326,7 +263,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* ============================================================ */}
       {/* 6. WHAT IS AN UPSHIFTER? — EDITORIAL PHILOSOPHY CLOSER       */}
       {/* ============================================================ */}
-      <section id="upshifter" className="section bg-[#0D0D0D] text-white relative scroll-mt-28 md:scroll-mt-32 pt-24 pb-20 md:pt-28 md:pb-24 overflow-hidden select-none">
+      <section id="upshifter" className="section bg-[#0D0D0D] text-white relative scroll-mt-28 md:scroll-mt-32 pt-7 pb-8 md:pt-9 md:pb-10 overflow-hidden select-none">
         {/* Deep Burgundy & Red Ambient Gradients */}
         <div 
           className="absolute inset-0 pointer-events-none"
@@ -387,9 +324,8 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
               />
               <MascotBadge 
                 pose="arrow" 
-                size="lg" 
-                caption="UpShift CONFIDENT BUILDER"
-                showBadge={true}
+                size="xl" 
+                showBadge={false}
               />
             </div>
           </div>
@@ -399,7 +335,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* ============================================================ */}
       {/* 7. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
       {/* ============================================================ */}
-      <section id="join-upshift" className="section bg-[#FAF8F5] text-[#111111] relative py-20 md:py-28 border-t border-[#E5E7EB]">
+      <section id="join-upshift" className="section bg-[#FAF8F5] text-[#111111] relative pt-6 pb-10 md:pt-7 md:pb-12 border-t border-[#E5E7EB]">
         <div className="container relative z-10" style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
           <span className="eyebrow mb-4 inline-flex items-center gap-2">
             <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />
@@ -408,16 +344,16 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
             </span>
           </span>
 
-          <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#111111] tracking-tight leading-[1.08] mb-5">
+          <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#111111] tracking-tight leading-[1.08] mb-3.5">
             READY TO START YOUR<br />
             <span className="text-[#E31B23]">UPSHIFT JOURNEY?</span>
           </h2>
 
-          <p className="text-base sm:text-lg text-[#4B5563] font-display max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-base sm:text-lg text-[#4B5563] font-display max-w-2xl mx-auto leading-relaxed mb-6">
             Build applied AI capability. Create proof of work. Turn that capability into real opportunity.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <Link
               to="/enroll"
               className="btn btn-primary btn-lg group"

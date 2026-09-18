@@ -1,28 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { 
-  BarChart3, 
   TrendingUp, 
   Users, 
   GraduationCap, 
-  BookOpen, 
+  Sparkles, 
   Calendar, 
-  Filter, 
   Loader2, 
-  AlertCircle, 
-  ArrowUpRight,
-  Sparkles
+  AlertCircle 
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function AnalyticsPage() {
-  // Filters
   const [dateRange, setDateRange] = useState('ALL'); // '7D', '30D', '90D', 'ALL'
-  const [selectedCourse, setSelectedCourse] = useState('ALL');
+  const [selectedTrack, setSelectedTrack] = useState('ALL');
 
-  // Raw fetched data
   const [enrollments, setEnrollments] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,13 +25,12 @@ export default function AnalyticsPage() {
     setError(null);
 
     try {
-      // 3 parallel bulk queries
-      const [enrollmentsRes, coursesRes, profilesRes] = await Promise.all([
+      const [enrollmentsRes, tracksRes, profilesRes] = await Promise.all([
         supabase
           .from('enrollments')
-          .select('id, user_id, course_id, enrolled_at, status'),
+          .select('id, user_id, track_id, enrolled_at, status'),
         supabase
-          .from('courses')
+          .from('tracks')
           .select('id, code, name, color, bg_color')
           .order('code', { ascending: true }),
         supabase
@@ -47,12 +39,30 @@ export default function AnalyticsPage() {
           .eq('role', 'learner'),
       ]);
 
-      if (enrollmentsRes.error) throw enrollmentsRes.error;
-      if (coursesRes.error) throw coursesRes.error;
+      let activeTracks = tracksRes.data;
+      if (tracksRes.error || !activeTracks) {
+        const fallbackRes = await supabase
+          .from('courses')
+          .select('id, code, name, color, bg_color')
+          .order('code', { ascending: true });
+        activeTracks = fallbackRes.data || [];
+      }
+
+      let activeEnrollments = enrollmentsRes.data;
+      if (enrollmentsRes.error || !activeEnrollments) {
+        const fallbackRes = await supabase
+          .from('enrollments')
+          .select('id, user_id, course_id, enrolled_at, status');
+        activeEnrollments = (fallbackRes.data || []).map(e => ({
+          ...e,
+          track_id: e.course_id
+        }));
+      }
+
       if (profilesRes.error) throw profilesRes.error;
 
-      setEnrollments(enrollmentsRes.data || []);
-      setCourses(coursesRes.data || []);
+      setEnrollments(activeEnrollments || []);
+      setTracks(activeTracks || []);
       setProfiles(profilesRes.data || []);
     } catch (err) {
       console.error('[AnalyticsPage] Data load error:', err);
@@ -66,7 +76,6 @@ export default function AnalyticsPage() {
     loadData();
   }, []);
 
-  // Filtered dataset calculation based on Date Range and Course Filter
   const filteredData = useMemo(() => {
     const now = new Date();
     let cutoff = null;
@@ -74,18 +83,16 @@ export default function AnalyticsPage() {
     else if (dateRange === '30D') cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     else if (dateRange === '90D') cutoff = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-    // Filter enrollments
     const activeEnrollments = enrollments.filter(e => {
-      if (selectedCourse !== 'ALL' && e.course_id !== selectedCourse) return false;
+      const tid = e.track_id || e.course_id;
+      if (selectedTrack !== 'ALL' && tid !== selectedTrack) return false;
       if (cutoff && new Date(e.enrolled_at) < cutoff) return false;
       return true;
     });
 
-    // Profile map for college lookup
     const profileMap = new Map();
     profiles.forEach(p => profileMap.set(p.id, p));
 
-    // Top colleges count
     const collegeCounts = {};
     activeEnrollments.forEach(e => {
       const p = profileMap.get(e.user_id);
@@ -97,31 +104,29 @@ export default function AnalyticsPage() {
       .map(([college, count]) => ({ college, count }))
       .sort((a, b) => b.count - a.count);
 
-    // Course distribution count (include all 6 tracks even if 0)
-    const courseCountMap = {};
-    courses.forEach(c => { courseCountMap[c.id] = 0; });
+    const trackCountMap = {};
+    tracks.forEach(t => { trackCountMap[t.id] = 0; });
     activeEnrollments.forEach(e => {
-      if (courseCountMap[e.course_id] !== undefined) {
-        courseCountMap[e.course_id]++;
+      const tid = e.track_id || e.course_id;
+      if (trackCountMap[tid] !== undefined) {
+        trackCountMap[tid]++;
       }
     });
 
-    const courseDistribution = courses.map(c => ({
-      ...c,
-      count: courseCountMap[c.id] || 0,
+    const trackDistribution = tracks.map(t => ({
+      ...t,
+      count: trackCountMap[t.id] || 0,
       percentage: activeEnrollments.length > 0 
-        ? Math.round(((courseCountMap[c.id] || 0) / activeEnrollments.length) * 100) 
+        ? Math.round(((trackCountMap[t.id] || 0) / activeEnrollments.length) * 100) 
         : 0,
     }));
 
-    // Daily timeline aggregation
     const dailyMap = {};
     activeEnrollments.forEach(e => {
       const dateKey = new Date(e.enrolled_at).toISOString().split('T')[0];
       dailyMap[dateKey] = (dailyMap[dateKey] || 0) + 1;
     });
 
-    // Sort dates
     const sortedDates = Object.keys(dailyMap).sort();
     const timeline = sortedDates.map(d => ({
       date: d,
@@ -132,285 +137,203 @@ export default function AnalyticsPage() {
     return {
       totalRegistrations: activeEnrollments.length,
       colleges: sortedColleges,
-      courseDistribution,
+      trackDistribution,
       timeline,
     };
-  }, [enrollments, courses, profiles, dateRange, selectedCourse]);
-
-  // SVG Chart rendering helper
-  const renderTimelineChart = () => {
-    const { timeline } = filteredData;
-    if (timeline.length === 0) {
-      return (
-        <div className="h-48 flex items-center justify-center text-gray-400 text-xs">
-          No registration activity recorded for the selected filter period.
-        </div>
-      );
-    }
-
-    const maxCount = Math.max(...timeline.map(t => t.count), 1);
-    const height = 160;
-    const width = 640;
-    const padding = 24;
-
-    const points = timeline.map((pt, idx) => {
-      const x = padding + (idx / Math.max(timeline.length - 1, 1)) * (width - 2 * padding);
-      const y = height - padding - (pt.count / maxCount) * (height - 2 * padding);
-      return { x, y, ...pt };
-    });
-
-    const pathString = points.reduce((acc, p, idx) => {
-      return idx === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`;
-    }, '');
-
-    const areaString = `${pathString} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
-
-    return (
-      <div className="w-full overflow-x-auto">
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-48 select-none">
-          <defs>
-            <linearGradient id="regGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#E31B23" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#E31B23" stopOpacity="0.0" />
-            </linearGradient>
-          </defs>
-
-          {/* Grid lines */}
-          <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="#F3F4F6" strokeDasharray="3 3" />
-          <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="#F3F4F6" strokeDasharray="3 3" />
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#E5E7EB" />
-
-          {/* Fill Area */}
-          <path d={areaString} fill="url(#regGradient)" />
-
-          {/* Stroke Line */}
-          <path d={pathString} fill="none" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-
-          {/* Dots */}
-          {points.map((p, i) => (
-            <g key={i} className="group">
-              <circle cx={p.x} cy={p.y} r="3.5" fill="#FFFFFF" stroke="#E31B23" strokeWidth="2" />
-              <title>{`${p.formattedDate}: ${p.count} registrations`}</title>
-            </g>
-          ))}
-
-          {/* Axis Labels */}
-          {points.length > 0 && (
-            <>
-              <text x={points[0].x} y={height - 6} fontSize="10" fill="#9CA3AF" textAnchor="start">
-                {points[0].formattedDate}
-              </text>
-              {points.length > 1 && (
-                <text x={points[points.length - 1].x} y={height - 6} fontSize="10" fill="#9CA3AF" textAnchor="end">
-                  {points[points.length - 1].formattedDate}
-                </text>
-              )}
-            </>
-          )}
-        </svg>
-      </div>
-    );
-  };
+  }, [enrollments, tracks, profiles, dateRange, selectedTrack]);
 
   return (
-    <div className="admin-page space-y-6">
+    <div className="admin-page">
       {/* Page Header */}
       <div className="admin-page-header">
-        <div>
-          <h1 className="flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-[#E31B23]" />
-            Registration Analytics
+        <div className="admin-page-title-group">
+          <h1 className="admin-page-title">
+            <TrendingUp size={22} />
+            <span>Registration & Growth Analytics</span>
           </h1>
-          <p>
-            Detailed learner registration and enrollment intelligence.
+          <p className="admin-page-description">
+            Explore enrollment velocity, track demand distribution, and institutional breakdown.
           </p>
         </div>
 
-        {/* Filters */}
+        {/* Filter Controls */}
         <div className="admin-page-actions">
-          {/* Date range filter */}
-          <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200 text-xs font-semibold">
-            {['7D', '30D', '90D', 'ALL'].map((r) => (
+          {/* Date Range Selector */}
+          <div style={{ display: 'inline-flex', backgroundColor: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: '8px', padding: '2px' }}>
+            {['7D', '30D', '90D', 'ALL'].map(range => (
               <button
-                key={r}
+                key={range}
                 type="button"
-                onClick={() => setDateRange(r)}
-                className={`px-3 py-1 rounded-md transition-all ${
-                  dateRange === r 
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
+                onClick={() => setDateRange(range)}
+                style={{
+                  padding: '5px 10px',
+                  borderRadius: '6px',
+                  fontSize: '11.5px',
+                  fontFamily: 'monospace',
+                  fontWeight: dateRange === range ? 700 : 500,
+                  backgroundColor: dateRange === range ? '#111827' : 'transparent',
+                  color: dateRange === range ? '#FFFFFF' : '#4B5563',
+                  transition: 'all 0.15s ease'
+                }}
               >
-                {r === 'ALL' ? 'All Time' : r}
+                {range}
               </button>
             ))}
           </div>
 
-          {/* Course filter */}
+          {/* Track Selector */}
           <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-            className="admin-select py-1.5 h-auto text-xs"
+            value={selectedTrack}
+            onChange={(e) => setSelectedTrack(e.target.value)}
+            className="admin-select"
+            style={{ width: 'auto', minWidth: '160px', height: '36px', fontSize: '12px' }}
           >
-            <option value="ALL">All Curriculum Tracks</option>
-            {courses.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.code} — {c.name}
-              </option>
+            <option value="ALL">All UpShift Tracks</option>
+            {tracks.map(t => (
+              <option key={t.id} value={t.id}>{t.code} — {t.name}</option>
             ))}
           </select>
         </div>
       </div>
 
-      {loading ? (
-        <div className="admin-card p-16 flex flex-col items-center justify-center gap-3 text-gray-500">
-          <Loader2 className="w-7 h-7 animate-spin text-[#E31B23]" />
-          <span className="text-xs font-medium">Loading analytics telemetry...</span>
-        </div>
-      ) : error ? (
-        <div className="admin-card p-12 text-center">
-          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-gray-900">{error}</p>
+      {error && (
+        <div role="alert" className="admin-alert admin-alert-danger">
+          <div className="admin-alert-content">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
           <button
             onClick={loadData}
-            className="mt-3 text-xs font-semibold text-[#E31B23] hover:underline"
+            className="admin-btn admin-btn-sm admin-btn-secondary"
           >
-            Retry Loading
+            Retry
           </button>
         </div>
+      )}
+
+      {loading ? (
+        <div className="admin-card" style={{ padding: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#6B7280' }}>
+          <Loader2 size={24} className="animate-spin" style={{ color: '#E31B23' }} />
+          <span style={{ fontSize: '13px', fontWeight: 500 }}>Aggregating analytics data...</span>
+        </div>
       ) : (
-        <div className="space-y-6">
-          {/* Summary Metric Header */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="admin-card p-4">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Filtered Registrations</span>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{filteredData.totalRegistrations}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Key KPI Row */}
+          <div className="admin-grid-3">
+            <div className="admin-card admin-card-compact">
+              <span className="admin-stat-label">Active Period Registrations</span>
+              <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#E31B23' }}>
+                {filteredData.totalRegistrations}
+              </p>
             </div>
-            <div className="admin-card p-4">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Active Partner Colleges</span>
-              <p className="text-2xl font-bold text-[#E31B23] mt-1">{filteredData.colleges.length}</p>
+
+            <div className="admin-card admin-card-compact">
+              <span className="admin-stat-label">Unique Colleges / Universities</span>
+              <p className="admin-stat-value" style={{ margin: '4px 0 0 0' }}>
+                {filteredData.colleges.length}
+              </p>
             </div>
-            <div className="admin-card p-4">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Top Enrolled Track</span>
-              <p className="text-2xl font-bold text-emerald-600 mt-1">
-                {filteredData.courseDistribution.reduce((max, c) => c.count > max.count ? c : max, { code: '—', count: 0 }).code}
+
+            <div className="admin-card admin-card-compact">
+              <span className="admin-stat-label">Track Diversity</span>
+              <p className="admin-stat-value" style={{ margin: '4px 0 0 0', color: '#059669' }}>
+                {tracks.length} Applied Tracks
               </p>
             </div>
           </div>
 
-          {/* Registrations Over Time Chart */}
-          <div className="admin-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-[#E31B23]" />
-                  Registrations Over Time
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Daily learner enrollment velocity across the platform
-                </p>
+          {/* Split View: Track Distribution & College Leaderboard */}
+          <div className="admin-dashboard-split">
+            {/* Track Enrollment Distribution */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <div className="admin-card-header-left">
+                  <span className="admin-card-eyebrow" style={{ color: '#059669' }}>
+                    <Sparkles size={13} />
+                    <span>Track Demand</span>
+                  </span>
+                  <h3 className="admin-card-title">Track Distribution</h3>
+                </div>
               </div>
-            </div>
-            {renderTimelineChart()}
-          </div>
 
-          {/* Bottom Row: Course Distribution + Top Colleges */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Registrations by Course (All 6 Tracks) */}
-            <div className="admin-card p-6 flex flex-col justify-between">
-              <div>
-                <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-2 mb-1">
-                  <BookOpen className="w-4 h-4 text-[#E31B23]" />
-                  Registrations by Course
-                </h3>
-                <p className="text-xs text-gray-500 mb-4">
-                  Learner breakdown across all 6 flagship tracks
-                </p>
+              <div className="admin-track-list">
+                {filteredData.trackDistribution.map(track => {
+                  const accentColor = track.color || '#E31B23';
 
-                <div className="space-y-3.5">
-                  {filteredData.courseDistribution.map((course) => (
-                    <div key={course.id} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-gray-700">{course.code}</span>
-                          <span className="font-medium text-gray-900">{course.name}</span>
-                        </div>
-                        <div className="font-mono text-gray-600">
-                          <strong>{course.count}</strong> ({course.percentage}%)
+                  return (
+                    <div key={track.id} className="admin-track-row">
+                      <div className="admin-track-identity">
+                        <span 
+                          className="admin-track-code"
+                          style={{ 
+                            backgroundColor: `${accentColor}18`, 
+                            color: accentColor,
+                            border: `1px solid ${accentColor}35`
+                          }}
+                        >
+                          {track.code}
+                        </span>
+                        <span className="admin-track-name" title={track.name}>
+                          {track.name}
+                        </span>
+                      </div>
+
+                      <div className="admin-track-bar-container">
+                        <div className="admin-track-bar-bg">
+                          <div 
+                            className="admin-track-bar-fill"
+                            style={{ 
+                              width: `${track.percentage}%`,
+                              backgroundColor: accentColor,
+                              minWidth: track.count > 0 ? '4px' : '0px'
+                            }}
+                          />
                         </div>
                       </div>
 
-                      {/* Bar indicator */}
-                      <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                        <div
-                          className="h-2 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${course.percentage}%`,
-                            backgroundColor: course.color || '#E31B23',
-                          }}
-                        />
+                      <div className="admin-track-meta">
+                        <span className="admin-track-count">{track.count}</span>
+                        <span className="admin-track-pct">({track.percentage}%)</span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Registrations by College (Top 10) */}
-            <div className="admin-card p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-sm font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                    <GraduationCap className="w-4 h-4 text-[#E31B23]" />
-                    Top Colleges
-                  </h3>
-                  <span className="text-[11px] font-mono text-gray-400">
-                    {filteredData.colleges.length} Total
+            {/* Top Colleges Roster */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <div className="admin-card-header-left">
+                  <span className="admin-card-eyebrow" style={{ color: '#2563EB' }}>
+                    <GraduationCap size={13} />
+                    <span>Institutions</span>
                   </span>
+                  <h3 className="admin-card-title">Top Registered Colleges</h3>
                 </div>
-                <p className="text-xs text-gray-500 mb-4">
-                  Colleges ranked by enrolled learner volume (Top 10)
-                </p>
-
-                {filteredData.colleges.length === 0 ? (
-                  <div className="p-8 text-center text-gray-400 text-xs">
-                    No college data recorded.
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {filteredData.colleges.slice(0, 10).map((col, idx) => {
-                      const share = filteredData.totalRegistrations > 0
-                        ? Math.round((col.count / filteredData.totalRegistrations) * 100)
-                        : 0;
-
-                      return (
-                        <div
-                          key={col.college}
-                          className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 text-xs"
-                        >
-                          <div className="flex items-center gap-2 min-w-0 pr-2">
-                            <span className="w-4 font-mono text-[11px] text-gray-400 flex-shrink-0">
-                              #{idx + 1}
-                            </span>
-                            <span className="font-medium text-gray-900 truncate" title={col.college}>
-                              {col.college}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-2 flex-shrink-0 font-mono text-gray-600">
-                            <strong>{col.count}</strong>
-                            <span className="text-gray-400 text-[11px]">({share}%)</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
               </div>
 
-              {filteredData.colleges.length > 10 && (
-                <div className="mt-4 pt-3 border-t border-gray-100 text-[11px] text-gray-400 text-center">
-                  + {filteredData.colleges.length - 10} additional partner institutions registered
+              {filteredData.colleges.length === 0 ? (
+                <div style={{ padding: '24px', textAlign: 'center', color: '#9CA3AF', fontSize: '13px' }}>
+                  No college data recorded in this period.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '280px', overflowY: 'auto' }}>
+                  {filteredData.colleges.slice(0, 8).map((col, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', fontSize: '12.5px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                        <span style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#E5E7EB', color: '#4B5563', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10.5px', fontFamily: 'monospace', fontWeight: 700, flexShrink: 0 }}>
+                          {idx + 1}
+                        </span>
+                        <span style={{ fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {col.college}
+                        </span>
+                      </div>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#4B5563', flexShrink: 0 }}>
+                        {col.count} {col.count === 1 ? 'student' : 'students'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

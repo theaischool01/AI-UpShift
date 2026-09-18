@@ -92,7 +92,7 @@ Deno.serve(async (req: Request) => {
     const fullName = learner.full_name.trim();
     const password = learner.password;
     const college = (learner.college || '').trim();
-    const courseId = learner.course_id || null;
+    const trackId = learner.track_id || learner.course_id || null;
 
     // 2. Cryptographic Signature Verification
     const hasLiveSecret = razorpayKeySecret && !razorpayKeySecret.includes('YOUR_RAZORPAY_KEY');
@@ -213,7 +213,35 @@ Deno.serve(async (req: Request) => {
         role: 'learner',
       });
 
-    // 7. Upsert UpShift Complete Program Enrollment
+    // 7. Resolve Track against public.tracks (fallback to public.courses if schema migration in flight)
+    let resolvedTrackId = 'reelrush-ai';
+    const targetTrackInput = trackId || learner.course_id || learner.track || 'reelrush-ai';
+
+    try {
+      const { data: trackData } = await adminClient
+        .from('tracks')
+        .select('id, code, name')
+        .or(`id.eq.${targetTrackInput},code.ilike.${targetTrackInput}`)
+        .maybeSingle();
+
+      if (trackData?.id) {
+        resolvedTrackId = trackData.id;
+      } else {
+        // Fallback for pre-migration table
+        const { data: courseData } = await adminClient
+          .from('courses')
+          .select('id, code, name')
+          .or(`id.eq.${targetTrackInput},code.ilike.${targetTrackInput}`)
+          .maybeSingle();
+        if (courseData?.id) {
+          resolvedTrackId = courseData.id;
+        }
+      }
+    } catch (_tErr) {
+      resolvedTrackId = targetTrackInput;
+    }
+
+    // 8. Upsert UpShift Complete Program Enrollment
     let enrollmentId: string | null = null;
     const { data: existingEnrollment } = await adminClient
       .from('enrollments')
@@ -224,33 +252,75 @@ Deno.serve(async (req: Request) => {
 
     if (existingEnrollment) {
       enrollmentId = existingEnrollment.id;
-      await adminClient
+      const updatePayload: Record<string, any> = {
+        status: 'active',
+        payment_status: 'paid',
+        amount_paid: CANONICAL_AMOUNT_INR,
+        currency: 'INR',
+        payment_reference: razorpay_payment_id,
+        track_id: resolvedTrackId,
+      };
+
+      const { error: updErr } = await adminClient
         .from('enrollments')
-        .update({
-          status: 'active',
-          payment_status: 'paid',
-          amount_paid: CANONICAL_AMOUNT_INR,
-          currency: 'INR',
-          payment_reference: razorpay_payment_id,
-          course_id: courseId,
-        })
+        .update(updatePayload)
         .eq('id', enrollmentId);
+
+      // Fallback if column still course_id
+      if (updErr && updErr.message?.includes('track_id')) {
+        await adminClient
+          .from('enrollments')
+          .update({
+            status: 'active',
+            payment_status: 'paid',
+            amount_paid: CANONICAL_AMOUNT_INR,
+            currency: 'INR',
+            payment_reference: razorpay_payment_id,
+            course_id: resolvedTrackId,
+          })
+          .eq('id', enrollmentId);
+      }
     } else {
-      const { data: newEnrollment, error: enrollErr } = await adminClient
+      const insertPayload: Record<string, any> = {
+        user_id: userId,
+        program_id: PROGRAM_ID,
+        track_id: resolvedTrackId,
+        status: 'active',
+        payment_status: 'paid',
+        amount_paid: CANONICAL_AMOUNT_INR,
+        currency: 'INR',
+        payment_reference: razorpay_payment_id,
+        enrolled_at: new Date().toISOString(),
+      };
+
+      let { data: newEnrollment, error: enrollErr } = await adminClient
         .from('enrollments')
-        .insert({
+        .insert(insertPayload)
+        .select('id')
+        .single();
+
+      // Fallback if column still course_id
+      if (enrollErr && enrollErr.message?.includes('track_id')) {
+        const legacyInsertPayload: Record<string, any> = {
           user_id: userId,
           program_id: PROGRAM_ID,
-          course_id: courseId,
+          course_id: resolvedTrackId,
           status: 'active',
           payment_status: 'paid',
           amount_paid: CANONICAL_AMOUNT_INR,
           currency: 'INR',
           payment_reference: razorpay_payment_id,
           enrolled_at: new Date().toISOString(),
-        })
-        .select('id')
-        .single();
+        };
+
+        const res = await adminClient
+          .from('enrollments')
+          .insert(legacyInsertPayload)
+          .select('id')
+          .single();
+        newEnrollment = res.data;
+        enrollErr = res.error;
+      }
 
       if (!enrollErr && newEnrollment) {
         enrollmentId = newEnrollment.id;

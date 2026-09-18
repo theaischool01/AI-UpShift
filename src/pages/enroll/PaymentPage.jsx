@@ -19,6 +19,7 @@ import {
   Bot
 } from 'lucide-react';
 import { loadRazorpayScript, createRazorpayOrder, verifyRazorpayPayment } from '../../services/paymentService';
+import UpShiftWordmark from '../../components/common/UpShiftWordmark';
 import './enroll.css';
 
 const INCLUDED_PROGRAMS = [
@@ -233,7 +234,7 @@ export default function PaymentPage() {
             <div className="enroll-brand-text">
               <span className="enroll-brand-school">THE AI SCHOOL</span>
               <span className="enroll-brand-divider">/</span>
-              <span className="enroll-brand-name">UpShift</span>
+              <UpShiftWordmark theme="light" className="enroll-brand-name" />
             </div>
           </Link>
 

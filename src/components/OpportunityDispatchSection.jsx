@@ -399,7 +399,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
     loadPublicGigs();
   }, []);
 
-  const courseIdMap = {
+  const trackIdMap = {
     'M1': 'reelrush-ai',
     'M2': 'visualforge-ai',
     'M3': 'deepannotator',
@@ -409,10 +409,10 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
   };
 
   const processedCards = OPPORTUNITY_MODULES.map(mod => {
-    const targetCourseId = courseIdMap[mod.code];
+    const targetTrackId = trackIdMap[mod.code];
     const matchingGigs = realGigs.filter(g => 
-      g.course_id === targetCourseId || 
-      (targetCourseId === 'agenthandlers' && g.course_id === 'agent-handlers')
+      (g.track_id || g.course_id) === targetTrackId || 
+      (targetTrackId === 'agenthandlers' && (g.track_id || g.course_id) === 'agent-handlers')
     );
     const primaryGig = matchingGigs[0];
 
@@ -565,19 +565,9 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
               </div>
 
               {/* Role Title */}
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: 800, color: card.textPrimary, letterSpacing: '-0.02em', margin: '0 0 6px 0', lineHeight: 1.25 }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: 800, color: card.textPrimary, letterSpacing: '-0.02em', margin: '0 0 10px 0', lineHeight: 1.25 }}>
                 {card.role}
               </h3>
-
-              {/* Organization & Location */}
-              <p style={{ fontSize: '13px', color: card.textMuted, margin: '0 0 14px 0', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px' }}>
-                <span>Client:</span>
-                <strong style={{ color: card.textPrimary, fontWeight: 700 }}>{card.organization}</strong>
-                <span>•</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                  <MapPin size={12} color={card.accentColor} /> {card.location}
-                </span>
-              </p>
 
               {/* Brief Snippet */}
               <p style={{ fontSize: '13px', fontStyle: 'italic', color: card.textSecondary, lineHeight: 1.5, margin: '0 0 14px 0', paddingLeft: '12px', borderLeft: `2.5px solid ${card.accentColor}` }}>
@@ -605,7 +595,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                 ))}
               </div>
 
-              {/* Snapshot Details Grid */}
+              {/* Snapshot Details Box */}
               <div 
                 style={{
                   backgroundColor: card.boxBg,
@@ -613,22 +603,18 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                   borderRadius: '10px',
                   padding: '10px 14px',
                   marginBottom: '14px',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                  gap: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
                 <div>
                   <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>COMPENSATION</span>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: card.accentColor }}>{card.payment_amount}</span>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: card.accentColor }}>{card.payment_amount}</span>
                 </div>
                 <div>
-                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>ENGAGEMENT</span>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: card.textPrimary }}>{card.engagement}</span>
-                </div>
-                <div>
-                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>ORIGIN</span>
-                  <span style={{ fontSize: '11px', fontWeight: 600, color: card.textSecondary }}>{card.originPlatform}</span>
+                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>VERIFICATION</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669' }}>✓ Verified by UpShift</span>
                 </div>
               </div>
 
@@ -692,7 +678,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
     <section id="opportunities" className="opp-wall-section scroll-mt-24 md:scroll-mt-28">
       <div className="opp-wall-container">
         {/* Section Header */}
-        <div style={{ maxWidth: '780px', marginBottom: '44px' }}>
+        <div style={{ maxWidth: '780px', marginBottom: '28px' }}>
           <span className="eyebrow mb-3 inline-flex items-center gap-2">
             <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />
             <span className="font-mono text-xs font-bold text-[#E31B23] uppercase tracking-wider">

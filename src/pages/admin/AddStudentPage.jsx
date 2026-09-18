@@ -10,7 +10,7 @@ import {
   Lock,
   Mail,
   GraduationCap,
-  BookOpen,
+  Sparkles,
   User
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
@@ -27,12 +27,12 @@ export default function AddStudentPage() {
     collegeEmail: '',
     college: '',
     password: '',
-    courseId: '',
+    trackId: '',
   });
 
-  // Available courses loaded dynamically from database
-  const [courses, setCourses] = useState([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
+  // Available tracks loaded dynamically from database
+  const [tracks, setTracks] = useState([]);
+  const [loadingTracks, setLoadingTracks] = useState(true);
 
   // Form submission state
   const [errors, setErrors] = useState({});
@@ -40,24 +40,32 @@ export default function AddStudentPage() {
   const [submitError, setSubmitError] = useState(null);
   const [createdStudent, setCreatedStudent] = useState(null);
 
-  // Load active courses from Supabase
+  // Load active tracks from Supabase
   useEffect(() => {
-    async function loadCourses() {
+    async function loadTracks() {
       try {
-        const { data, error } = await supabase
-          .from('courses')
+        let { data, error } = await supabase
+          .from('tracks')
           .select('id, code, name, category')
           .order('code', { ascending: true });
 
-        if (error) throw error;
-        setCourses(data || []);
+        if (error) {
+          // Fallback during schema transition
+          const fallbackRes = await supabase
+            .from('courses')
+            .select('id, code, name, category')
+            .order('code', { ascending: true });
+          if (fallbackRes.error) throw error;
+          data = fallbackRes.data;
+        }
+        setTracks(data || []);
       } catch (err) {
-        console.warn('[AddStudentPage] Error loading courses:', err);
+        console.warn('[AddStudentPage] Error loading tracks:', err);
       } finally {
-        setLoadingCourses(false);
+        setLoadingTracks(false);
       }
     }
-    loadCourses();
+    loadTracks();
   }, []);
 
   // Validate form inputs
@@ -91,8 +99,8 @@ export default function AddStudentPage() {
       newErrors.password = 'Password must be at least 8 characters in length.';
     }
 
-    if (!formData.courseId) {
-      newErrors.courseId = 'Please select a flagship curriculum track.';
+    if (!formData.trackId) {
+      newErrors.trackId = 'Please select an assigned UpShift track.';
     }
 
     setErrors(newErrors);
@@ -101,7 +109,6 @@ export default function AddStudentPage() {
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear inline error on edit
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: null }));
     }
@@ -125,20 +132,18 @@ export default function AddStudentPage() {
           college_email: formData.collegeEmail.trim().toLowerCase(),
           college: formData.college.trim(),
           password: formData.password,
-          course_id: formData.courseId,
+          track_id: formData.trackId,
         },
       };
 
       // Invoke the secure Edge Function using the authenticated session
       let resultData = null;
 
-      // Method A: supabase.functions.invoke
       const { data, error } = await supabase.functions.invoke('admin-create-learner', {
         body: payload,
       });
 
       if (error) {
-        // Fallback: direct HTTP fetch to functions endpoint if invoke encountered network error
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const token = session?.access_token;
 
@@ -176,7 +181,7 @@ export default function AddStudentPage() {
         collegeEmail: '',
         college: '',
         password: '',
-        courseId: '',
+        trackId: '',
       });
     } catch (err) {
       console.error('[AddStudentPage] Error creating student:', err);
@@ -202,7 +207,7 @@ export default function AddStudentPage() {
             Add Student
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] mt-1">
-            Create a learner account and enroll them into an UpShift curriculum track.
+            Create a learner account and enroll them into the UpShift Program with an assigned track.
           </p>
         </div>
 
@@ -229,7 +234,7 @@ export default function AddStudentPage() {
                 Student Created Successfully
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
-                The learner account, profile, and track enrollment have been provisioned in the database.
+                The learner account, profile, and UpShift program enrollment have been provisioned in the database.
               </p>
             </div>
           </div>
@@ -245,9 +250,14 @@ export default function AddStudentPage() {
               <span className="font-mono text-gray-900">{createdStudent.email}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-gray-100">
-              <span className="text-gray-500">Enrolled Course:</span>
+              <span className="text-gray-500">Program:</span>
+              <span className="font-semibold text-gray-900">UpShift Complete Applied AI Program</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-gray-100">
+              <span className="text-gray-500">Assigned Track:</span>
               <span className="font-bold text-gray-900">
-                {createdStudent.course_code ? `${createdStudent.course_code} — ` : ''}{createdStudent.course_name || createdStudent.course_id}
+                {(createdStudent.track_code || createdStudent.course_code) ? `${createdStudent.track_code || createdStudent.course_code} — ` : ''}
+                {createdStudent.track_name || createdStudent.course_name || createdStudent.track_id || createdStudent.course_id}
               </span>
             </div>
             <div className="flex justify-between py-1">
@@ -320,7 +330,7 @@ export default function AddStudentPage() {
               {/* Account Email */}
               <div className="admin-form-group">
                 <label htmlFor="email" className="admin-form-label">
-                  Email <span className="text-[#E31B23]">*</span>
+                  Account Email <span className="text-[#E31B23]">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 z-10">
@@ -416,32 +426,32 @@ export default function AddStudentPage() {
               )}
             </div>
 
-            {/* Course Dropdown */}
+            {/* Track Dropdown */}
             <div className="admin-form-group">
-              <label htmlFor="courseId" className="admin-form-label">
-                Flagship Curriculum Track <span className="text-[#E31B23]">*</span>
+              <label htmlFor="trackId" className="admin-form-label">
+                UpShift Track <span className="text-[#E31B23]">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 z-10">
-                  <BookOpen size={15} />
+                  <Sparkles size={15} />
                 </div>
                 <select
-                  id="courseId"
-                  value={formData.courseId}
-                  onChange={(e) => handleInputChange('courseId', e.target.value)}
-                  disabled={loadingCourses || isSubmitting}
-                  className={`admin-select pl-9 ${errors.courseId ? 'border-red-400' : ''}`}
+                  id="trackId"
+                  value={formData.trackId}
+                  onChange={(e) => handleInputChange('trackId', e.target.value)}
+                  disabled={loadingTracks || isSubmitting}
+                  className={`admin-select pl-9 ${errors.trackId ? 'border-red-400' : ''}`}
                 >
-                  <option value="">Select a flagship track...</option>
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.code} — {course.name} ({course.category})
+                  <option value="">Select an UpShift track...</option>
+                  {tracks.map((track) => (
+                    <option key={track.id} value={track.id}>
+                      {track.code} — {track.name} ({track.category})
                     </option>
                   ))}
                 </select>
               </div>
-              {errors.courseId && (
-                <p className="text-[11px] text-red-600 mt-1">{errors.courseId}</p>
+              {errors.trackId && (
+                <p className="text-[11px] text-red-600 mt-1">{errors.trackId}</p>
               )}
             </div>
 
@@ -456,7 +466,7 @@ export default function AddStudentPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting || loadingCourses}
+                disabled={isSubmitting || loadingTracks}
                 className="admin-btn-primary"
               >
                 {isSubmitting ? (

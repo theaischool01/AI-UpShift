@@ -1,16 +1,18 @@
 import React from 'react';
 import { Layers } from 'lucide-react';
 
-export default function CourseDistribution({ courses = [], enrollments = [], isLoading = false }) {
-  // Compute enrollment counts per course truthfully from real database records
-  const courseStats = courses.map((course) => {
-    const count = enrollments.filter((e) => e.course_id === course.id).length;
+export default function CourseDistribution({ courses = [], tracks = [], enrollments = [], isLoading = false }) {
+  const activeTracks = tracks.length > 0 ? tracks : courses;
+
+  // Compute enrollment counts per track truthfully from real database records
+  const trackStats = activeTracks.map((track) => {
+    const count = enrollments.filter((e) => (e.track_id || e.course_id) === track.id).length;
     const percentage = enrollments.length > 0 
       ? Math.round((count / enrollments.length) * 100) 
       : 0;
 
     return {
-      ...course,
+      ...track,
       count,
       percentage
     };
@@ -18,83 +20,78 @@ export default function CourseDistribution({ courses = [], enrollments = [], isL
 
   if (isLoading) {
     return (
-      <div className="admin-card animate-pulse flex flex-col justify-between h-[300px]">
-        <div className="h-5 w-44 bg-gray-200 rounded mb-4" />
-        <div className="space-y-2">
+      <div className="admin-card" style={{ minHeight: '320px', opacity: 0.6 }}>
+        <div style={{ width: '160px', height: '18px', backgroundColor: '#E5E7EB', borderRadius: '4px', marginBottom: '16px' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-9 w-full bg-gray-100 rounded-lg" />
+            <div key={i} style={{ height: '42px', backgroundColor: '#F9FAFB', borderRadius: '8px' }} />
           ))}
         </div>
-        <div className="h-4 w-48 bg-gray-100 rounded mt-3" />
       </div>
     );
   }
 
   return (
-    <div className="admin-card flex flex-col justify-between">
+    <div className="admin-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div>
-          <div className="flex items-center gap-1.5 mb-1 text-[11px] font-mono text-emerald-700 uppercase font-bold tracking-wider">
+      <div className="admin-card-header">
+        <div className="admin-card-header-left">
+          <span className="admin-card-eyebrow" style={{ color: '#059669' }}>
             <Layers size={13} />
-            <span>Curriculum Tracks</span>
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight m-0">
-            Registrations by Course
+            <span>UpShift Tracks</span>
+          </span>
+          <h3 className="admin-card-title">
+            Track Distribution
           </h3>
         </div>
 
-        <span className="text-xs font-mono text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-200 flex-shrink-0">
-          6 Flagship Tracks
+        <span className="admin-card-badge">
+          6 Applied Tracks
         </span>
       </div>
 
-      {/* Courses Distribution List: Compact Analytical Row Layout */}
-      <div className="space-y-1.5">
-        {courseStats.map((course) => {
-          const accentColor = course.color || '#E31B23';
+      {/* Tracks Distribution List */}
+      <div className="admin-track-list">
+        {trackStats.map((track) => {
+          const accentColor = track.color || '#E31B23';
 
           return (
-            <div 
-              key={course.id}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50/70 border border-gray-200/70 hover:bg-gray-100/70 transition-all group"
-              style={{ minHeight: '46px' }}
-            >
-              {/* Course Identity Left: Pill + Name */}
-              <div className="flex items-center gap-2 w-48 sm:w-56 shrink-0 min-w-0">
+            <div key={track.id} className="admin-track-row">
+              {/* Track Identity Left */}
+              <div className="admin-track-identity">
                 <span 
-                  className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider shrink-0"
+                  className="admin-track-code"
                   style={{ 
-                    backgroundColor: `${accentColor}15`, 
+                    backgroundColor: `${accentColor}18`, 
                     color: accentColor,
-                    border: `1px solid ${accentColor}30`
+                    border: `1px solid ${accentColor}35`
                   }}
                 >
-                  {course.code}
+                  {track.code}
                 </span>
-                <span className="text-xs font-semibold text-gray-800 truncate group-hover:text-gray-900 transition-colors">
-                  {course.name}
+                <span className="admin-track-name" title={track.name}>
+                  {track.name}
                 </span>
               </div>
 
               {/* Progress Bar Center */}
-              <div className="flex-1 min-w-[80px]">
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="admin-track-bar-container">
+                <div className="admin-track-bar-bg">
                   <div 
-                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    className="admin-track-bar-fill"
                     style={{ 
-                      width: `${course.percentage}%`,
+                      width: `${track.percentage}%`,
                       backgroundColor: accentColor,
-                      minWidth: course.count > 0 ? '4px' : '0px'
+                      minWidth: track.count > 0 ? '4px' : '0px'
                     }}
                   />
                 </div>
               </div>
 
               {/* Percentage & Count Right */}
-              <div className="w-20 text-right shrink-0 flex items-center justify-end gap-1.5 text-xs font-mono">
-                <span className="font-bold text-gray-900">{course.count}</span>
-                <span className="text-gray-400">({course.percentage}%)</span>
+              <div className="admin-track-meta">
+                <span className="admin-track-count">{track.count}</span>
+                <span className="admin-track-pct">({track.percentage}%)</span>
               </div>
             </div>
           );
@@ -102,9 +99,11 @@ export default function CourseDistribution({ courses = [], enrollments = [], isL
       </div>
 
       {/* Summary Footer */}
-      <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-mono text-gray-500">
-        <span>Total enrolled: {enrollments.length} seats</span>
-        <span>Distribution across 6 flagship tracks</span>
+      <div className="admin-chart-footer" style={{ marginTop: '16px' }}>
+        <div className="admin-chart-legend">
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#059669' }} />
+          <span>Active track assignments</span>
+        </div>
       </div>
     </div>
   );

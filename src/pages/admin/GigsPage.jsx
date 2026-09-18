@@ -5,7 +5,6 @@ import {
   Plus, 
   Upload, 
   Search, 
-  Filter, 
   ExternalLink, 
   Eye, 
   Edit, 
@@ -14,12 +13,7 @@ import {
   Loader2, 
   AlertCircle, 
   ChevronLeft, 
-  ChevronRight,
-  Building,
-  MapPin,
-  Clock,
-  Calendar,
-  Globe
+  ChevronRight
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
@@ -29,18 +23,16 @@ export default function GigsPage() {
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('ALL');
-  const [selectedOriginSite, setSelectedOriginSite] = useState('ALL');
+  const [selectedTrack, setSelectedTrack] = useState('ALL');
 
   // Pagination states
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize] = useState(25);
   const [totalGigs, setTotalGigs] = useState(0);
 
   // Data states
   const [gigs, setGigs] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [originSites, setOriginSites] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -61,24 +53,25 @@ export default function GigsPage() {
     }, 300);
   };
 
-  // Load courses & distinct origin sites once
+  // Load tracks
   useEffect(() => {
     async function loadMetadata() {
       try {
-        const { data: coursesData } = await supabase
-          .from('courses')
+        let { data: tracksData, error } = await supabase
+          .from('tracks')
           .select('id, code, name')
           .order('code', { ascending: true });
-        setCourses(coursesData || []);
 
-        const { data: sitesData } = await supabase
-          .from('gigs')
-          .select('origin_site');
-        
-        if (sitesData) {
-          const uniqueSites = Array.from(new Set(sitesData.map(s => s.origin_site).filter(Boolean))).sort();
-          setOriginSites(uniqueSites);
+        if (error) {
+          const fallbackRes = await supabase
+            .from('courses')
+            .select('id, code, name')
+            .order('code', { ascending: true });
+          if (fallbackRes.error) throw error;
+          tracksData = fallbackRes.data;
         }
+
+        setTracks(tracksData || []);
       } catch (err) {
         console.warn('[GigsPage] Error loading filter metadata:', err);
       }
@@ -101,17 +94,17 @@ export default function GigsPage() {
           id,
           external_gig_id,
           title,
-          course_id,
+          track_id,
           short_description,
-          long_description,
-          origin_site,
+          overview,
+          responsibilities,
+          deliverables,
+          requirements,
+          proof_spec,
           origin_url,
-          organization,
           payment_amount,
-          location,
-          engagement_type,
           created_at,
-          course:courses (
+          track:tracks (
             id,
             code,
             name
@@ -120,17 +113,12 @@ export default function GigsPage() {
 
       // Apply Search
       if (debouncedSearch) {
-        query = query.or(`title.ilike.%${debouncedSearch}%,origin_site.ilike.%${debouncedSearch}%,organization.ilike.%${debouncedSearch}%`);
+        query = query.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
       }
 
-      // Apply Course Filter
-      if (selectedCourse !== 'ALL') {
-        query = query.eq('course_id', selectedCourse);
-      }
-
-      // Apply Origin Site Filter
-      if (selectedOriginSite !== 'ALL') {
-        query = query.eq('origin_site', selectedOriginSite);
+      // Apply Track Filter
+      if (selectedTrack !== 'ALL') {
+        query = query.eq('track_id', selectedTrack);
       }
 
       // Order & Paginate
@@ -138,160 +126,176 @@ export default function GigsPage() {
         .order('created_at', { ascending: false })
         .range(from, to);
 
-      if (queryError) throw queryError;
+      if (queryError) {
+        console.warn('[GigsPage] Relational query error, falling back to flat query:', queryError);
+        let flatQuery = supabase
+          .from('gigs')
+          .select(`
+            id,
+            external_gig_id,
+            title,
+            track_id,
+            short_description,
+            overview,
+            responsibilities,
+            deliverables,
+            requirements,
+            proof_spec,
+            origin_url,
+            payment_amount,
+            created_at
+          `, { count: 'exact' });
 
-      setGigs(data || []);
-      setTotalGigs(count || 0);
+        if (debouncedSearch) {
+          flatQuery = flatQuery.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
+        }
+        if (selectedTrack !== 'ALL') {
+          flatQuery = flatQuery.eq('track_id', selectedTrack);
+        }
+
+        const { data: flatData, count: flatCount, error: flatError } = await flatQuery
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (flatError) throw flatError;
+        setGigs(flatData || []);
+        setTotalGigs(flatCount || 0);
+      } else {
+        setGigs(data || []);
+        setTotalGigs(count || 0);
+      }
     } catch (err) {
-      console.error('[GigsPage] Fetch failed:', err);
-      setError('Unable to load gigs. Please check your connection.');
+      console.error('[GigsPage] Fetch gigs error:', err);
+      setError('Unable to load commercial opportunities. Please refresh.');
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, debouncedSearch, selectedCourse, selectedOriginSite]);
+  }, [page, pageSize, debouncedSearch, selectedTrack]);
 
   useEffect(() => {
     fetchGigs();
   }, [fetchGigs]);
 
-  // Delete gig confirmation
-  const handleConfirmDelete = async () => {
+  // Handle Gig Deletion
+  const confirmDeleteGig = async () => {
     if (!deletingGig || isDeleting) return;
-
     setIsDeleting(true);
+
     try {
-      const { error: delErr } = await supabase
+      const { error: delError } = await supabase
         .from('gigs')
         .delete()
         .eq('id', deletingGig.id);
 
-      if (delErr) throw delErr;
+      if (delError) throw delError;
 
+      setGigs(prev => prev.filter(g => g.id !== deletingGig.id));
+      setTotalGigs(prev => Math.max(0, prev - 1));
       setDeletingGig(null);
-      // Refresh current page or go back a page if this was the only item
-      if (gigs.length === 1 && page > 1) {
-        setPage(prev => prev - 1);
-      } else {
-        fetchGigs();
-      }
     } catch (err) {
-      alert(`Failed to delete gig: ${err.message || 'Server error'}`);
+      console.error('[GigsPage] Delete error:', err);
+      alert('Unable to delete opportunity record: ' + (err.message || 'Unknown database error'));
     } finally {
       setIsDeleting(false);
     }
   };
 
-  // Safe external URL open helper
-  const handleOpenExternal = (url) => {
-    if (!url) return;
+  const totalPages = Math.max(1, Math.ceil(totalGigs / pageSize));
+
+  const formatDate = (iso) => {
+    if (!iso) return '—';
     try {
-      const parsed = new URL(url);
-      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      } else {
-        alert('Invalid or unsupported web address.');
-      }
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }).format(new Date(iso));
     } catch {
-      alert('Invalid URL format.');
+      return iso.slice(0, 10);
     }
   };
 
-  const totalPages = Math.ceil(totalGigs / pageSize) || 1;
-  const startRow = totalGigs === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endRow = Math.min(page * pageSize, totalGigs);
-
   return (
-    <div className="admin-page space-y-6">
+    <div className="admin-page">
       {/* Page Header */}
       <div className="admin-page-header">
-        <div>
-          <h1 className="flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-[#E31B23]" />
-            Gigs
+        <div className="admin-page-title-group">
+          <h1 className="admin-page-title">
+            <Briefcase size={22} />
+            <span>Opportunities Directory</span>
           </h1>
-          <p>Manage aggregated opportunities available to UpShift learners.</p>
+          <p className="admin-page-description">
+            Manage commercial gigs, verify external apply gateways, and associate with UpShift tracks.
+          </p>
         </div>
 
         <div className="admin-page-actions">
           <Link
             to="/admin/gigs/import"
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-secondary"
+            title="Bulk import opportunities from CSV"
           >
-            <Upload className="w-4 h-4 text-gray-600" />
-            <span>Bulk Import</span>
+            <Upload size={14} />
+            <span>Bulk CSV Import</span>
           </Link>
 
           <Link
             to="/admin/gigs/new"
-            className="admin-btn-primary"
+            className="admin-btn admin-btn-primary"
           >
-            <Plus className="w-4 h-4" />
+            <Plus size={14} />
             <span>Add Gig</span>
           </Link>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="admin-card p-4">
+      {/* Error Alert */}
+      {error && (
+        <div role="alert" className="admin-alert admin-alert-danger">
+          <div className="admin-alert-content">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={fetchGigs}
+            className="admin-btn admin-btn-sm admin-btn-secondary"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Search & Filter Toolbar */}
+      <div className="admin-card admin-card-compact">
         <div className="admin-filter-bar">
-          {/* Search Input */}
-          <div className="relative min-w-0">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+          <div className="admin-input-wrapper">
+            <div className="admin-input-icon">
+              <Search size={15} />
+            </div>
             <input
               type="text"
               value={searchQuery}
               onChange={handleSearchChange}
-              placeholder="Search gigs by title, origin site, or client..."
-              className="admin-input pl-9 pr-9"
+              placeholder="Search by title, overview, short description..."
+              className="admin-input admin-input-with-icon"
+              aria-label="Search opportunities"
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setDebouncedSearch('');
-                  setPage(1);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
 
-          {/* Course Filter */}
           <div>
             <select
-              value={selectedCourse}
+              value={selectedTrack}
               onChange={(e) => {
-                setSelectedCourse(e.target.value);
+                setSelectedTrack(e.target.value);
                 setPage(1);
               }}
               className="admin-select"
+              aria-label="Filter by UpShift track"
             >
-              <option value="ALL">All Curriculum Tracks</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} — {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Origin Site Filter */}
-          <div>
-            <select
-              value={selectedOriginSite}
-              onChange={(e) => {
-                setSelectedOriginSite(e.target.value);
-                setPage(1);
-              }}
-              className="admin-select"
-            >
-              <option value="ALL">All Origin Sites</option>
-              {originSites.map((site) => (
-                <option key={site} value={site}>
-                  {site}
+              <option value="ALL">All UpShift Tracks</option>
+              {tracks.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.code} — {t.name}
                 </option>
               ))}
             </select>
@@ -299,353 +303,386 @@ export default function GigsPage() {
         </div>
       </div>
 
-      {/* Gigs Table Container */}
-      <div className="admin-card overflow-hidden p-0">
+      {/* Main Gigs Table */}
+      <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
         {loading ? (
-          <div className="p-16 flex flex-col items-center justify-center gap-3 text-gray-500">
-            <Loader2 className="w-7 h-7 animate-spin text-[#E31B23]" />
-            <span className="text-xs font-medium">Loading opportunities...</span>
-          </div>
-        ) : error ? (
-          <div className="p-12 text-center">
-            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-gray-900">{error}</p>
-            <button
-              onClick={fetchGigs}
-              className="mt-3 text-xs font-semibold text-[#E31B23] hover:underline"
-            >
-              Try Again
-            </button>
+          <div style={{ padding: '36px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#6B7280' }}>
+            <Loader2 size={24} className="animate-spin" style={{ color: '#E31B23' }} />
+            <span style={{ fontSize: '13px', fontWeight: 500 }}>Loading opportunities...</span>
           </div>
         ) : gigs.length === 0 ? (
-          /* Empty State */
-          <div className="p-16 text-center max-w-md mx-auto">
-            <div className="w-14 h-14 rounded-full bg-red-50 text-[#E31B23] flex items-center justify-center mx-auto mb-4">
-              <Briefcase className="w-7 h-7" />
+          <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#F3F4F6', margin: '0 auto 10px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF' }}>
+              <Briefcase size={20} />
             </div>
-            <h3 className="text-base font-bold text-gray-900 tracking-tight">NO GIGS YET</h3>
-            <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-              Add your first opportunity or import a gig dataset to begin building the UpShift opportunity board.
+            <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#111827', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              No Opportunities Found
+            </h4>
+            <p style={{ fontSize: '12.5px', color: '#6B7280', maxWidth: '440px', margin: '0 auto 20px auto', lineHeight: 1.5 }}>
+              {searchQuery || selectedTrack !== 'ALL'
+                ? 'No gigs match your search filters. Try adjusting your query.'
+                : 'Create your first opportunity record or upload a bulk CSV listing.'}
             </p>
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <Link
-                to="/admin/gigs/new"
-                className="admin-btn-primary"
-              >
-                Add Gig
-              </Link>
-              <Link
-                to="/admin/gigs/import"
-                className="admin-btn-secondary"
-              >
-                Bulk Import
-              </Link>
-            </div>
+            <Link
+              to="/admin/gigs/new"
+              className="admin-btn admin-btn-primary"
+            >
+              <Plus size={14} />
+              <span>Add First Opportunity</span>
+            </Link>
           </div>
         ) : (
-          <div>
-            <div className="admin-table-wrapper border-0 rounded-none">
-              <table className="admin-table">
-                <thead className="bg-gray-50 border-b border-gray-200 font-semibold text-gray-700">
-                  <tr>
-                    <th className="py-3 px-4 w-32">Gig ID</th>
-                    <th className="py-3 px-4">Title & Client</th>
-                    <th className="py-3 px-4">Course</th>
-                    <th className="py-3 px-4">Payment</th>
-                    <th className="py-3 px-4">Origin Site</th>
-                    <th className="py-3 px-4">Created</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {gigs.map((gig) => (
-                    <tr key={gig.id} className="hover:bg-gray-50/60 transition-colors">
-                      {/* Gig ID */}
-                      <td className="py-3 px-4 font-mono text-gray-500 text-[11px]">
-                        {gig.external_gig_id || gig.id.slice(0, 8)}
-                      </td>
+          <div className="admin-table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Opportunity</th>
+                  <th>Track</th>
+                  <th>Compensation</th>
+                  <th>Apply Gateway</th>
+                  <th>Created</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gigs.map((gig) => {
+                  const track = gig.track || tracks.find(t => t.id === gig.track_id);
 
-                      {/* Title & Organization */}
-                      <td className="py-3 px-4 max-w-xs">
-                        <div className="font-medium text-gray-900 truncate" title={gig.title}>
+                  return (
+                    <tr key={gig.id}>
+                      {/* Title & Short Description */}
+                      <td>
+                        <div style={{ fontWeight: 700, color: '#111827', fontSize: '13.5px', marginBottom: '2px' }}>
                           {gig.title}
                         </div>
-                        {gig.organization && (
-                           <div className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
-                            <Building className="w-3 h-3" />
-                            <span className="truncate">{gig.organization}</span>
-                          </div>
+                        {gig.short_description && (
+                          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, maxWidth: '420px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {gig.short_description}
+                          </p>
                         )}
                       </td>
 
-                      {/* Course */}
-                      <td className="py-3 px-4">
-                        {gig.course ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-gray-100 text-gray-800">
-                            {gig.course.code} &bull; {gig.course.name}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
-                      </td>
-
-                      {/* Payment */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        {gig.payment_amount ? (
-                          <span className="font-semibold text-gray-900 text-xs">
-                            {gig.payment_amount}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 text-xs">—</span>
-                        )}
-                      </td>
-
-                      {/* Origin Site */}
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                          <Globe className="w-3 h-3 text-blue-500" />
-                          {gig.origin_site}
+                      {/* Track Code / Badge */}
+                      <td>
+                        <span style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          gap: '5px',
+                          padding: '3px 8px', 
+                          borderRadius: '6px', 
+                          fontSize: '11px', 
+                          fontWeight: 700, 
+                          fontFamily: 'monospace',
+                          backgroundColor: '#F3F4F6',
+                          color: '#1F2937'
+                        }}>
+                          {track ? `${track.code} · ${track.name}` : (gig.track_id || '—')}
                         </span>
                       </td>
 
-                      {/* Created */}
-                      <td className="py-3 px-4 text-gray-400 font-mono text-[11px]">
-                        {new Date(gig.created_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
+                      {/* Compensation */}
+                      <td>
+                        <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#047857' }}>
+                          {gig.payment_amount || '—'}
+                        </span>
                       </td>
 
-                      {/* Actions */}
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {/* View Modal */}
+                      {/* Apply Gateway Origin */}
+                      <td>
+                        {gig.origin_url ? (
+                          <a
+                            href={gig.origin_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="admin-link"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#4F46E5', fontWeight: 500 }}
+                            title={gig.origin_url}
+                          >
+                            <span>Open URL</span>
+                            <ExternalLink size={11} />
+                          </a>
+                        ) : (
+                          <span style={{ color: '#9CA3AF', fontSize: '12px' }}>—</span>
+                        )}
+                      </td>
+
+                      {/* Created Date */}
+                      <td style={{ fontSize: '12px', color: '#6B7280', whiteSpace: 'nowrap' }}>
+                        {formatDate(gig.created_at)}
+                      </td>
+
+                      {/* Action Buttons */}
+                      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <button
                             type="button"
                             onClick={() => setViewingGig(gig)}
                             className="admin-btn-icon"
-                            title="View details"
-                            aria-label="View details"
+                            title="Preview opportunity detail modal"
                           >
-                            <Eye className="w-4 h-4 text-gray-500" />
+                            <Eye size={13} />
                           </button>
 
-                          {/* Edit */}
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/admin/gigs/new?id=${gig.id}`)}
+                          <Link
+                            to={`/admin/gigs/new?id=${gig.id}`}
                             className="admin-btn-icon"
                             title="Edit opportunity"
-                            aria-label="Edit opportunity"
                           >
-                            <Edit className="w-4 h-4 text-gray-500" />
-                          </button>
+                            <Edit size={13} />
+                          </Link>
 
-                          {/* Delete */}
                           <button
                             type="button"
                             onClick={() => setDeletingGig(gig)}
-                            className="admin-btn-icon text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200"
+                            className="admin-btn-icon admin-btn-icon-danger"
                             title="Delete opportunity"
-                            aria-label="Delete opportunity"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-            {/* Pagination Controls */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-              <div>
-                Showing <strong>{startRow}</strong>–<strong>{endRow}</strong> of <strong>{totalGigs}</strong> gigs
-              </div>
+        {/* Pagination Bar */}
+        {!loading && totalPages > 1 && (
+          <div style={{ padding: '12px 20px', borderTop: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FAFAFA' }}>
+            <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'monospace' }}>
+              Showing {((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, totalGigs)} of {totalGigs} opportunities
+            </span>
 
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span>Rows per page:</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setPage(1);
-                    }}
-                    className="px-2 py-1 text-xs border border-gray-200 rounded bg-white text-gray-700"
-                  >
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+              >
+                <ChevronLeft size={13} />
+                <span>Prev</span>
+              </button>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className="p-1 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                    title="Previous page"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
+              <span style={{ fontSize: '12px', fontWeight: 600, padding: '0 8px', fontFamily: 'monospace' }}>
+                {page} / {totalPages}
+              </span>
 
-                  <span className="px-2 font-medium text-gray-700">
-                    Page {page} of {totalPages}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages}
-                    className="p-1 rounded border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                    title="Next page"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+              >
+                <span>Next</span>
+                <ChevronRight size={13} />
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* 4D.10 View Gig Details Modal */}
+      {/* Detail Preview Modal */}
       {viewingGig && (
-        <div className="admin-modal-backdrop">
-          <div className="admin-modal-card max-w-2xl">
-            {/* Modal Header */}
-            <div className="p-5 border-b border-gray-100 flex items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-[11px] text-gray-400">
-                    {viewingGig.external_gig_id || viewingGig.id}
-                  </span>
-                  {viewingGig.course && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700">
-                      {viewingGig.course.code} &bull; {viewingGig.course.name}
-                    </span>
-                  )}
-                </div>
-                <h2 className="text-lg font-bold text-gray-900">{viewingGig.title}</h2>
+        <div className="admin-modal-overlay" onClick={() => setViewingGig(null)}>
+          <div className="admin-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Briefcase size={17} style={{ color: '#E31B23' }} />
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#111827' }}>
+                  Opportunity Details
+                </h3>
               </div>
               <button
-                type="button"
                 onClick={() => setViewingGig(null)}
                 className="admin-btn-icon"
-                aria-label="Close modal"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X size={15} />
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6 text-xs text-gray-700">
-              {/* Meta Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 p-3.5 bg-gray-50 rounded-xl border border-gray-100">
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-gray-400">Origin Platform</span>
-                  <p className="font-semibold text-gray-900 mt-0.5">{viewingGig.origin_site}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-gray-400">Organization</span>
-                  <p className="font-semibold text-gray-900 mt-0.5">{viewingGig.organization || 'Undisclosed'}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-gray-400">Payment</span>
-                  <p className="font-semibold text-gray-900 mt-0.5">{viewingGig.payment_amount && viewingGig.payment_amount.trim() !== '' ? viewingGig.payment_amount : 'Payment not specified'}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-gray-400">Location</span>
-                  <p className="font-semibold text-gray-900 mt-0.5">{viewingGig.location || 'Remote'}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-semibold text-gray-400">Engagement</span>
-                  <p className="font-semibold text-gray-900 mt-0.5">{viewingGig.engagement_type || 'Contract'}</p>
-                </div>
-              </div>
-
-              {/* Short Description */}
+            <div className="admin-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Overview</h4>
-                <p className="text-gray-800 leading-relaxed font-medium bg-gray-50/70 p-3 rounded-lg border border-gray-100">
-                  {viewingGig.short_description}
-                </p>
+                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                  Title
+                </span>
+                <h4 style={{ margin: '2px 0 0 0', fontSize: '16px', fontWeight: 800, color: '#111827' }}>
+                  {viewingGig.title}
+                </h4>
               </div>
 
-              {/* Long Description */}
-              <div>
-                <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Complete Scope & Deliverables</h4>
-                <div className="text-gray-600 whitespace-pre-line leading-relaxed bg-white p-4 rounded-lg border border-gray-200">
-                  {viewingGig.long_description}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    UpShift Track
+                  </span>
+                  <div style={{ marginTop: '2px', fontSize: '13px', fontWeight: 700, fontFamily: 'monospace' }}>
+                    {viewingGig.track?.name ? `${viewingGig.track.code} · ${viewingGig.track.name}` : (viewingGig.track_id || '—')}
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    Compensation
+                  </span>
+                  <div style={{ marginTop: '2px', fontSize: '13px', fontWeight: 700, color: '#047857' }}>
+                    {viewingGig.payment_amount || '—'}
+                  </div>
                 </div>
               </div>
 
-              <div className="text-[11px] text-gray-400 font-mono">
-                Opportunity indexed on {new Date(viewingGig.created_at).toLocaleString()}
-              </div>
+              {viewingGig.origin_url && (
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    Apply Gateway Origin URL
+                  </span>
+                  <div style={{ marginTop: '2px' }}>
+                    <a
+                      href={viewingGig.origin_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ fontSize: '12px', color: '#4F46E5', wordBreak: 'break-all' }}
+                    >
+                      {viewingGig.origin_url}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {viewingGig.overview && (
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    About the Role
+                  </span>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                    {viewingGig.overview}
+                  </p>
+                </div>
+              )}
+
+              {Array.isArray(viewingGig.responsibilities) && viewingGig.responsibilities.length > 0 && (
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    Responsibilities
+                  </span>
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12.5px', color: '#374151', lineHeight: 1.6 }}>
+                    {viewingGig.responsibilities.map((r, i) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {Array.isArray(viewingGig.deliverables) && viewingGig.deliverables.length > 0 && (
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    Deliverables
+                  </span>
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12.5px', color: '#374151', lineHeight: 1.6 }}>
+                    {viewingGig.deliverables.map((d, i) => (
+                      <li key={i}>{d}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {Array.isArray(viewingGig.requirements) && viewingGig.requirements.length > 0 && (
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    Requirements
+                  </span>
+                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12.5px', color: '#374151', lineHeight: 1.6 }}>
+                    {viewingGig.requirements.map((req, i) => (
+                      <li key={i}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {viewingGig.proof_spec && (
+                <div style={{ backgroundColor: '#F9FAFB', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#4B5563', fontWeight: 700 }}>
+                    Required Proof Specification
+                  </span>
+                  <p style={{ margin: '3px 0 0 0', fontSize: '12px', color: '#111827', fontWeight: 500 }}>
+                    {viewingGig.proof_spec}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+            <div className="admin-modal-footer">
+              <Link
+                to={`/admin/gigs/new?id=${viewingGig.id}`}
+                className="admin-btn admin-btn-primary"
+              >
+                <Edit size={13} />
+                <span>Edit Opportunity</span>
+              </Link>
+
               <button
-                type="button"
                 onClick={() => setViewingGig(null)}
-                className="admin-btn-secondary"
+                className="admin-btn admin-btn-secondary"
               >
                 Close
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleOpenExternal(viewingGig.origin_url)}
-                className="admin-btn-primary"
-              >
-                <span>Apply on Origin Site</span>
-                <ExternalLink className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 4D.18 Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       {deletingGig && (
-        <div className="admin-modal-backdrop">
-          <div className="admin-modal-card max-w-md p-6 text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
-              <Trash2 className="w-6 h-6" />
+        <div className="admin-modal-overlay" onClick={() => setDeletingGig(null)}>
+          <div className="admin-modal-container admin-modal-compact" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#DC2626' }}>
+                <Trash2 size={17} />
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#111827' }}>
+                  Delete Opportunity?
+                </h3>
+              </div>
+              <button
+                onClick={() => setDeletingGig(null)}
+                className="admin-btn-icon"
+              >
+                <X size={15} />
+              </button>
             </div>
 
-            <div>
-              <h3 className="text-base font-bold text-gray-900">Delete this gig?</h3>
-              <p className="text-xs text-gray-500 mt-1">
-                Are you sure you want to remove <strong>"{deletingGig.title}"</strong>? This action cannot be undone.
+            <div className="admin-modal-body">
+              <p style={{ fontSize: '13px', color: '#4B5563', lineHeight: 1.5, margin: 0 }}>
+                Are you sure you want to delete <strong>{deletingGig.title}</strong>? This will permanently remove the commercial opportunity from learner feeds.
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="admin-modal-footer">
               <button
                 type="button"
                 onClick={() => setDeletingGig(null)}
                 disabled={isDeleting}
-                className="admin-btn-secondary"
+                className="admin-btn admin-btn-secondary"
               >
                 Cancel
               </button>
 
               <button
                 type="button"
-                onClick={handleConfirmDelete}
+                onClick={confirmDeleteGig}
                 disabled={isDeleting}
-                className="admin-btn-primary bg-red-600 hover:bg-red-700"
+                className="admin-btn admin-btn-danger"
               >
-                {isDeleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>Delete Gig</span>
+                {isDeleting ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Yes, Delete</span>
+                )}
               </button>
             </div>
           </div>

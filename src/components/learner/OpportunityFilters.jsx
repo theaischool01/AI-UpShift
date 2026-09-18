@@ -2,9 +2,7 @@ import React, { useRef } from 'react';
 import { 
   Search, 
   X, 
-  Filter, 
   Sparkles, 
-  Globe, 
   Layers 
 } from 'lucide-react';
 
@@ -13,19 +11,22 @@ export default function OpportunityFilters({
   setMode,
   searchQuery,
   setSearchQuery,
+  selectedTrack,
+  setSelectedTrack,
+  tracks = [],
+  assignedTrack = null,
+  // Backward-compatibility props
   selectedCourse,
   setSelectedCourse,
-  selectedOrigin,
-  setSelectedOrigin,
-  selectedEngagement,
-  setSelectedEngagement,
   courses = [],
-  originSites = [],
-  engagementTypes = [],
   enrolledCourses = [],
   onFilterChange = () => {},
 }) {
   const debounceTimerRef = useRef(null);
+  const activeSelectedTrack = selectedTrack || selectedCourse || 'ALL';
+  const handleSelectTrack = setSelectedTrack || setSelectedCourse || (() => {});
+  const availableTracks = tracks.length > 0 ? tracks : courses;
+  const currentAssigned = assignedTrack || enrolledCourses[0] || null;
 
   const handleSearchInput = (e) => {
     const val = e.target.value;
@@ -72,11 +73,11 @@ export default function OpportunityFilters({
         </div>
 
         {/* Informative track note when in recommended mode */}
-        {mode === 'recommended' && enrolledCourses.length > 0 && (
+        {mode === 'recommended' && currentAssigned && (
           <div className="text-xs text-[#6B7280] flex items-center gap-1.5">
             <span>Filtered for:</span>
             <strong className="text-[#111827] font-semibold">
-              {enrolledCourses.map(c => `${c.code} · ${c.name}`).join(', ')}
+              {currentAssigned.code} · {currentAssigned.name}
             </strong>
           </div>
         )}
@@ -91,7 +92,7 @@ export default function OpportunityFilters({
             type="text"
             value={searchQuery}
             onChange={handleSearchInput}
-            placeholder="Search opportunities by title, origin site, or client..."
+            placeholder="Search opportunities by title or description..."
             className="learner-search-input"
           />
           {searchQuery && (
@@ -105,65 +106,26 @@ export default function OpportunityFilters({
           )}
         </div>
 
-        {/* Dropdown Filters */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Track Filter */}
-          {mode === 'all' && (
+        {/* Track Filter */}
+        {mode === 'all' && (
+          <div className="flex items-center">
             <select
-              value={selectedCourse}
+              value={activeSelectedTrack}
               onChange={(e) => {
-                setSelectedCourse(e.target.value);
+                handleSelectTrack(e.target.value);
                 onFilterChange();
               }}
               className="learner-select-filter"
             >
-              <option value="ALL">All Curriculum Tracks</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} — {c.name}
+              <option value="ALL">All UpShift Tracks</option>
+              {availableTracks.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.code} — {t.name}
                 </option>
               ))}
             </select>
-          )}
-
-          {/* Origin Platform Filter */}
-          {originSites.length > 0 && (
-            <select
-              value={selectedOrigin}
-              onChange={(e) => {
-                setSelectedOrigin(e.target.value);
-                onFilterChange();
-              }}
-              className="learner-select-filter"
-            >
-              <option value="ALL">All Platforms</option>
-              {originSites.map((site) => (
-                <option key={site} value={site}>
-                  {site}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {/* Engagement Type Filter */}
-          {engagementTypes.length > 0 && (
-            <select
-              value={selectedEngagement}
-              onChange={(e) => {
-                setSelectedEngagement(e.target.value);
-                onFilterChange();
-              }}
-              className="learner-select-filter"
-            >
-              <option value="ALL">All Engagements</option>
-              {engagementTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

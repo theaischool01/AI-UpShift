@@ -281,15 +281,15 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
               }}
             />
 
-            {/* Central Fox Mascot (Enlarged +14% to 224x248, firmly anchored and fully visible) */}
+            {/* Central Fox Mascot (Enlarged and wider to 340x370, scale(1.44), firmly anchored and fully visible) */}
             <div 
               style={{
                 position: 'absolute',
-                top: '46%',
+                top: '49%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '224px',
-                height: '248px',
+                width: '340px',
+                height: '370px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -302,11 +302,11 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
               <div 
                 style={{
                   position: 'absolute',
-                  width: '230px',
-                  height: '230px',
+                  width: '350px',
+                  height: '350px',
                   borderRadius: '50%',
                   background: 'radial-gradient(circle, rgba(233,29,43,0.20) 0%, rgba(255,167,38,0.09) 50%, transparent 75%)',
-                  filter: 'blur(30px)',
+                  filter: 'blur(34px)',
                   zIndex: -1,
                 }}
               />
@@ -318,8 +318,8 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
-                  transform: 'scale(1.10)',
-                  filter: 'drop-shadow(0 14px 26px rgba(0,0,0,0.18))',
+                  transform: 'scale(1.44)',
+                  filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.22))',
                 }}
                 draggable={false}
               />
@@ -327,9 +327,9 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
               {/* Base Contact Shadow */}
               <div 
                 style={{
-                  width: '180px',
-                  height: '14px',
-                  background: 'radial-gradient(ellipse, rgba(0,0,0,0.22) 0%, transparent 70%)',
+                  width: '250px',
+                  height: '16px',
+                  background: 'radial-gradient(ellipse, rgba(0,0,0,0.24) 0%, transparent 70%)',
                   borderRadius: '50%',
                   marginTop: '-8px',
                 }}

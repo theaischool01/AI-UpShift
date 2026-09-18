@@ -92,23 +92,35 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Pre-fetch all active courses once for $O(1)$ validation in batch
-    const { data: activeCourses, error: coursesFetchErr } = await adminClient
-      .from('courses')
+    // Pre-fetch all active tracks once for O(1) validation in batch
+    let { data: activeTracks, error: tracksFetchErr } = await adminClient
+      .from('tracks')
       .select('id, code, name');
 
-    if (coursesFetchErr || !activeCourses) {
+    // Backward-compatibility fallback if query executes before PostgREST reload
+    if (tracksFetchErr || !activeTracks) {
+      const { data: fallbackCourses, error: fallbackErr } = await adminClient
+        .from('courses')
+        .select('id, code, name');
+      if (!fallbackErr && fallbackCourses) {
+        activeTracks = fallbackCourses;
+        tracksFetchErr = null;
+      }
+    }
+
+    if (tracksFetchErr || !activeTracks) {
       return new Response(
-        JSON.stringify({ error: 'Unable to load curriculum courses for validation.' }),
+        JSON.stringify({ error: 'Unable to load UpShift tracks for validation.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const courseMap = new Map();
-    activeCourses.forEach((c: any) => {
-      courseMap.set(c.id, c);
-      courseMap.set(c.code.toLowerCase(), c);
-      courseMap.set(c.id.toLowerCase(), c);
+    const trackMap = new Map();
+    activeTracks.forEach((t: any) => {
+      trackMap.set(t.id, t);
+      trackMap.set(t.code.toLowerCase(), t);
+      trackMap.set(t.id.toLowerCase(), t);
+      trackMap.set(t.code, t);
     });
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -120,17 +132,18 @@ Deno.serve(async (req: Request) => {
       const collegeEmail = rawLearner.college_email?.trim().toLowerCase();
       const college = rawLearner.college?.trim();
       const password = rawLearner.password;
-      const courseIdInput = rawLearner.course_id?.trim() || rawLearner.course?.trim();
+      // Accept track_id primarily, with backward compatibility for course_id/track/course aliases
+      const trackIdInput = rawLearner.track_id?.trim() || rawLearner.track?.trim() || rawLearner.course_id?.trim() || rawLearner.course?.trim();
 
-      if (!fullName || !email || !collegeEmail || !college || !password || !courseIdInput) {
+      if (!fullName || !email || !collegeEmail || !college || !password || !trackIdInput) {
         return {
           success: false,
           row: index + 1,
           email: email || 'unknown',
           full_name: fullName || 'unknown',
           college: college || 'unknown',
-          course_id: courseIdInput || 'unknown',
-          error: 'All fields (full_name, email, college_email, college, password, course_id) are required.',
+          track_id: trackIdInput || 'unknown',
+          error: 'All fields (full_name, email, college_email, college, password, track_id) are required.',
         };
       }
 
@@ -141,7 +154,7 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          course_id: courseIdInput,
+          track_id: trackIdInput,
           error: 'Please enter valid email formats for account and college email.',
         };
       }
@@ -153,21 +166,21 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          course_id: courseIdInput,
+          track_id: trackIdInput,
           error: 'Password must be at least 8 characters in length.',
         };
       }
 
-      const matchedCourse = courseMap.get(courseIdInput) || courseMap.get(courseIdInput.toLowerCase());
-      if (!matchedCourse) {
+      const matchedTrack = trackMap.get(trackIdInput) || trackMap.get(trackIdInput.toLowerCase());
+      if (!matchedTrack) {
         return {
           success: false,
           row: index + 1,
           email,
           full_name: fullName,
           college,
-          course_id: courseIdInput,
-          error: `Invalid course: ${courseIdInput}. Must match a valid UpShift course track.`,
+          track_id: trackIdInput,
+          error: `Invalid track: ${trackIdInput}. Must match a valid UpShift track (M1–M6 or track slug).`,
         };
       }
 
@@ -185,7 +198,7 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          course_id: matchedCourse.id,
+          track_id: matchedTrack.id,
           error: 'A learner account already exists for this email.',
         };
       }
@@ -215,7 +228,7 @@ Deno.serve(async (req: Request) => {
               email,
               full_name: fullName,
               college,
-              course_id: matchedCourse.id,
+              track_id: matchedTrack.id,
               error: 'A learner account already exists for this email.',
             };
           }
@@ -225,7 +238,7 @@ Deno.serve(async (req: Request) => {
             email,
             full_name: fullName,
             college,
-            course_id: matchedCourse.id,
+            track_id: matchedTrack.id,
             error: msg,
           };
         }
@@ -248,19 +261,21 @@ Deno.serve(async (req: Request) => {
           throw new Error(`Profile creation failed: ${profileUpsertError.message}`);
         }
 
-        // Step C: Create Complete Program Enrollment (with initial track reference)
+        // Step C: Create Single Program Enrollment with Assigned Track
+        const enrollmentPayload: any = {
+          user_id: createdUserId,
+          program_id: 'upshift-complete-program',
+          track_id: matchedTrack.id,
+          status: 'active',
+          payment_status: 'active',
+          amount_paid: 4999.00,
+          currency: 'INR',
+          enrolled_at: new Date().toISOString(),
+        };
+
         const { error: enrollmentError } = await adminClient
           .from('enrollments')
-          .insert({
-            user_id: createdUserId,
-            program_id: 'upshift-complete-program',
-            course_id: matchedCourse.id,
-            status: 'active',
-            payment_status: 'active',
-            amount_paid: 4999.00,
-            currency: 'INR',
-            enrolled_at: new Date().toISOString(),
-          });
+          .insert(enrollmentPayload);
 
         if (enrollmentError) {
           throw new Error(`Enrollment creation failed: ${enrollmentError.message}`);
@@ -275,9 +290,9 @@ Deno.serve(async (req: Request) => {
             college,
             program_id: 'upshift-complete-program',
             program_name: 'UpShift Complete Applied AI Program',
-            course_id: matchedCourse.id,
-            course_name: matchedCourse.name,
-            course_code: matchedCourse.code,
+            track_id: matchedTrack.id,
+            track_name: matchedTrack.name,
+            track_code: matchedTrack.code,
           },
         };
       } catch (transactionErr: any) {
@@ -295,8 +310,8 @@ Deno.serve(async (req: Request) => {
           email,
           full_name: fullName,
           college,
-          course_id: matchedCourse.id,
-          error: 'Failed to complete learner registration. Changes were rolled back.',
+          track_id: matchedTrack.id,
+          error: transactionErr?.message || 'Failed to complete learner registration. Changes were rolled back.',
         };
       }
     };
@@ -333,7 +348,7 @@ Deno.serve(async (req: Request) => {
       email: r.email,
       full_name: r.full_name,
       college: r.college,
-      course_id: r.course_id,
+      track_id: r.track_id,
       error: r.error,
     }));
 

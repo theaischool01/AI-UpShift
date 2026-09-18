@@ -1,35 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
-  Building, 
-  MapPin, 
-  Clock, 
-  ExternalLink, 
-  Globe, 
+  ArrowRight,
   Sparkles, 
   AlertCircle, 
   Loader2, 
-  CheckCircle2,
-  Share2,
-  Banknote
+  CheckCircle2, 
+  Share2, 
+  ShieldCheck 
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
-// Strict URL protocol validator
 function isValidExternalUrl(urlString) {
   if (!urlString || typeof urlString !== 'string') return false;
   try {
-    const parsed = new URL(urlString);
+    const trimmed = urlString.trim();
+    const formatted = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const parsed = new URL(formatted);
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
   } catch {
     return false;
   }
 }
 
+// Helper to normalize array or newline-delimited strings into clean arrays
+function parseListItems(fieldData) {
+  if (!fieldData) return [];
+  if (Array.isArray(fieldData)) {
+    return fieldData.map(item => String(item).trim()).filter(Boolean);
+  }
+  if (typeof fieldData === 'string') {
+    return fieldData
+      .split(/\n|\|\|/)
+      .map(item => item.replace(/^[•\-\*\s]+/, '').trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export default function LearnerGigDetailPage() {
   const { gigId } = useParams();
-  const navigate = useNavigate();
 
   const [gig, setGig] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,41 +51,87 @@ export default function LearnerGigDetailPage() {
 
   useEffect(() => {
     async function loadGigDetail() {
-      if (!gigId) return;
+      // Validate that gigId is a valid UUID
+      if (!gigId || !UUID_REGEX.test(gigId)) {
+        setGig(null);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
       try {
-        let { data, error: fetchErr } = await supabase
+        const { data, error: fetchErr } = await supabase
           .from('gigs')
           .select(`
             id,
             external_gig_id,
             title,
-            course_id,
+            track_id,
             short_description,
-            long_description,
-            origin_site,
+            overview,
+            responsibilities,
+            deliverables,
+            requirements,
+            proof_spec,
             origin_url,
-            organization,
             payment_amount,
-            location,
-            engagement_type,
             created_at,
-            course:courses (
+            track:tracks (
               id,
               code,
               name,
               category,
               color,
-              bg_color,
-              tagline
+              bg_color
             )
           `)
           .eq('id', gigId)
           .maybeSingle();
 
-        if (fetchErr) throw fetchErr;
+        if (fetchErr) {
+          console.warn('[LearnerGigDetailPage] Relational query error, trying flat query fallback:', fetchErr);
+          const { data: flatData, error: flatErr } = await supabase
+            .from('gigs')
+            .select(`
+              id,
+              external_gig_id,
+              title,
+              track_id,
+              short_description,
+              overview,
+              responsibilities,
+              deliverables,
+              requirements,
+              proof_spec,
+              origin_url,
+              payment_amount,
+              created_at
+            `)
+            .eq('id', gigId)
+            .maybeSingle();
+
+          if (flatErr) throw flatErr;
+
+          if (flatData) {
+            let trackData = null;
+            const targetTrackId = flatData.track_id;
+            if (targetTrackId) {
+              const { data: tData } = await supabase
+                .from('tracks')
+                .select('id, code, name, category, color, bg_color')
+                .eq('id', targetTrackId)
+                .maybeSingle();
+              trackData = tData;
+            }
+
+            setGig({ ...flatData, track: trackData || null });
+          } else {
+            setGig(null);
+          }
+          return;
+        }
 
         if (!data) {
           setGig(null);
@@ -81,11 +140,7 @@ export default function LearnerGigDetailPage() {
         }
       } catch (err) {
         console.error('[LearnerGigDetailPage] Load error:', err);
-        if (err.code === '42703' || err.code === 'PGRST204' || err.message?.toLowerCase().includes('payment_amount')) {
-          setError('Database schema error: payment_amount field unavailable. Please apply the latest database migration.');
-        } else {
-          setError('Unable to load this opportunity. Please try again.');
-        }
+        setError('Unable to load this opportunity. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -94,10 +149,13 @@ export default function LearnerGigDetailPage() {
     loadGigDetail();
   }, [gigId]);
 
-  // Safe external navigation handler
   const handleApplyClick = () => {
-    if (!gig?.origin_url || !isValidExternalUrl(gig.origin_url)) return;
-    window.open(gig.origin_url, '_blank', 'noopener,noreferrer');
+    if (!gig?.origin_url) return;
+    let url = gig.origin_url.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const handleCopyShareLink = () => {
@@ -108,65 +166,60 @@ export default function LearnerGigDetailPage() {
 
   if (loading) {
     return (
-      <div className="py-24 flex flex-col items-center justify-center gap-3 text-[#6B7280]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#E31B23]" />
-        <span className="text-xs font-medium">Loading opportunity details...</span>
+      <div className="learner-detail-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '360px', gap: '12px', color: '#6B7280' }}>
+        <Loader2 className="animate-spin" size={32} style={{ color: '#E31B23' }} />
+        <span style={{ fontSize: '13px', fontWeight: 500 }}>Loading opportunity details...</span>
       </div>
     );
   }
 
-  // 404 Not Found state
-  if (!gig) {
+  if (error || !gig) {
     return (
-      <div className="py-16 max-w-lg mx-auto text-center">
-        <div className="learner-card p-12 space-y-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 text-[#E31B23] flex items-center justify-center mx-auto">
-            <AlertCircle className="w-6 h-6" />
-          </div>
-          <h2 className="text-lg font-bold text-[#111827] tracking-tight">
-            OPPORTUNITY NOT FOUND
+      <div className="learner-detail-container">
+        <div className="learner-detail-top-nav">
+          <Link to="/learner/dashboard" className="learner-back-link">
+            <ArrowLeft size={16} />
+            <span>Back to Opportunities</span>
+          </Link>
+        </div>
+
+        <div className="learner-detail-error-card">
+          <AlertCircle size={28} className="text-[#E31B23]" />
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#111827', margin: 0 }}>
+            Opportunity Not Found
           </h2>
-          <p className="text-xs text-[#4B5563] leading-relaxed">
-            The requested opportunity could not be found or may have been retired.
+          <p style={{ fontSize: '13px', color: '#6B7280', margin: 0, maxWidth: '420px', lineHeight: 1.5 }}>
+            {error || 'This commercial opportunity may have been removed, fulfilled, or the link is invalid.'}
           </p>
-          <div className="pt-2">
-            <Link to="/learner/dashboard" className="learner-btn-primary text-xs">
-              Back to Opportunities
-            </Link>
-          </div>
+          <Link to="/learner/dashboard" className="learner-btn-primary" style={{ marginTop: '8px' }}>
+            <span>Explore Active Opportunities</span>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const course = gig.course;
-  const isApplyUrlValid = isValidExternalUrl(gig.origin_url);
+  const track = gig.track || gig.course;
 
-  // Split long description into clean paragraphs while preserving single newlines
-  const descriptionParagraphs = gig.long_description
-    ? gig.long_description
-        .split(/\n\n+/)
-        .map(p => p.trim())
-        .filter(Boolean)
-    : [];
+  // Overview / About the Role text
+  const overviewText = gig.overview || gig.short_description || '';
+  const overviewParagraphs = overviewText
+    .split(/\n\n+/)
+    .map(p => p.trim())
+    .filter(Boolean);
 
-  const formattedDate = gig.created_at
-    ? new Date(gig.created_at).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : null;
+  // Parse structured lists
+  const responsibilitiesList = parseListItems(gig.responsibilities);
+  const deliverablesList = parseListItems(gig.deliverables);
+  const requirementsList = parseListItems(gig.requirements);
+  const proofSpecText = gig.proof_spec || '';
 
   return (
     <div className="learner-detail-container">
-      {/* Top Action Row */}
-      <div className="flex items-center justify-between gap-4 mb-8">
-        <Link
-          to="/learner/dashboard"
-          className="learner-back-link"
-        >
-          <ArrowLeft className="w-5 h-5" />
+      {/* 1. TOP NAVIGATION: BACK TO DASHBOARD + SHARE LINK */}
+      <div className="learner-detail-top-nav">
+        <Link to="/learner/dashboard" className="learner-back-link">
+          <ArrowLeft size={16} />
           <span>Back to Opportunities</span>
         </Link>
 
@@ -175,189 +228,241 @@ export default function LearnerGigDetailPage() {
           onClick={handleCopyShareLink}
           className="learner-share-btn"
           title="Copy link to opportunity"
-          aria-label="Share opportunity"
         >
           {copiedLink ? (
             <>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span className="text-emerald-700 font-semibold">Link Copied</span>
+              <CheckCircle2 size={15} style={{ color: '#10B981' }} />
+              <span style={{ color: '#10B981', fontWeight: 600 }}>Link Copied</span>
             </>
           ) : (
             <>
-              <Share2 className="w-4 h-4 text-[#4B5563]" />
+              <Share2 size={15} />
               <span>Share</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Main Two-Column Layout */}
+      {/* 2. HERO HEADER CARD */}
+      <header className="learner-detail-header">
+        {/* Row of Badges: Track + Opportunity ID */}
+        <div className="learner-detail-header-badges">
+          {track ? (
+            <span
+              className="learner-detail-badge-track"
+              style={{
+                backgroundColor: track.bg_color || 'rgba(227, 27, 35, 0.08)',
+                color: track.color || '#E31B23',
+                border: `1px solid ${track.color ? `${track.color}33` : 'rgba(227, 27, 35, 0.2)'}`,
+              }}
+            >
+              <Sparkles size={13} />
+              <span>{track.code} · {track.name}</span>
+            </span>
+          ) : (
+            <span
+              className="learner-detail-badge-track"
+              style={{
+                backgroundColor: 'rgba(227, 27, 35, 0.08)',
+                color: '#E31B23',
+                border: '1px solid rgba(227, 27, 35, 0.2)'
+              }}
+            >
+              <Sparkles size={13} />
+              <span>UpShift Track</span>
+            </span>
+          )}
+
+          {gig.external_gig_id && (
+            <span className="learner-detail-id">
+              ID: {gig.external_gig_id}
+            </span>
+          )}
+        </div>
+
+        {/* Large Crisp Opportunity Title */}
+        <h1 className="learner-detail-title">
+          {gig.title}
+        </h1>
+
+        {/* Relevant Metadata Pills (No company name, No platform leak) */}
+        <div className="learner-detail-chips">
+          <span className="learner-detail-chip">
+            <span className="learner-dot-green" />
+            <span>Remote</span>
+          </span>
+
+          {gig.payment_amount && gig.payment_amount.trim() !== '' && (
+            <span className="learner-detail-chip">
+              <span style={{ color: '#E31B23', fontWeight: 700 }}>$</span>
+              <span>Rate: <strong style={{ color: '#111827' }}>{gig.payment_amount}</strong></span>
+            </span>
+          )}
+
+          <span className="learner-detail-chip learner-chip-verified">
+            <ShieldCheck size={14} style={{ color: '#059669' }} />
+            <span>Verified by UpShift</span>
+          </span>
+        </div>
+      </header>
+
+      {/* 3. MAIN 2-COLUMN LAYOUT: LEFT JOB DETAILS + RIGHT APPLY CARD */}
       <div className="learner-detail-layout">
-        {/* Left Column: Role Details, Overview & Complete Scope */}
-        <div className="min-w-0 space-y-6">
-          {/* Track Badge & External ID Header */}
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2.5">
-              {course && (
-                <span
-                  className="learner-detail-badge-track"
-                  style={{
-                    backgroundColor: course.bg_color || '#FEF2F2',
-                    color: course.color || '#DC2626',
-                    borderColor: course.color ? `${course.color}40` : '#FECACA',
-                  }}
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>{course.code} · {course.name}</span>
-                </span>
-              )}
-              {gig.external_gig_id && (
-                <span className="learner-detail-id">
-                  ID: {gig.external_gig_id}
-                </span>
-              )}
-            </div>
-
-            {/* Gig Title */}
-            <h1 className="learner-detail-title">
-              {gig.title}
-            </h1>
-
-            {/* Organization */}
-            {gig.organization && (
-              <div className="learner-detail-org">
-                <Building className="w-5 h-5 text-[#4B5563] flex-shrink-0" />
-                <span>{gig.organization}</span>
-              </div>
-            )}
-
-            {/* Metadata Chips */}
-            <div className="learner-detail-chips">
-              <span className="learner-detail-chip font-bold text-[#111827] bg-red-50/50 border-red-200">
-                <Banknote className="w-4 h-4 text-[#E31B23]" />
-                <span>{gig.payment_amount && gig.payment_amount.trim() !== '' ? gig.payment_amount : 'Payment not specified'}</span>
-              </span>
-              {gig.origin_site && (
-                <span className="learner-detail-chip">
-                  <Globe className="w-4 h-4 text-[#6B7280]" />
-                  <span>Origin: {gig.origin_site}</span>
-                </span>
-              )}
-              {gig.location && (
-                <span className="learner-detail-chip">
-                  <MapPin className="w-4 h-4 text-[#6B7280]" />
-                  <span>{gig.location}</span>
-                </span>
-              )}
-              {gig.engagement_type && (
-                <span className="learner-detail-chip">
-                  <Clock className="w-4 h-4 text-[#6B7280]" />
-                  <span>{gig.engagement_type}</span>
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Short Summary Card */}
-          {gig.short_description && (
-            <div className="learner-detail-summary-card">
-              <span className="text-[11px] font-mono font-bold tracking-wider text-[#6B7280] uppercase block mb-2">
-                Overview Snippet
-              </span>
-              <p className="learner-detail-summary-text">
+        {/* LEFT COLUMN: SINGLE UNIFIED JOB DETAILS CARD */}
+        <article className="learner-detail-main-card">
+          {/* Section: Overview */}
+          {gig.short_description && gig.short_description.trim() !== '' && gig.short_description !== gig.overview && (
+            <div className="learner-card-section">
+              <span className="learner-section-eyebrow">Overview</span>
+              <p className="learner-lead-paragraph">
                 {gig.short_description}
               </p>
             </div>
           )}
 
           {/* Section: About the Role */}
-          <div>
-            <h2 className="learner-detail-section-title">
-              About the Role
-            </h2>
-
-            {/* Complete Scope Card with Preserved Formatting */}
-            <div className="learner-detail-desc-card">
-              {descriptionParagraphs.length > 0 ? (
-                descriptionParagraphs.map((paragraph, idx) => (
-                  <p key={idx} className="learner-detail-desc-p whitespace-pre-line">
-                    {paragraph}
-                  </p>
+          <div className="learner-card-section">
+            <h2 className="learner-section-heading">About the Role</h2>
+            <div className="learner-prose">
+              {overviewParagraphs.length > 0 ? (
+                overviewParagraphs.map((paragraph, idx) => (
+                  <p key={idx}>{paragraph}</p>
                 ))
               ) : (
-                <p className="learner-detail-desc-p whitespace-pre-line">
-                  {gig.long_description}
-                </p>
+                <p>{overviewText}</p>
               )}
             </div>
           </div>
 
-          {/* Source / Indexed Date Footnote */}
-          {formattedDate && (
-            <div className="learner-detail-indexed">
-              Indexed into the UpShift board on {formattedDate}
+          {/* Section: Responsibilities */}
+          {responsibilitiesList.length > 0 && (
+            <div className="learner-card-section">
+              <h2 className="learner-section-heading">Key Responsibilities</h2>
+              <ul className="learner-bullet-list">
+                {responsibilitiesList.map((item, index) => (
+                  <li key={index} className="learner-bullet-item">
+                    <span className="learner-bullet-dot" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
-        </div>
 
-        {/* Right Column: Opportunity Gateway Apply Panel */}
-        <div className="learner-sticky-apply">
-          <div className="learner-apply-panel space-y-6">
-            <div>
-              <span className="text-[11px] font-mono font-bold tracking-wider text-[#111827] uppercase block mb-1">
-                Opportunity Gateway
-              </span>
-              <h3 className="text-xl font-bold text-[#111827] tracking-tight m-0">
-                Ready to Apply?
-              </h3>
-              <p className="text-[14px] text-[#4B5563] mt-2 leading-relaxed">
-                Review the complete opportunity and submit your application on the originating platform.
-              </p>
+          {/* Section: Deliverables */}
+          {deliverablesList.length > 0 && (
+            <div className="learner-card-section">
+              <h2 className="learner-section-heading">Project Deliverables</h2>
+              <ul className="learner-bullet-list">
+                {deliverablesList.map((item, index) => (
+                  <li key={index} className="learner-bullet-item">
+                    <CheckCircle2 size={15} style={{ color: '#059669', flexShrink: 0, marginTop: '2px' }} />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Section: Requirements */}
+          {requirementsList.length > 0 && (
+            <div className="learner-card-section">
+              <h2 className="learner-section-heading">Requirements & Qualifications</h2>
+              <ul className="learner-bullet-list">
+                {requirementsList.map((item, index) => (
+                  <li key={index} className="learner-bullet-item">
+                    <span className="learner-bullet-dot" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Section: Required Proof-of-Work Spec */}
+          {proofSpecText && (
+            <div className="learner-card-section learner-proof-section">
+              <div className="learner-proof-header">
+                <ShieldCheck size={18} style={{ color: '#059669', flexShrink: 0 }} />
+                <div>
+                  <h3 className="learner-proof-title">
+                    Required Proof-of-Work Artifact
+                  </h3>
+                  <p className="learner-proof-desc">
+                    To be considered for this client engagement, prepare and submit your verified proof artifact:
+                  </p>
+                </div>
+              </div>
+              <div className="learner-proof-box">
+                <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#111827', lineHeight: 1.5 }}>
+                  {proofSpecText}
+                </p>
+              </div>
+            </div>
+          )}
+        </article>
+
+        {/* RIGHT COLUMN: STICKY OPPORTUNITY GATEWAY / APPLY CARD */}
+        <aside className="learner-detail-sidebar">
+          <div className="learner-sidebar-card">
+            {/* Top Compensation Banner */}
+            <div className="learner-sidebar-top">
+              <span className="learner-sidebar-label">Estimated Compensation</span>
+              <div className="learner-sidebar-price">
+                {gig.payment_amount && gig.payment_amount.trim() !== '' ? (
+                  gig.payment_amount
+                ) : (
+                  <span style={{ fontSize: '15px', color: '#6B7280', fontWeight: 600 }}>
+                    Competitive / Negotiable
+                  </span>
+                )}
+              </div>
+              <span className="learner-sidebar-subtext">Verified applied brief</span>
             </div>
 
-            {/* Platform Verification Card */}
-            <div className="p-4 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] text-xs space-y-2.5">
-              <div className="flex items-center justify-between text-xs pb-2 border-b border-gray-100">
-                <span className="text-[#6B7280]">Payment:</span>
-                <span className="font-bold text-[#111827] text-sm">{gig.payment_amount && gig.payment_amount.trim() !== '' ? gig.payment_amount : 'Payment not specified'}</span>
+            <div className="learner-sidebar-divider" />
+
+            {/* Quick Summary Highlights */}
+            <div className="learner-sidebar-highlights">
+              <div className="learner-highlight-row">
+                <span className="learner-highlight-label">UpShift Track</span>
+                <span className="learner-highlight-value">
+                  {track ? `${track.code} · ${track.name}` : (gig.track_id || 'UpShift')}
+                </span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-[#6B7280]">Hosting Platform:</span>
-                <span className="font-semibold text-[#111827]">{gig.origin_site || 'External'}</span>
+
+              <div className="learner-highlight-row">
+                <span className="learner-highlight-label">Location</span>
+                <span className="learner-highlight-value">Remote (Global)</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-[#6B7280]">Verification:</span>
-                <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Verified Link
+
+              <div className="learner-highlight-row">
+                <span className="learner-highlight-label">Vetting</span>
+                <span className="learner-highlight-value" style={{ color: '#059669' }}>
+                  ✓ Direct Gateway
                 </span>
               </div>
             </div>
 
-            {/* Primary Apply CTA */}
-            {isApplyUrlValid ? (
-              <a
-                href={gig.origin_url}
-                target="_blank"
-                rel="noopener noreferrer"
+            {/* Primary Action Button: Apply Now Gateway */}
+            <div style={{ marginTop: '20px' }}>
+              <button
+                type="button"
                 onClick={handleApplyClick}
-                className="learner-apply-btn shadow-md hover:shadow-lg"
+                className="learner-btn-primary learner-btn-apply-lg"
               >
                 <span>Apply Now</span>
-                <ExternalLink className="w-5 h-5" />
-              </a>
-            ) : (
-              <div className="p-3.5 rounded-xl bg-[#F3F4F6] border border-[#E5E7EB] text-center text-xs font-medium text-[#6B7280]">
-                Application link currently unavailable
-              </div>
-            )}
+                <ArrowRight size={16} />
+              </button>
+            </div>
 
-            {/* Disclaimer */}
-            <p className="learner-apply-disclaimer">
-              You will be directed to the third-party client site. No UpShift application account required.
-            </p>
+            {/* Verification & Safety Pill */}
+            <div className="learner-sidebar-trust">
+              <ShieldCheck size={14} style={{ color: '#059669', flexShrink: 0 }} />
+              <span>Direct application via UpShift Verified Gateway</span>
+            </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

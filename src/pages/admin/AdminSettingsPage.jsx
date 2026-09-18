@@ -3,16 +3,11 @@ import {
   Settings, 
   User, 
   ShieldCheck, 
-  Database, 
-  Lock, 
-  CheckCircle2, 
-  Clock, 
-  Mail, 
-  KeyRound, 
   Server,
   RefreshCw,
-  Loader2,
-  AlertCircle
+  Clock,
+  Mail,
+  KeyRound
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
@@ -20,7 +15,6 @@ import { supabase } from '../../lib/supabaseClient';
 export default function AdminSettingsPage() {
   const { user, profile } = useAuth();
 
-  // Truthful platform status ping
   const [dbStatus, setDbStatus] = useState('checking'); // 'connected', 'error', 'checking'
   const [dbLatency, setDbLatency] = useState(null);
   const [checkingPing, setCheckingPing] = useState(false);
@@ -29,7 +23,6 @@ export default function AdminSettingsPage() {
     setCheckingPing(true);
     const start = performance.now();
     try {
-      // Bounded minimal ping to verify real database connection
       const { data, error } = await supabase
         .from('courses')
         .select('id')
@@ -62,164 +55,106 @@ export default function AdminSettingsPage() {
     : 'Active Session';
 
   return (
-    <div className="admin-page max-w-4xl space-y-6">
+    <div className="admin-page admin-page-compact">
       {/* Page Header */}
       <div className="admin-page-header">
-        <div>
-          <h1 className="flex items-center gap-2">
-            <Settings className="w-6 h-6 text-[#E31B23]" />
-            Platform Settings
+        <div className="admin-page-title-group">
+          <h1 className="admin-page-title">
+            <Settings size={22} />
+            <span>Platform Settings</span>
           </h1>
-          <p>
+          <p className="admin-page-description">
             Administrative profile, platform health status, and security telemetry.
           </p>
         </div>
       </div>
 
-      {/* 4F.14 Administrator Profile Card */}
-      <div className="admin-card p-6 space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-          <div>
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <User className="w-4 h-4 text-[#E31B23]" />
-              Administrator Account
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Current authenticated administrator session details
-            </p>
+      {/* Administrator Profile Card */}
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <div className="admin-card-header-left">
+            <span className="admin-card-eyebrow">
+              <User size={13} />
+              <span>Admin Profile</span>
+            </span>
+            <h3 className="admin-card-title">Administrator Account</h3>
           </div>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-[#E31B23] border border-red-100">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Administrator
+
+          <span className="admin-status-pill" style={{ color: '#E31B23', backgroundColor: '#FEF2F2', borderColor: '#FECACA' }}>
+            <ShieldCheck size={13} />
+            <span>Administrator</span>
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-1">
-            <span className="text-[10px] uppercase font-semibold text-gray-400">Full Name</span>
-            <p className="font-semibold text-gray-900 text-sm">{adminName}</p>
+        <div className="admin-grid-2">
+          <div style={{ backgroundColor: '#F9FAFB', padding: '14px', borderRadius: '10px', border: '1px solid #E5E7EB' }}>
+            <span style={{ fontSize: '10.5px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF', fontWeight: 700, display: 'block', marginBottom: '2px' }}>Full Name</span>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#111827', margin: 0 }}>{adminName}</p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-1">
-            <span className="text-[10px] uppercase font-semibold text-gray-400">Email Address</span>
-            <p className="font-mono text-gray-900 text-sm truncate">{adminEmail}</p>
+          <div style={{ backgroundColor: '#F9FAFB', padding: '14px', borderRadius: '10px', border: '1px solid #E5E7EB' }}>
+            <span style={{ fontSize: '10.5px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF', fontWeight: 700, display: 'block', marginBottom: '2px' }}>Email Address</span>
+            <p style={{ fontSize: '13px', fontFamily: 'monospace', color: '#111827', margin: 0 }}>{adminEmail}</p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-1">
-            <span className="text-[10px] uppercase font-semibold text-gray-400">Assigned Privilege Tier</span>
-            <p className="font-semibold text-gray-900 text-sm">Full Control Center Access (Admin)</p>
+          <div style={{ backgroundColor: '#F9FAFB', padding: '14px', borderRadius: '10px', border: '1px solid #E5E7EB' }}>
+            <span style={{ fontSize: '10.5px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF', fontWeight: 700, display: 'block', marginBottom: '2px' }}>Privilege Tier</span>
+            <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#111827', margin: 0 }}>Full Control Center Access</p>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-1">
-            <span className="text-[10px] uppercase font-semibold text-gray-400">Last Sign-In Timestamp</span>
-            <p className="font-mono text-gray-700 text-sm">{lastSignIn}</p>
+          <div style={{ backgroundColor: '#F9FAFB', padding: '14px', borderRadius: '10px', border: '1px solid #E5E7EB' }}>
+            <span style={{ fontSize: '10.5px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF', fontWeight: 700, display: 'block', marginBottom: '2px' }}>Last Sign-In Timestamp</span>
+            <p style={{ fontSize: '12px', fontFamily: 'monospace', color: '#6B7280', margin: 0 }}>{lastSignIn}</p>
           </div>
         </div>
       </div>
 
-      {/* 4F.16 Platform Health & Connectivity Status */}
-      <div className="admin-card p-6 space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-          <div>
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <Server className="w-4 h-4 text-[#E31B23]" />
-              Platform Infrastructure Status
-            </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Live operational health verification across authentication and database services
-            </p>
+      {/* Platform Health & Connectivity Status */}
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <div className="admin-card-header-left">
+            <span className="admin-card-eyebrow" style={{ color: '#059669' }}>
+              <Server size={13} />
+              <span>Infrastructure</span>
+            </span>
+            <h3 className="admin-card-title">Live Service Telemetry</h3>
           </div>
 
           <button
             type="button"
             onClick={checkConnectivity}
             disabled={checkingPing}
-            className="admin-btn-secondary"
+            className="admin-btn admin-btn-sm admin-btn-secondary"
             title="Refresh connectivity ping"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${checkingPing ? 'animate-spin' : ''}`} />
-            <span>Check Status</span>
+            <RefreshCw size={13} className={checkingPing ? 'animate-spin' : ''} />
+            <span>Ping Status</span>
           </button>
         </div>
 
-        <div className="divide-y divide-gray-100 text-xs">
-          {/* Item 1: Authentication */}
-          <div className="py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Lock className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">Supabase Authentication</p>
-                <p className="text-gray-500 text-[11px]">JWT session active & verified via bearer token</p>
-              </div>
+        <div className="admin-grid-2">
+          <div style={{ backgroundColor: '#F9FAFB', padding: '14px', borderRadius: '10px', border: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <span style={{ fontSize: '10.5px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF', fontWeight: 700, display: 'block', marginBottom: '2px' }}>PostgreSQL Database</span>
+              <p style={{ fontSize: '13.5px', fontWeight: 700, color: '#111827', margin: 0 }}>
+                {dbStatus === 'connected' ? 'Connected & Operational' : (dbStatus === 'error' ? 'Connection Warning' : 'Checking...')}
+              </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Operational
-            </span>
+            <span style={{
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              backgroundColor: dbStatus === 'connected' ? '#10B981' : (dbStatus === 'error' ? '#EF4444' : '#F59E0B')
+            }} />
           </div>
 
-          {/* Item 2: Database Connection */}
-          <div className="py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <Database className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">PostgreSQL Database Connection</p>
-                <p className="text-gray-500 text-[11px]">
-                  {dbStatus === 'connected' 
-                    ? `Live query responding (${dbLatency}ms round-trip)` 
-                    : dbStatus === 'checking'
-                    ? 'Pinging remote database...'
-                    : 'Connection error'}
-                </p>
-              </div>
-            </div>
-            {dbStatus === 'connected' ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Live Connected
-              </span>
-            ) : dbStatus === 'checking' ? (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-600">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Checking
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">
-                <AlertCircle className="w-3 h-3" />
-                Degraded
-              </span>
-            )}
-          </div>
-
-          {/* Item 3: Admin Authorization */}
-          <div className="py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">Admin Authorization Guard</p>
-                <p className="text-gray-500 text-[11px]">Strict RLS policy & Edge Function role verification</p>
-              </div>
-            </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              Authorized
-            </span>
+          <div style={{ backgroundColor: '#F9FAFB', padding: '14px', borderRadius: '10px', border: '1px solid #E5E7EB' }}>
+            <span style={{ fontSize: '10.5px', fontFamily: 'monospace', textTransform: 'uppercase', color: '#9CA3AF', fontWeight: 700, display: 'block', marginBottom: '2px' }}>Round-Trip Ping Latency</span>
+            <p style={{ fontSize: '13.5px', fontFamily: 'monospace', fontWeight: 700, color: dbLatency && dbLatency < 300 ? '#059669' : '#111827', margin: 0 }}>
+              {dbLatency ? `${dbLatency} ms` : 'Measuring...'}
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Security Architecture Note */}
-      <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-600 space-y-1">
-        <p className="font-semibold text-gray-900">Security Architecture Notes</p>
-        <p>
-          All privileged operations (such as student onboarding and credential generation) are isolated server-side inside Supabase Edge Functions with compensating transactional rollback. Service role keys and internal infrastructure secrets are strictly barred from client browser bundles.
-        </p>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
+import UpShiftWordmark from '../../components/common/UpShiftWordmark';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -129,9 +130,7 @@ export default function LoginPage() {
       >
         {/* Brand Lockup */}
         <div style={{ textAlign: 'center', marginBottom: '4px' }}>
-          <span style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.02em', color: '#111827' }}>
-            UpShift
-          </span>
+          <UpShiftWordmark theme="light" style={{ fontSize: '22px', fontWeight: '800' }} />
         </div>
 
         {/* Micro Eyebrow */}

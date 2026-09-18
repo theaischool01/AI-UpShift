@@ -1,34 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Award } from 'lucide-react';
+import dianaAvatar from '../assets/diana_johnston.jpg';
 
 const STORIES_DATA = [
   {
     id: 1,
-    quote: '"I could buy a Laptop with my earnings, AI did the Magic for me."',
-    story: 'After completing the ReelRush and Vibe Coder tracks, I delivered three automated video workflows for an e-commerce brand. Having real proof of work rather than just a certificate changed every client conversation.',
-    name: 'Aman Verma',
+    name: 'Edward Alexander',
+    shortCode: 'EA',
+    rating: '4.9',
+    date: '29 Aug, 2026',
     role: 'Undergraduate Builder · ReelRush & Vibe Coder Track',
-    image: '/assets/mascot/mascot_builder.jpg',
-    badge: 'Verified Commercial Dispatch'
+    quote: 'Overall pleasurable experience. Pay a little first and Pay a little during the development of the app as milestones are achieved, which made me feel very confident and comfortable. Seamless and Easy process.',
+    story: 'After completing the ReelRush and Vibe Coder tracks, I delivered three automated video workflows for an e-commerce brand. Having real proof of work changed every client conversation.',
+    badge: 'Verified Commercial Dispatch',
+    avatar: null
   },
   {
     id: 2,
-    quote: '"Turned two weeks of deep work into a live client retainer."',
-    story: 'DeepAnnotator gave me hands-on dataset evaluation skills that enterprise teams actually need. The portfolio project I published through UpShift became my proof of competence for a remote data curation contract.',
-    name: 'Rhea Sen',
-    role: 'AI Annotation Specialist · DeepAnnotator Track',
-    image: '/assets/mascot/mascot_inspecting.jpg',
-    badge: 'Sprint Retainer Completed'
+    name: 'Diana Johnston',
+    shortCode: 'DJ',
+    rating: '5.0',
+    date: '02 Sep, 2026',
+    role: 'Autonomous Agent Handler · AgentHandlers Track',
+    quote: 'Zero prior coding background. Built client agents in 3 weeks with automated API workflows.',
+    story: 'AgentHandlers taught me how to wire multi-agent workflows with real APIs. Building and shipping functional tools gave me the confidence to pitch and close local businesses on custom automation.',
+    badge: 'Commercial Proof Verified',
+    avatar: dianaAvatar
   },
   {
     id: 3,
-    quote: '"Zero prior coding background. Built client agents in 3 weeks."',
-    story: 'AgentHandlers taught me how to wire multi-agent workflows with real APIs. Building and shipping functional tools gave me the confidence to pitch and close local businesses on custom automation.',
-    name: 'Devika Nair',
-    role: 'Autonomous Agent Handler · AgentHandlers Track',
-    image: '/assets/mascot/mascot_upshift_arrow.jpg',
-    badge: 'Commercial Proof of Work'
+    name: 'Lauren Contreras',
+    shortCode: 'LC',
+    rating: '4.9',
+    date: '29 Aug, 2026',
+    role: 'AI Annotation Specialist · DeepAnnotator Track',
+    quote: 'Been working with UpShift for a number of years now with a variety of different apps. They have my recommendation. They are a great team.',
+    story: 'DeepAnnotator gave me hands-on dataset evaluation skills that enterprise teams actually need. The portfolio project I published through UpShift became my proof of competence for a remote data curation contract.',
+    badge: 'Sprint Retainer Completed',
+    avatar: null
   }
 ];
 
@@ -62,27 +72,21 @@ export default function UserJourneySection() {
     return () => observer.disconnect();
   }, []);
 
-  // Auto-rotate every 3 seconds (3000ms) continuously
+  // Auto-rotate every exactly 3 seconds (3000ms) continuously
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
     const timer = setInterval(() => {
       setActiveStory((prev) => (prev + 1) % STORIES_DATA.length);
     }, 3000);
 
     return () => clearInterval(timer);
-  }, [activeStory]); // Reset interval cleanly when activeStory changes (via timer or manual clicks)
-
-  const handlePrevStory = () => {
-    setActiveStory((prev) => (prev - 1 + STORIES_DATA.length) % STORIES_DATA.length);
-  };
-
-  const handleNextStory = () => {
-    setActiveStory((prev) => (prev + 1) % STORIES_DATA.length);
-  };
+  }, []);
 
   const currentStory = STORIES_DATA[activeStory];
+
+  // Extract drop-cap first letter and remaining quote
+  const rawQuote = currentStory.quote.replace(/^["“]/, '');
+  const firstLetter = rawQuote.charAt(0);
+  const restOfQuote = rawQuote.slice(1);
 
   const steps = [
     {
@@ -134,12 +138,12 @@ export default function UserJourneySection() {
           </div>
 
           <h2 className="journey-heading journey-anim-heading">
-            DON'T JUST LEARN AI.<br />
-            <span className="journey-heading-accent">BUILD A CAREER WITH IT.</span>
+            TURN AI INTO CAPABILITY.<br />
+            <span className="journey-heading-accent">TURN CAPABILITY INTO EARNINGS.</span>
           </h2>
 
           <p className="journey-description journey-anim-desc">
-            From acquiring applied capabilities to publishing verified deliverables and reaching real commercial opportunities.
+            Create real projects, showcase what you can do, and open new paths to career, freelance and business opportunities.
           </p>
         </header>
 
@@ -242,72 +246,94 @@ export default function UserJourneySection() {
         </div>
 
         {/* ============================================================ */}
-        {/* COMPACT AI UPSHIFTER STORIES TESTIMONIAL SECTION             */}
-        {/* Auto-rotates every 3 seconds with smooth transition          */}
+        {/* EDITORIAL REAL UPSHIFT STORIES TESTIMONIAL SLIDER            */}
+        {/* Automatic 2-Column Editorial Slider (No Orbit / No Controls) */}
         {/* ============================================================ */}
-        <div className="journey-stories-wrapper journey-anim-cta">
-          <div className="journey-stories-card">
-            <div className="journey-stories-layout">
-              {/* Left Column: Compact Circular Portrait */}
-              <div className="journey-stories-portrait-col">
-                <div className="journey-stories-portrait-frame">
+        <div
+          className="journey-testimonial-slider-card"
+          role="region"
+          aria-label="Real UpShift Stories Testimonials"
+        >
+          {/* Top Editorial Card Header */}
+          <div className="journey-testimonial-header">
+            <div className="journey-testimonial-header-left">
+              <div className="journey-testimonial-accent-bar" />
+              <h3 className="journey-testimonial-title">
+                <span className="journey-testimonial-title-red">REAL</span>{' '}
+                <span className="journey-testimonial-title-dark">UPSHIFT STORIES</span>
+              </h3>
+              <p className="journey-testimonial-desc">
+                See how people are turning AI capabilities into projects, opportunities and new career paths.
+              </p>
+            </div>
+
+            <div className="journey-testimonial-badge-kicker">
+              BUILD. PROVE. <span className="journey-testimonial-kicker-red">EARN.</span>
+            </div>
+          </div>
+
+          {/* 2-Column Editorial Body */}
+          <div className="journey-testimonial-grid">
+            {/* Left Column: Dominant Circular Profile Photo + Person Identity */}
+            <div className="journey-testimonial-profile-col">
+              <div
+                key={`pfp-${activeStory}`}
+                className="journey-testimonial-pfp-frame"
+              >
+                {currentStory.avatar ? (
                   <img
-                    key={`portrait-${currentStory.id}`}
-                    src={currentStory.image}
+                    src={currentStory.avatar}
                     alt={currentStory.name}
-                    className="journey-stories-img"
+                    className="journey-testimonial-pfp-img"
                   />
-                  <div className="journey-stories-badge-pill">
-                    <Sparkles size={10} style={{ color: '#059669' }} />
-                    <span>{currentStory.badge}</span>
+                ) : (
+                  <div className="journey-testimonial-pfp-initials">
+                    <span className="journey-testimonial-initials-text">{currentStory.shortCode}</span>
                   </div>
-                </div>
+                )}
               </div>
 
-              {/* Right Column: Quote, Story, Author & Brand Label */}
-              <div className="journey-stories-content-col">
-                <div>
-                  <h3 key={`quote-${currentStory.id}`} className="journey-stories-quote">
-                    {currentStory.quote}
-                  </h3>
+              <div key={`meta-${activeStory}`} className="journey-testimonial-profile-meta">
+                <div className="journey-testimonial-pfp-name">{currentStory.name}</div>
+                <div className="journey-testimonial-pfp-rating">
+                  <span className="journey-testimonial-star-rating">★ {currentStory.rating}</span>
+                  <span className="journey-testimonial-date">on {currentStory.date}</span>
+                </div>
+              </div>
+            </div>
 
-                  <p key={`story-${currentStory.id}`} className="journey-stories-body">
-                    {currentStory.story}
-                  </p>
-
-                  <div key={`author-${currentStory.id}`} className="journey-stories-author-block">
-                    <span className="journey-stories-author-name">{currentStory.name}</span>
-                    <span className="journey-stories-author-role">{currentStory.role}</span>
-                  </div>
+            {/* Right Column: Editorial Quote & Verification Attribution */}
+            <div className="journey-testimonial-content-col">
+              <div
+                key={`quote-${activeStory}`}
+                className="journey-testimonial-quote-wrapper"
+              >
+                {/* Large Editorial Quotation Mark */}
+                <div className="journey-testimonial-quote-mark" aria-hidden="true">
+                  “
                 </div>
 
-                {/* Footer Bar: Editorial Label & Navigation Controls */}
-                <div className="journey-stories-footer">
-                  <div className="journey-stories-controls">
-                    <button
-                      type="button"
-                      onClick={handlePrevStory}
-                      className="journey-stories-btn"
-                      aria-label="Previous UpShifter story"
-                    >
-                      <ChevronLeft size={15} />
-                    </button>
-                    <span className="journey-stories-indicator">
-                      0{activeStory + 1} / 0{STORIES_DATA.length}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleNextStory}
-                      className="journey-stories-btn"
-                      aria-label="Next UpShifter story"
-                    >
-                      <ChevronRight size={15} />
-                    </button>
+                <blockquote className="journey-testimonial-quote-text">
+                  <span className="journey-testimonial-dropcap" aria-hidden="true">
+                    {firstLetter}
+                  </span>
+                  <span>{restOfQuote}</span>
+                </blockquote>
+
+                {/* Clean Horizontal Divider & Attribution */}
+                <div className="journey-testimonial-attribution-row">
+                  <div className="journey-testimonial-attribution-info">
+                    <div className="journey-testimonial-author-name">
+                      {currentStory.name}
+                    </div>
+                    <div className="journey-testimonial-author-role">
+                      {currentStory.role}
+                    </div>
                   </div>
 
-                  <div className="journey-stories-brand-label">
-                    <span>AI UpShifter Stories</span>
-                    <span className="journey-stories-brand-accent">...</span>
+                  <div className="journey-testimonial-verify-badge">
+                    <Award size={15} className="journey-testimonial-award-icon" />
+                    <span>{currentStory.badge || 'Commercial Proof Verified'}</span>
                   </div>
                 </div>
               </div>
@@ -343,3 +369,4 @@ export default function UserJourneySection() {
     </section>
   );
 }
+

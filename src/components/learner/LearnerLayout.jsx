@@ -7,23 +7,29 @@ import './learner.css';
 
 export default function LearnerLayout() {
   const { user } = useAuth();
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [assignedTrack, setAssignedTrack] = useState(null);
+  const [enrolledProgram, setEnrolledProgram] = useState(null);
   const [loadingEnrollments, setLoadingEnrollments] = useState(true);
 
-  // Fetch active enrolled course(s) from database
+  // Fetch learner's active program enrollment and assigned track
   useEffect(() => {
-    async function loadLearnerTracks() {
+    async function loadLearnerTrack() {
       if (!user?.id) return;
       try {
-        const { data: enrollmentData, error } = await supabase
+        let { data: enrollmentData, error } = await supabase
           .from('enrollments')
           .select(`
             id,
             program_id,
-            course_id,
+            track_id,
             status,
             payment_status,
-            course:courses (
+            program:programs (
+              id,
+              name,
+              slug
+            ),
+            track:tracks (
               id,
               code,
               name,
@@ -36,49 +42,68 @@ export default function LearnerLayout() {
           .eq('user_id', user.id)
           .eq('status', 'active');
 
-        if (error) throw error;
+        // Fallback for transition phase if PostgREST cache has not reloaded
+        if (error) {
+          const fallbackRes = await supabase
+            .from('enrollments')
+            .select(`
+              id,
+              program_id,
+              course_id,
+              status,
+              payment_status,
+              course:courses (
+                id,
+                code,
+                name,
+                category,
+                color,
+                bg_color,
+                tagline
+              )
+            `)
+            .eq('user_id', user.id)
+            .eq('status', 'active');
 
-        // If enrolled in UpShift Complete Program (or any active enrollment), load all 6 flagship courses
-        const hasCompleteProgram = (enrollmentData || []).some(
-          e => e.program_id === 'upshift-complete-program' || !e.course_id || e.status === 'active'
-        );
-
-        if (hasCompleteProgram) {
-          const { data: allCourses, error: coursesErr } = await supabase
-            .from('courses')
-            .select('id, code, name, category, color, bg_color, tagline')
-            .eq('is_active', true)
-            .order('code', { ascending: true });
-
-          if (!coursesErr && allCourses && allCourses.length > 0) {
-            setEnrolledCourses(allCourses);
-            return;
-          }
+          if (fallbackRes.error) throw error;
+          enrollmentData = fallbackRes.data?.map(e => ({
+            ...e,
+            track_id: e.course_id,
+            track: e.course
+          }));
         }
 
-        // Fallback: extract specific enrolled course(s)
-        const courses = (enrollmentData || [])
-          .map(e => e.course)
-          .filter(Boolean);
-
-        setEnrolledCourses(courses);
+        const activeEnrollment = enrollmentData?.[0] || null;
+        if (activeEnrollment) {
+          setEnrolledProgram(activeEnrollment.program || {
+            id: 'upshift-complete-program',
+            name: 'UpShift Complete Applied AI Program'
+          });
+          setAssignedTrack(activeEnrollment.track || null);
+        }
       } catch (err) {
-        console.warn('[LearnerLayout] Failed to load enrollment tracks:', err);
+        console.warn('[LearnerLayout] Failed to load enrollment track:', err);
       } finally {
         setLoadingEnrollments(false);
       }
     }
-    loadLearnerTracks();
+    loadLearnerTrack();
   }, [user?.id]);
 
   return (
     <div className="learner-shell">
       {/* Persistent Learner Header */}
-      <LearnerHeader enrolledCourses={enrolledCourses} />
+      <LearnerHeader assignedTrack={assignedTrack} />
 
       {/* Main Content View */}
       <main className="learner-content">
-        <Outlet context={{ enrolledCourses, loadingEnrollments }} />
+        <Outlet context={{ 
+          assignedTrack, 
+          enrolledProgram, 
+          loadingEnrollments,
+          // Backward-compatibility alias
+          enrolledCourses: assignedTrack ? [assignedTrack] : [] 
+        }} />
       </main>
     </div>
   );

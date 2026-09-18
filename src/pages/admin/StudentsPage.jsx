@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { 
   Users, 
   UserPlus, 
-  FileSpreadsheet, 
+  Upload, 
   Search, 
-  Filter, 
   ChevronLeft, 
   ChevronRight, 
   Eye, 
   X, 
   AlertCircle, 
   CheckCircle2, 
-  Clock, 
   GraduationCap,
-  BookOpen,
+  Sparkles,
   Mail
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
@@ -25,7 +23,7 @@ export default function StudentsPage() {
   // Data states
   const [students, setStudents] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [courses, setCourses] = useState([]);
+  const [tracks, setTracks] = useState([]);
   const [collegeList, setCollegeList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -33,13 +31,13 @@ export default function StudentsPage() {
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState('all');
+  const [selectedTrack, setSelectedTrack] = useState('all');
   const [selectedCollege, setSelectedCollege] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize] = useState(25);
 
   // Details Modal state
   const [viewingStudent, setViewingStudent] = useState(null);
@@ -48,21 +46,35 @@ export default function StudentsPage() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm.trim());
-      setCurrentPage(1); // Reset page on new search
+      setCurrentPage(1);
     }, 300);
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // 2. Fetch Filter Metadata (Courses & Colleges)
+  // 2. Fetch Filter Metadata (Tracks & Colleges)
   useEffect(() => {
     async function loadFilterMetadata() {
       try {
-        const [coursesRes, collegesRes] = await Promise.all([
-          supabase.from('courses').select('id, code, name, color').order('code', { ascending: true }),
-          supabase.from('profiles').select('college').eq('role', 'learner').not('college', 'is', null)
-        ]);
+        let { data: tracksData, error } = await supabase
+          .from('tracks')
+          .select('id, code, name, color')
+          .order('code', { ascending: true });
 
-        if (coursesRes.data) setCourses(coursesRes.data);
+        if (error) {
+          const fallbackRes = await supabase
+            .from('courses')
+            .select('id, code, name, color')
+            .order('code', { ascending: true });
+          tracksData = fallbackRes.data || [];
+        }
+
+        const collegesRes = await supabase
+          .from('profiles')
+          .select('college')
+          .eq('role', 'learner')
+          .not('college', 'is', null);
+
+        if (tracksData) setTracks(tracksData);
         if (collegesRes.data) {
           const uniqueColleges = Array.from(
             new Set(collegesRes.data.map((c) => c.college?.trim()).filter(Boolean))
@@ -82,11 +94,10 @@ export default function StudentsPage() {
     setErrorMessage(null);
 
     try {
-      // Determine if inner join on enrollments is needed for course/status filter
-      const needsInnerEnrollment = selectedCourse !== 'all' || selectedStatus !== 'all';
+      const needsInnerEnrollment = selectedTrack !== 'all' || selectedStatus !== 'all';
       const enrollmentSelect = needsInnerEnrollment
-        ? 'enrollments!inner(id, enrolled_at, status, course_id, course:courses(id, code, name, color))'
-        : 'enrollments(id, enrolled_at, status, course_id, course:courses(id, code, name, color))';
+        ? 'enrollments!inner(id, enrolled_at, status, track_id, track:tracks(id, code, name, color))'
+        : 'enrollments(id, enrolled_at, status, track_id, track:tracks(id, code, name, color))';
 
       let query = supabase
         .from('profiles')
@@ -104,9 +115,9 @@ export default function StudentsPage() {
         query = query.eq('college', selectedCollege);
       }
 
-      // Course Filter
-      if (selectedCourse !== 'all') {
-        query = query.eq('enrollments.course_id', selectedCourse);
+      // Track Filter
+      if (selectedTrack !== 'all') {
+        query = query.eq('enrollments.track_id', selectedTrack);
       }
 
       // Status Filter
@@ -114,7 +125,7 @@ export default function StudentsPage() {
         query = query.eq('enrollments.status', selectedStatus);
       }
 
-      // Server-side Pagination with .range()
+      // Server-side Pagination
       const startIndex = (currentPage - 1) * pageSize;
       const endIndex = startIndex + pageSize - 1;
 
@@ -124,25 +135,61 @@ export default function StudentsPage() {
 
       const { data, count, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.warn('[StudentsPage] Relational query error, trying fallback query:', error);
+        // Fallback query for transitional schemas
+        const fallbackSelect = needsInnerEnrollment
+          ? 'enrollments!inner(id, enrolled_at, status, course_id, course:courses(id, code, name, color))'
+          : 'enrollments(id, enrolled_at, status, course_id, course:courses(id, code, name, color))';
 
-      setStudents(data || []);
-      setTotalCount(count || 0);
+        let fbQuery = supabase
+          .from('profiles')
+          .select(`id, full_name, email, college, college_email, created_at, ${fallbackSelect}`, { count: 'exact' })
+          .eq('role', 'learner');
+
+        if (debouncedSearch) {
+          const q = debouncedSearch.replace(/[,%]/g, '');
+          fbQuery = fbQuery.or(`full_name.ilike.%${q}%,email.ilike.%${q}%,college_email.ilike.%${q}%,college.ilike.%${q}%`);
+        }
+        if (selectedCollege !== 'all') fbQuery = fbQuery.eq('college', selectedCollege);
+        if (selectedTrack !== 'all') fbQuery = fbQuery.eq('enrollments.course_id', selectedTrack);
+        if (selectedStatus !== 'all') fbQuery = fbQuery.eq('enrollments.status', selectedStatus);
+
+        const { data: fbData, count: fbCount, error: fbError } = await fbQuery
+          .order('created_at', { ascending: false })
+          .range(startIndex, endIndex);
+
+        if (fbError) throw fbError;
+
+        const normalizedData = (fbData || []).map(student => ({
+          ...student,
+          enrollments: (student.enrollments || []).map(e => ({
+            ...e,
+            track_id: e.course_id,
+            track: e.course
+          }))
+        }));
+
+        setStudents(normalizedData);
+        setTotalCount(fbCount || 0);
+      } else {
+        setStudents(data || []);
+        setTotalCount(count || 0);
+      }
     } catch (err) {
       console.error('[StudentsPage] Error fetching students:', err);
       setErrorMessage('Unable to load students. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [debouncedSearch, selectedCourse, selectedCollege, selectedStatus, currentPage, pageSize]);
+  }, [debouncedSearch, selectedTrack, selectedCollege, selectedStatus, currentPage, pageSize]);
 
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents, refreshTrigger]);
 
-  // Reset page when filters change
-  const handleCourseFilterChange = (val) => {
-    setSelectedCourse(val);
+  const handleTrackFilterChange = (val) => {
+    setSelectedTrack(val);
     setCurrentPage(1);
   };
 
@@ -156,14 +203,8 @@ export default function StudentsPage() {
     setCurrentPage(1);
   };
 
-  const handlePageSizeChange = (val) => {
-    setPageSize(Number(val));
-    setCurrentPage(1);
-  };
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-
-  // Date Formatter
   const formatDate = (isoString) => {
     if (!isoString) return '—';
     try {
@@ -177,83 +218,132 @@ export default function StudentsPage() {
     }
   };
 
-  // Status Badge Helper
-  const renderStatusBadge = (status) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#ECFDF5',
+            color: '#047857',
+            border: '1px solid #A7F3D0'
+          }}>
+            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#10B981' }} />
             Active
           </span>
         );
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#EFF6FF',
+            color: '#1D4ED8',
+            border: '1px solid #BFDBFE'
+          }}>
             <CheckCircle2 size={11} />
             Completed
           </span>
         );
       case 'dropped':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-red-50 text-red-700 border border-red-200">
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#FEF2F2',
+            color: '#B91C1C',
+            border: '1px solid #FECACA'
+          }}>
             <AlertCircle size={11} />
             Dropped
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-gray-100 text-gray-700 border border-gray-200">
-            {status || 'Active'}
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            fontSize: '10.5px',
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            backgroundColor: '#F3F4F6',
+            color: '#4B5563'
+          }}>
+            {status || 'Unknown'}
           </span>
         );
     }
   };
 
   return (
-    <div className="admin-page space-y-6">
-      {/* Top Action Bar */}
+    <div className="admin-page">
+      {/* Normalized Header */}
       <div className="admin-page-header">
         <div>
-          <h2>Learner Directory</h2>
-          <p>Manage registered students, academic institutions, and course enrollments.</p>
+          <h1 className="admin-page-title">
+            <Users size={22} />
+            <span>Students Directory</span>
+          </h1>
+          <p className="admin-page-description">
+            Manage enrolled learners, review UpShift track assignments, and institutional distribution.
+          </p>
         </div>
 
         <div className="admin-page-actions">
           <Link
             to="/admin/students/import"
-            className="admin-btn-secondary"
-            title="Import students via CSV file"
+            className="admin-btn admin-btn-secondary"
+            title="Bulk import learners via CSV"
           >
-            <FileSpreadsheet size={15} />
-            <span>Import CSV</span>
+            <Upload size={14} />
+            <span>Bulk CSV Import</span>
           </Link>
 
           <Link
             to="/admin/students/new"
-            className="admin-btn-primary"
+            className="admin-btn admin-btn-primary"
           >
-            <UserPlus size={15} />
+            <UserPlus size={14} />
             <span>Add Student</span>
           </Link>
         </div>
       </div>
 
-      {/* Error Banner */}
+      {/* Error Alert */}
       {errorMessage && (
-        <div 
-          role="alert" 
-          className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center justify-between gap-4 text-left"
-        >
-          <div className="flex items-center gap-2.5">
-            <AlertCircle size={17} className="text-[#E31B23] flex-shrink-0" />
-            <p className="text-xs sm:text-sm text-red-800 font-medium">
-              {errorMessage}
-            </p>
+        <div role="alert" className="admin-alert admin-alert-danger">
+          <div className="admin-alert-content">
+            <AlertCircle size={16} />
+            <span>{errorMessage}</span>
           </div>
           <button
             onClick={fetchStudents}
-            className="admin-btn-secondary text-xs"
+            className="admin-btn admin-btn-sm admin-btn-secondary"
           >
             Retry
           </button>
@@ -261,11 +351,11 @@ export default function StudentsPage() {
       )}
 
       {/* Search & Filters Toolbar */}
-      <div className="admin-card p-4">
+      <div className="admin-card admin-card-compact">
         <div className="admin-filter-bar">
           {/* Search Box with Debounce */}
-          <div className="relative min-w-0">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+          <div className="admin-input-wrapper">
+            <div className="admin-input-icon">
               <Search size={15} />
             </div>
             <input
@@ -273,23 +363,23 @@ export default function StudentsPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name, email, college..."
-              className="admin-input pl-9"
+              className="admin-input admin-input-with-icon"
               aria-label="Search students"
             />
           </div>
 
-          {/* Course Filter */}
+          {/* Track Filter */}
           <div>
             <select
-              value={selectedCourse}
-              onChange={(e) => handleCourseFilterChange(e.target.value)}
+              value={selectedTrack}
+              onChange={(e) => handleTrackFilterChange(e.target.value)}
               className="admin-select"
-              aria-label="Filter by course"
+              aria-label="Filter by UpShift track"
             >
-              <option value="all">All Courses (Tracks)</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} — {c.name}
+              <option value="all">All UpShift Tracks</option>
+              {tracks.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.code} — {t.name}
                 </option>
               ))}
             </select>
@@ -330,119 +420,129 @@ export default function StudentsPage() {
       </div>
 
       {/* Main Student Directory Table */}
-      <div className="admin-card p-0 overflow-hidden">
+      <div className="admin-card" style={{ padding: 0, overflow: 'hidden' }}>
         {isLoading ? (
-          <div className="p-6 space-y-3 animate-pulse">
-            <div className="h-4 w-44 bg-gray-200 rounded mb-4" />
+          <div style={{ padding: '24px', opacity: 0.6, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ width: '140px', height: '16px', backgroundColor: '#E5E7EB', borderRadius: '4px', marginBottom: '12px' }} />
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-12 w-full bg-gray-100 rounded-lg" />
+              <div key={i} style={{ height: '44px', backgroundColor: '#F9FAFB', borderRadius: '8px' }} />
             ))}
           </div>
         ) : students.length === 0 ? (
           /* Empty State */
-          <div className="py-16 text-center px-4">
-            <div className="w-12 h-12 rounded-full bg-gray-100 mx-auto flex items-center justify-center text-gray-400 mb-3">
-              <Users size={22} />
+          <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#F3F4F6', margin: '0 auto 10px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF' }}>
+              <Users size={20} />
             </div>
-            <h4 className="text-base font-bold text-gray-900 mb-1 uppercase tracking-wide">
-              No Learners Yet
+            <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#111827', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              No Learners Found
             </h4>
-            <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto leading-relaxed mb-5">
-              Create the first learner account to begin building your UpShift roster, or adjust your active search and filter criteria.
+            <p style={{ fontSize: '12.5px', color: '#6B7280', maxWidth: '440px', margin: '0 auto 20px auto', lineHeight: 1.5 }}>
+              {searchTerm || selectedTrack !== 'all' || selectedCollege !== 'all' || selectedStatus !== 'all'
+                ? 'No learners match your search criteria. Try adjusting your filters.'
+                : 'Get started by creating your first student account or uploading a bulk CSV roster.'}
             </p>
             <Link
               to="/admin/students/new"
-              className="admin-btn-primary"
+              className="admin-btn admin-btn-primary"
             >
-              <UserPlus size={15} />
-              <span>Add Student</span>
+              <UserPlus size={14} />
+              <span>Add First Student</span>
             </Link>
           </div>
         ) : (
-          /* Data Table */
-          <div className="admin-table-wrapper border-0 rounded-none">
+          /* Normalized Table */
+          <div className="admin-table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
             <table className="admin-table">
               <thead>
-                <tr className="bg-gray-50/80 border-b border-gray-200 text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">
-                  <th className="py-3 px-4">Student</th>
-                  <th className="py-3 px-4">College</th>
-                  <th className="py-3 px-4">College Email</th>
-                  <th className="py-3 px-4">Course</th>
-                  <th className="py-3 px-4">Registered</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                <tr>
+                  <th>Student</th>
+                  <th>College</th>
+                  <th>College Email</th>
+                  <th>Assigned Track</th>
+                  <th>Registered</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'right' }}>Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-xs">
+              <tbody>
                 {students.map((student) => {
-                  const enrollment = student.enrollments?.[0] || {};
-                  const course = enrollment.course || {};
-                  const courseColor = course.color || '#E31B23';
+                  const enrollment = Array.isArray(student.enrollments) && student.enrollments.length > 0
+                    ? student.enrollments[0]
+                    : null;
+                  const track = enrollment?.track;
+                  const trackColor = track?.color || '#E31B23';
 
                   return (
-                    <tr key={student.id} className="hover:bg-gray-50/80 transition-colors">
-                      {/* Student Column */}
-                      <td className="py-3 px-4">
-                        <div className="font-bold text-gray-900">
-                          {student.full_name}
+                    <tr key={student.id}>
+                      {/* Name & Email */}
+                      <td>
+                        <div style={{ fontWeight: 700, color: '#111827', fontSize: '13px' }}>
+                          {student.full_name || 'Anonymous Student'}
                         </div>
-                        <div className="text-[11px] font-mono text-gray-400">
+                        <div style={{ fontSize: '11px', fontFamily: 'monospace', color: '#9CA3AF', marginTop: '2px' }}>
                           {student.email}
                         </div>
                       </td>
 
-                      {/* College Column */}
-                      <td className="py-3 px-4 text-gray-700">
+                      {/* College */}
+                      <td style={{ color: '#4B5563', fontSize: '12.5px' }}>
                         {student.college || '—'}
                       </td>
 
-                      {/* College Email Column */}
-                      <td className="py-3 px-4 font-mono text-gray-500 text-[11px]">
+                      {/* College Email */}
+                      <td style={{ fontFamily: 'monospace', color: '#6B7280', fontSize: '11px' }}>
                         {student.college_email || '—'}
                       </td>
 
-                      {/* Course Column */}
-                      <td className="py-3 px-4">
-                        {course.name ? (
-                          <div className="flex items-center gap-1.5">
+                      {/* Track */}
+                      <td>
+                        {track ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <span 
-                              className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase flex-shrink-0"
                               style={{ 
-                                backgroundColor: `${courseColor}15`, 
-                                color: courseColor,
-                                border: `1px solid ${courseColor}30`
+                                backgroundColor: `${trackColor}18`, 
+                                color: trackColor,
+                                border: `1px solid ${trackColor}35`,
+                                padding: '2px 5px',
+                                borderRadius: '4px',
+                                fontSize: '10px',
+                                fontFamily: 'monospace',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                flexShrink: 0
                               }}
                             >
-                              {course.code || 'M'}
+                              {track.code}
                             </span>
-                            <span className="font-medium text-gray-800 truncate max-w-[160px]">
-                              {course.name}
+                            <span style={{ fontWeight: 500, color: '#1F2937', fontSize: '12.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '170px' }}>
+                              {track.name}
                             </span>
                           </div>
                         ) : (
-                          <span className="text-gray-400 italic">Not Enrolled</span>
+                          <span style={{ color: '#9CA3AF', fontStyle: 'italic', fontSize: '12px' }}>Not Assigned</span>
                         )}
                       </td>
 
-                      {/* Registered Date Column */}
-                      <td className="py-3 px-4 font-mono text-gray-500 whitespace-nowrap">
-                        {formatDate(enrollment.enrolled_at || student.created_at)}
+                      {/* Registered Date */}
+                      <td style={{ fontFamily: 'monospace', color: '#6B7280', fontSize: '11.5px', whiteSpace: 'nowrap' }}>
+                        {formatDate(student.created_at)}
                       </td>
 
-                      {/* Status Column */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        {renderStatusBadge(enrollment.status || 'active')}
+                      {/* Status */}
+                      <td style={{ whiteSpace: 'nowrap' }}>
+                        {getStatusBadge(enrollment?.status || 'active')}
                       </td>
 
-                      {/* Actions Column */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                      {/* Action */}
+                      <td className="admin-table-actions">
                         <button
                           onClick={() => setViewingStudent(student)}
-                          className="admin-btn-secondary py-1 px-2.5 text-[11px]"
-                          title="View student profile and enrollment details"
+                          className="admin-btn-icon"
+                          title="View student profile details"
+                          aria-label={`View details for ${student.full_name}`}
                         >
-                          <Eye size={12} />
-                          <span>View</span>
+                          <Eye size={14} />
                         </button>
                       </td>
                     </tr>
@@ -453,161 +553,128 @@ export default function StudentsPage() {
           </div>
         )}
 
-        {/* Pagination Toolbar */}
-        {!isLoading && totalCount > 0 && (
-          <div className="p-4 bg-gray-50/50 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-gray-600">
-            {/* Range Text */}
-            <div className="font-mono">
-              Showing <span className="font-bold text-gray-900">{Math.min((currentPage - 1) * pageSize + 1, totalCount)}</span>–
-              <span className="font-bold text-gray-900">{Math.min(currentPage * pageSize, totalCount)}</span> of{' '}
-              <span className="font-bold text-gray-900">{totalCount}</span> students
-            </div>
+        {/* Pagination Bar */}
+        {!isLoading && totalCount > pageSize && (
+          <div className="admin-table-pagination">
+            <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'monospace' }}>
+              Showing {((currentPage - 1) * pageSize) + 1}–{Math.min(currentPage * pageSize, totalCount)} of {totalCount} students
+            </span>
 
-            {/* Controls */}
-            <div className="flex items-center gap-3 self-end sm:self-auto">
-              <div className="flex items-center gap-1.5 font-mono">
-                <span>Per page:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => handlePageSizeChange(e.target.value)}
-                  className="px-2 py-1 text-xs rounded border border-gray-200 bg-white text-gray-800"
-                >
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+                aria-label="Previous page"
+              >
+                <ChevronLeft size={13} />
+                <span>Prev</span>
+              </button>
 
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage <= 1}
-                  className="admin-btn-secondary p-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Previous Page"
-                >
-                  <ChevronLeft size={14} />
-                </button>
-                <span className="px-2 font-mono text-gray-500">
-                  {currentPage} / {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage >= totalPages}
-                  className="admin-btn-secondary p-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Next Page"
-                >
-                  <ChevronRight size={14} />
-                </button>
-              </div>
+              <span style={{ fontSize: '12px', fontWeight: 600, padding: '0 8px', fontFamily: 'monospace' }}>
+                {currentPage} / {totalPages}
+              </span>
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="admin-btn admin-btn-sm admin-btn-secondary"
+                aria-label="Next page"
+              >
+                <span>Next</span>
+                <ChevronRight size={13} />
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Student Details Modal (Normalized Footprint max 680px, compact rows) */}
+      {/* Student Details Slide-Over / Modal */}
       {viewingStudent && (
-        <div 
-          className="admin-modal-backdrop"
-          onClick={() => setViewingStudent(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="student-details-title"
-        >
-          <div 
-            className="admin-modal-card space-y-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-red-50 text-[#E31B23] border border-red-100 flex items-center justify-center font-bold">
-                  <GraduationCap size={16} />
-                </div>
-                <div>
-                  <h3 id="student-details-title" className="text-base font-extrabold text-[#111827] tracking-tight m-0">
-                    Student Details
-                  </h3>
-                  <p className="text-xs text-[#6B7280] m-0">Verified learner registration and enrollment record</p>
-                </div>
+        <div className="admin-modal-overlay" onClick={() => setViewingStudent(null)}>
+          <div className="admin-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Users size={17} style={{ color: '#E31B23' }} />
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#111827' }}>
+                  Student Profile Details
+                </h3>
               </div>
-
               <button
                 onClick={() => setViewingStudent(null)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                aria-label="Close dialog"
+                className="admin-btn-icon"
               >
-                <X size={18} />
+                <X size={15} />
               </button>
             </div>
 
-            {/* Section 1: Personal & Academic Profile */}
-            <div className="space-y-2.5">
-              <div className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider">
-                Personal & Academic Profile
+            <div className="admin-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                  Full Name
+                </span>
+                <h4 style={{ margin: '2px 0 0 0', fontSize: '16px', fontWeight: 800, color: '#111827' }}>
+                  {viewingStudent.full_name}
+                </h4>
               </div>
 
-              <div className="bg-gray-50/80 rounded-xl p-3.5 space-y-2 text-xs border border-gray-100">
-                <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
-                  <span className="text-gray-500 font-medium">Full Name</span>
-                  <span className="font-bold text-gray-900">{viewingStudent.full_name}</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    Account Email
+                  </span>
+                  <div style={{ marginTop: '2px', fontSize: '12.5px', fontFamily: 'monospace', color: '#1F2937' }}>
+                    {viewingStudent.email}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
-                  <span className="text-gray-500 font-medium">Account Email</span>
-                  <span className="font-mono text-gray-900 font-semibold">{viewingStudent.email}</span>
+                <div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                    College Email
+                  </span>
+                  <div style={{ marginTop: '2px', fontSize: '12.5px', fontFamily: 'monospace', color: '#1F2937' }}>
+                    {viewingStudent.college_email || '—'}
+                  </div>
                 </div>
+              </div>
 
-                <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
-                  <span className="text-gray-500 font-medium">College Email</span>
-                  <span className="font-mono text-gray-900">{viewingStudent.college_email || '—'}</span>
+              <div>
+                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                  Institution / College
+                </span>
+                <div style={{ marginTop: '2px', fontSize: '13px', fontWeight: 600, color: '#111827' }}>
+                  {viewingStudent.college || '—'}
                 </div>
+              </div>
 
-                <div className="flex items-center justify-between py-1">
-                  <span className="text-gray-500 font-medium">College / Institution</span>
-                  <span className="font-semibold text-gray-900">{viewingStudent.college || '—'}</span>
-                </div>
+              <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '12px' }}>
+                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
+                  Program & Track Enrollment
+                </span>
+                {Array.isArray(viewingStudent.enrollments) && viewingStudent.enrollments.length > 0 ? (
+                  <div style={{ marginTop: '8px', padding: '10px 12px', borderRadius: '8px', backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#111827' }}>
+                      Program: UpShift Complete Applied AI Program
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#4B5563' }}>
+                      Assigned Track: <strong>{viewingStudent.enrollments[0]?.track?.code} — {viewingStudent.enrollments[0]?.track?.name}</strong>
+                    </div>
+                    <div style={{ fontSize: '11.5px', color: '#6B7280', fontFamily: 'monospace' }}>
+                      Enrolled: {formatDate(viewingStudent.enrollments[0]?.enrolled_at)} · Status: {viewingStudent.enrollments[0]?.status}
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#9CA3AF', fontStyle: 'italic' }}>
+                    No active track enrollment recorded.
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Section 2: Enrollment Information */}
-            <div className="space-y-2.5">
-              <div className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-wider">
-                Course Enrollment
-              </div>
-
-              {viewingStudent.enrollments?.[0] ? (
-                <div className="bg-gray-50/80 rounded-xl p-3.5 space-y-2 text-xs border border-gray-100">
-                  <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
-                    <span className="text-gray-500 font-medium">Flagship Track</span>
-                    <span className="font-bold text-gray-900">
-                      {viewingStudent.enrollments[0].course?.code} — {viewingStudent.enrollments[0].course?.name}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
-                    <span className="text-gray-500 font-medium">Enrollment Status</span>
-                    <span>{renderStatusBadge(viewingStudent.enrollments[0].status)}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-gray-500 font-medium">Enrolled Date</span>
-                    <span className="font-mono text-gray-800">
-                      {formatDate(viewingStudent.enrollments[0].enrolled_at)}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4 text-xs text-gray-400 bg-gray-50 rounded-xl italic text-center border border-dashed border-gray-200">
-                  No active course enrollment found.
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="pt-2 border-t border-gray-100 flex justify-end">
+            <div className="admin-modal-footer">
               <button
                 onClick={() => setViewingStudent(null)}
-                className="admin-btn-secondary"
+                className="admin-btn admin-btn-secondary"
               >
                 Close
               </button>
