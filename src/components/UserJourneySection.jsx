@@ -27,6 +27,14 @@ const STORIES_DATA = [
     role: 'Undergraduate Builder · ReelRush & Vibe Coder Track',
     quote: 'Overall pleasurable experience. Pay a little first and Pay a little during the development of the app as milestones are achieved, which made me feel very confident and comfortable. Seamless and Easy process.',
     avatar: null
+  },
+  {
+    id: 4,
+    name: 'Lauren Contreras',
+    shortCode: 'LC',
+    role: 'AI Annotation Specialist · DeepAnnotator Track',
+    quote: 'Been working with UpShift for a number of years now with a variety of different apps. They have my recommendation. They are a great team.',
+    avatar: null
   }
 ];
 
