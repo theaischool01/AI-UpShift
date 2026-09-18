@@ -9,7 +9,6 @@ const STORIES_DATA = [
     name: 'Edward Alexander',
     shortCode: 'EA',
     rating: '4.9',
-    date: '29 Aug, 2026',
     role: 'Undergraduate Builder · ReelRush & Vibe Coder Track',
     quote: 'Overall pleasurable experience. Pay a little first and Pay a little during the development of the app as milestones are achieved, which made me feel very confident and comfortable. Seamless and Easy process.',
     story: 'After completing the ReelRush and Vibe Coder tracks, I delivered three automated video workflows for an e-commerce brand. Having real proof of work changed every client conversation.',
@@ -18,10 +17,9 @@ const STORIES_DATA = [
   },
   {
     id: 2,
-    name: 'Diana Johnston',
-    shortCode: 'DJ',
+    name: 'Likitha',
+    shortCode: 'L',
     rating: '5.0',
-    date: '02 Sep, 2026',
     role: 'Autonomous Agent Handler · AgentHandlers Track',
     quote: 'Zero prior coding background. Built client agents in 3 weeks with automated API workflows.',
     story: 'AgentHandlers taught me how to wire multi-agent workflows with real APIs. Building and shipping functional tools gave me the confidence to pitch and close local businesses on custom automation.',
@@ -33,7 +31,6 @@ const STORIES_DATA = [
     name: 'Lauren Contreras',
     shortCode: 'LC',
     rating: '4.9',
-    date: '29 Aug, 2026',
     role: 'AI Annotation Specialist · DeepAnnotator Track',
     quote: 'Been working with UpShift for a number of years now with a variety of different apps. They have my recommendation. They are a great team.',
     story: 'DeepAnnotator gave me hands-on dataset evaluation skills that enterprise teams actually need. The portfolio project I published through UpShift became my proof of competence for a remote data curation contract.',
@@ -297,7 +294,7 @@ export default function UserJourneySection() {
                 <div className="journey-testimonial-pfp-name">{currentStory.name}</div>
                 <div className="journey-testimonial-pfp-rating">
                   <span className="journey-testimonial-star-rating">★ {currentStory.rating}</span>
-                  <span className="journey-testimonial-date">on {currentStory.date}</span>
+                  {currentStory.date && <span className="journey-testimonial-date">on {currentStory.date}</span>}
                 </div>
               </div>
             </div>
