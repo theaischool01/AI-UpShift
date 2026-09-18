@@ -23,11 +23,9 @@ import MascotBadge from '../components/MascotBadge';
 import ExploringProgramsSection from '../components/ExploringProgramsSection';
 import ProgramOrbitCarousel from '../components/ProgramOrbitCarousel';
 import UserJourneySection from '../components/UserJourneySection';
-import ProofWallSection from '../components/ProofWallSection';
 import OpportunityDispatchSection from '../components/OpportunityDispatchSection';
 
 import { PROGRAMS_DATA } from '../data/programsData';
-import { PROOF_PROJECTS } from '../data/proofData';
 import { CONCEPTUAL_CLASSIFIEDS } from '../data/opportunitiesData';
 
 // Program Icon Map matching the 6 tracks
@@ -249,11 +247,6 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* 4. CAREER JOURNEY TIMELINE (How It Works — Light Editorial)  */}
       {/* ============================================================ */}
       <UserJourneySection />
-
-      {/* ============================================================ */}
-      {/* 4. THE RECEIPT — 21ST.DEV ASYMMETRIC STUDIO EXHIBITION GRID */}
-      {/* ============================================================ */}
-      <ProofWallSection />
 
       {/* ============================================================ */}
       {/* 5. OPPORTUNITIES — HORIZONTAL EXPANDING PANEL WALL           */}

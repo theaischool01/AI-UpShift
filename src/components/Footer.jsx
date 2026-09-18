@@ -104,14 +104,6 @@ export default function Footer({ onNavigate }) {
               </li>
               <li>
                 <button 
-                  onClick={() => handleNavigate('proof')} 
-                  className="upshift-footer-link"
-                >
-                  Outcomes
-                </button>
-              </li>
-              <li>
-                <button 
                   onClick={() => handleNavigate('opportunities')} 
                   className="upshift-footer-link"
                 >

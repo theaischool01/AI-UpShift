@@ -25,7 +25,7 @@ export default function Navbar({ onOpenRegistration }) {
 
   // Track active section as user scrolls through sections
   useEffect(() => {
-    const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'proof', 'opportunities', 'upshifter'];
+    const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'opportunities', 'upshifter'];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -52,7 +52,6 @@ export default function Navbar({ onOpenRegistration }) {
   const navItems = [
     { id: 'programs', label: 'Programs' },
     { id: 'how-it-works', label: 'How It Works' },
-    { id: 'proof', label: 'Outcomes' },
     { id: 'opportunities', label: 'Opportunities' },
   ];
 
