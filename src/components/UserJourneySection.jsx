@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Award } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import dianaAvatar from '../assets/diana_johnston.jpg';
 
 const STORIES_DATA = [
@@ -316,23 +316,6 @@ export default function UserJourneySection() {
                   </span>
                   <span>{restOfQuote}</span>
                 </blockquote>
-
-                {/* Clean Horizontal Divider & Attribution */}
-                <div className="journey-testimonial-attribution-row">
-                  <div className="journey-testimonial-attribution-info">
-                    <div className="journey-testimonial-author-name">
-                      {currentStory.name}
-                    </div>
-                    <div className="journey-testimonial-author-role">
-                      {currentStory.role}
-                    </div>
-                  </div>
-
-                  <div className="journey-testimonial-verify-badge">
-                    <Award size={15} className="journey-testimonial-award-icon" />
-                    <span>{currentStory.badge || 'Commercial Proof Verified'}</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
