@@ -232,7 +232,7 @@ export default function Footer({ onNavigate }) {
       {/* ============================================================ */}
       <div className="upshift-footer-container upshift-footer-legal-layer">
         <div className="upshift-footer-legal-flex">
-          <p style={{ margin: 0 }}>© {new Date().getFullYear()} UpShift by The AI School. All rights reserved.</p>
+          <p style={{ margin: 0 }}>© {new Date().getFullYear()} UpShift by TheAISCHOOL. All rights reserved.</p>
           <div className="upshift-footer-legal-links">
             <span className="upshift-footer-legal-link">Terms of Study</span>
             <span className="upshift-footer-legal-dot">·</span>
