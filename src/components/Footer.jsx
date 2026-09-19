@@ -121,7 +121,7 @@ export default function Footer({ onNavigate }) {
             <ul className="upshift-footer-list">
               <li>
                 <Link to="/enroll" className="upshift-footer-link">
-                  Enroll
+                  Get Started
                 </Link>
               </li>
               <li>

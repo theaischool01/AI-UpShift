@@ -725,49 +725,6 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
             {rightColumnCards.map(renderCard)}
           </div>
         </div>
-
-        {/* Supporting Capability Promise Footer Banner */}
-        <div 
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-white rounded-2xl border border-[#E7E4DF] shadow-xs text-[#111111] mt-10"
-        >
-          <div>
-            <h4 className="font-display text-sm sm:text-base font-bold text-[#111111]">
-              No Guaranteed Jobs. Just Guaranteed Real Capability.
-            </h4>
-            <p className="text-xs text-[#6B7280] mt-0.5">
-              We equip you with verifiable proof so you can pitch freelance clients, apply for high-velocity startup sprints, and earn trust.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onExploreClick && onExploreClick()}
-            className="btn btn-secondary btn-sm shrink-0 flex items-center gap-1.5"
-            style={{
-              borderRadius: '9999px',
-              border: '1px solid #D1D5DB',
-              backgroundColor: '#FFFFFF',
-              color: '#111827',
-              fontWeight: '600',
-              padding: '8px 16px',
-              fontSize: '13px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#111111';
-              e.currentTarget.style.color = '#FFFFFF';
-              e.currentTarget.style.borderColor = '#111111';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF';
-              e.currentTarget.style.color = '#111827';
-              e.currentTarget.style.borderColor = '#D1D5DB';
-            }}
-          >
-            <span>Explore Tracks</span>
-            <ArrowRight size={13} />
-          </button>
-        </div>
       </div>
     </section>
   );

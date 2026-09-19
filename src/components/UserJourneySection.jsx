@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import dianaAvatar from '../assets/diana_johnston.jpg';
+import MascotBadge from './MascotBadge';
 
 const STORIES_DATA = [
   {
@@ -89,25 +90,19 @@ export default function UserJourneySection() {
       number: '01',
       label: 'BUILD THE SKILL',
       title: 'Learn',
-      description: 'Master applied AI capabilities through intensive applied learning built around real-world tools.',
-      artifactLabel: 'Applied AI Curriculum',
-      artifactContent: 'ReelRush · VibeCoder · BrandBuzz'
+      description: 'Master applied AI capabilities through intensive applied learning built around real-world tools.'
     },
     {
       number: '02',
       label: 'SHOW THE WORK',
       title: 'Proof of Work',
-      description: 'Create and publish real deliverables that demonstrate what you can actually do.',
-      artifactLabel: 'Verified Project Sheet',
-      artifactContent: '100% Industry Fidelity Seal · Pinned Exhibit'
+      description: 'Create and publish real deliverables that demonstrate what you can actually do.'
     },
     {
       number: '03',
       label: 'GO AFTER OPPORTUNITY',
       title: 'Earning',
-      description: 'Connect your verified deliverables to client retainers, startup sprints, and paid opportunities.',
-      artifactLabel: 'Opportunity Dispatch',
-      artifactContent: 'Sprint Retainer · Freelance Brief'
+      description: 'Connect your verified deliverables to client retainers, startup sprints, and paid opportunities.'
     }
   ];
 
@@ -192,11 +187,6 @@ export default function UserJourneySection() {
 
                   <p className="journey-card-desc">{step.description}</p>
                 </div>
-
-                <div className="journey-card-artifact">
-                  <span className="journey-artifact-label">★ {step.artifactLabel}</span>
-                  <span className="journey-artifact-content">{step.artifactContent}</span>
-                </div>
               </article>
             ))}
           </div>
@@ -228,35 +218,92 @@ export default function UserJourneySection() {
                   {step.title}
                 </h3>
 
-                <p className="journey-card-desc" style={{ marginBottom: '14px' }}>
+                <p className="journey-card-desc">
                   {step.description}
                 </p>
-
-                <div className="journey-card-artifact">
-                  <span className="journey-artifact-label">★ {step.artifactLabel}</span>
-                  <span className="journey-artifact-content">{step.artifactContent}</span>
-                </div>
               </article>
             </div>
           ))}
         </div>
 
         {/* ============================================================ */}
-        {/* EDITORIAL REAL UPSHIFT STORIES TESTIMONIAL SLIDER            */}
+        {/* WHAT IS AN UPSHIFTER? — CINEMATIC BLACK + RED EDITORIAL CARD */}
+        {/* ============================================================ */}
+        <div id="upshifter" className="upshifter-editorial-card scroll-mt-28 md:scroll-mt-32">
+          {/* Matrix Pattern Overlay */}
+          <div className="upshifter-grid-mesh" aria-hidden="true" />
+
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+            {/* Left Brand Narrative */}
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#E31B23]/15 border border-[#E31B23]/35 mb-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E31B23]" />
+                <span className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#FF5A65]">
+                  The UpShifter Standard
+                </span>
+              </div>
+
+              <h2 className="upshifter-title mb-2.5 sm:mb-3">
+                <span className="text-white">WHAT IS AN</span><br />
+                <span style={{ color: '#E31B23' }}>UPSHIFTER?</span>
+              </h2>
+
+              <p className="upshifter-quote mb-3 sm:mb-3.5">
+                <span className="text-white">“An UpShifter doesn't just know AI.</span><br />
+                <span style={{ color: '#E31B23', fontWeight: 800 }}>They know what to do with it.”</span>
+              </p>
+
+              {/* Compact Editorial Discipline Line with Red Separators */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 font-mono text-[11px] sm:text-xs text-[#E5E7EB] tracking-wider uppercase mb-3 sm:mb-3.5 select-none font-bold">
+                <span>CREATOR</span>
+                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
+                <span>BUILDER</span>
+                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
+                <span>RESEARCHER</span>
+                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
+                <span>OPERATOR</span>
+                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
+                <span>AUTOMATOR</span>
+                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
+                <span>GENERALIST</span>
+              </div>
+
+              <p className="upshifter-body max-w-[580px]">
+                The modern economy doesn't reward passive prompt typing. It rewards versatile operators who can translate messy real-world challenges into concrete digital assets, automated workflows, and verified commercial results.
+              </p>
+            </div>
+
+            {/* Right Mascot Presence */}
+            <div className="lg:col-span-5 flex flex-col items-center justify-center relative py-1 lg:py-0">
+              <div className="upshifter-mascot-wrapper">
+                <div className="upshifter-mascot-glow" aria-hidden="true" />
+                <MascotBadge 
+                  pose="arrow" 
+                  size="lg" 
+                  showBadge={false}
+                  className="relative z-10"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================ */}
+        {/* EDITORIAL OUR UPSHIFT STORIES TESTIMONIAL SLIDER             */}
         {/* Automatic 2-Column Editorial Slider (No Orbit / No Controls) */}
         {/* ============================================================ */}
         <div
           id="outcomes"
           className="journey-testimonial-slider-card scroll-mt-28 md:scroll-mt-32"
           role="region"
-          aria-label="Real UpShift Stories Testimonials"
+          aria-label="Our UpShift Stories Testimonials"
         >
           {/* Top Editorial Card Header */}
           <div className="journey-testimonial-header">
             <div className="journey-testimonial-header-left">
               <div className="journey-testimonial-accent-bar" />
               <h3 className="journey-testimonial-title">
-                <span className="journey-testimonial-title-red">REAL</span>{' '}
+                <span className="journey-testimonial-title-red">OUR</span>{' '}
                 <span className="journey-testimonial-title-dark">UPSHIFT STORIES</span>
               </h3>
               <p className="journey-testimonial-desc">
@@ -318,17 +365,16 @@ export default function UserJourneySection() {
         </div>
 
         {/* ============================================================ */}
-        {/* STEP 04 — ENROLLMENT CTA PANEL                               */}
+        {/* ENROLLMENT CTA PANEL                                         */}
         {/* Positioned below the Testimonial Section with proper spacing */}
         {/* ============================================================ */}
         <div className="journey-enrollment-panel journey-anim-cta">
           <div className="journey-enrollment-content">
-            <span className="journey-enrollment-badge">STEP 04 · ENROLLMENT</span>
             <h3 className="journey-enrollment-title">
               Ready to Start Your UpShift Journey?
             </h3>
             <p className="journey-enrollment-desc">
-              Select your applied track and build your first verified commercial proof of work.
+              One Journey that helps anyone turn AI capabilities into real projects, credible proof of work and new earning pathways.
             </p>
           </div>
 
@@ -337,7 +383,7 @@ export default function UserJourneySection() {
             className="journey-enrollment-cta-btn"
             aria-label="Proceed to canonical UpShift enrollment"
           >
-            <span>ENROLL NOW</span>
+            <span>GET STARTED</span>
             <ArrowRight size={18} aria-hidden="true" />
           </Link>
         </div>

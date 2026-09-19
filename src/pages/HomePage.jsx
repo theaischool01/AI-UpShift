@@ -108,15 +108,21 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
             <div className="hero-left-content">
 
               {/* Editorial Headline with EXACTLY 3 lines */}
-              <h1 className="hero-title font-extrabold text-3xl sm:text-5xl lg:text-[52px] xl:text-[58px] tracking-tight leading-[1.08] mb-5">
-                <span className="block" style={{ color: '#FFFFFF' }}>YOU KNOW AI.</span>
-                <span className="block" style={{ color: '#FFFFFF' }}>NOW TURN IT INTO</span>
-                <span className="block" style={{ color: '#E31B23' }}>SOMETHING REAL.</span>
+              <h1 className="hero-title font-extrabold text-3xl sm:text-5xl lg:text-[52px] xl:text-[58px] tracking-tight leading-[1.1] mb-5">
+                <span className="block" style={{ color: '#FFFFFF' }}>
+                  YOU KNOW <span className="hero-headline-emphasis">AI.</span>
+                </span>
+                <span className="block" style={{ color: '#FFFFFF' }}>
+                  NOW MAKE IT
+                </span>
+                <span className="block" style={{ color: '#FFFFFF' }}>
+                  WORK FOR <span className="hero-headline-emphasis">YOU.</span>
+                </span>
               </h1>
 
               {/* Supporting Paragraph */}
-              <p className="hero-desc text-white/80 text-base sm:text-lg max-w-[540px] leading-relaxed mb-8">
-                Build practical AI capabilities, create real outcomes and open new paths to work, business and growth.
+              <p className="hero-desc text-white/85 text-base sm:text-lg max-w-[560px] leading-relaxed mb-8">
+                Build practical AI skills. Create real outcomes and Start earning through digital gigs, transforming local businesses into AI-native businesses, and building AI-powered ventures.
               </p>
 
               {/* Action CTAs: How UpShift Works (Red Primary) + Explore Programs (Secondary) */}
@@ -223,15 +229,17 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
             <span className="eyebrow mb-1 inline-flex items-center gap-2 text-[#E31B23]">
               <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />
               <span className="text-[#E31B23] font-mono text-[10px] sm:text-[11px] font-bold tracking-wider uppercase">
-                Flagship Tracks · Curriculum & Deliverables
+                COMPLETE AI CAPABILITY JOURNEY
               </span>
             </span>
-            <h2 className="font-heading text-xl sm:text-3xl lg:text-[34px] font-bold text-white tracking-tight leading-[1.08] mb-1 sm:mb-1.5">
-              WHAT DO YOU WANT TO<br />
-              <span className="text-[#E31B23]">BUILD WITH AI?</span>
+            <h2 className="font-heading text-xl sm:text-3xl lg:text-[34px] font-bold text-white tracking-tight leading-[1.12] mb-1 sm:mb-1.5">
+              <span className="block text-white">BUILD WITH AI</span>
+              <span className="block text-white">
+                CREATE YOUR PATH TO <span className="hero-headline-emphasis">EARNING</span>
+              </span>
             </h2>
             <p className="text-xs sm:text-sm text-white/75 font-display leading-relaxed">
-              Six applied tracks engineered around real commercial deliverables. Select a track to explore its curriculum and verified deliverables.
+              One Journey that helps anyone turn AI capabilities into real projects, credible proof of work and new earning pathways.
             </p>
           </div>
 
@@ -252,78 +260,6 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* 5. OPPORTUNITIES — HORIZONTAL EXPANDING PANEL WALL           */}
       {/* ============================================================ */}
       <OpportunityDispatchSection onExploreClick={() => scrollToSection('courses')} />
-
-      {/* ============================================================ */}
-      {/* 6. WHAT IS AN UPSHIFTER? — EDITORIAL PHILOSOPHY CLOSER       */}
-      {/* ============================================================ */}
-      <section id="upshifter" className="section bg-[#0D0D0D] text-white relative scroll-mt-28 md:scroll-mt-32 pt-7 pb-8 md:pt-9 md:pb-10 overflow-hidden select-none">
-        {/* Deep Burgundy & Red Ambient Gradients */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle at 80% 50%, rgba(227, 27, 35, 0.22) 0%, rgba(130, 15, 20, 0.1) 45%, transparent 75%), radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%), #0D0D0D'
-          }}
-        />
-
-        {/* Subtle Matrix / Mesh Grid */}
-        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:24px_24px]" />
-
-        <div className="container relative z-10" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px' }}>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left Brand Narrative */}
-            <div className="lg:col-span-7">
-              <span className="eyebrow mb-3 inline-flex items-center gap-2 border border-[#E31B23]/30 bg-[#E31B23]/10 text-[#E31B23]">
-                <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#E31B23]">The UpShifter Standard</span>
-              </span>
-              <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-5">
-                WHAT IS AN UPSHIFTER?
-              </h2>
-
-              <p className="font-display text-xl sm:text-2xl lg:text-3xl text-white font-medium leading-snug mb-6">
-                “An UpShifter doesn't just know AI.<br />
-                <span className="text-[#E31B23] font-bold">They know what to do with it.”</span>
-              </p>
-
-              {/* Compact Editorial Discipline Line with Red Separators */}
-              <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs text-[#D1D5DB] tracking-widest uppercase mb-6 select-none font-semibold">
-                <span>CREATOR</span>
-                <span className="text-[#E31B23] font-bold">·</span>
-                <span>BUILDER</span>
-                <span className="text-[#E31B23] font-bold">·</span>
-                <span>RESEARCHER</span>
-                <span className="text-[#E31B23] font-bold">·</span>
-                <span>OPERATOR</span>
-                <span className="text-[#E31B23] font-bold">·</span>
-                <span>AUTOMATOR</span>
-                <span className="text-[#E31B23] font-bold">·</span>
-                <span>GENERALIST</span>
-              </div>
-
-              <p className="text-sm sm:text-base text-[#9CA3AF] font-display leading-relaxed max-w-xl">
-                The modern economy doesn't reward passive prompt typing. It rewards versatile operators who can translate messy real-world challenges into concrete digital assets, automated workflows, and verified commercial results.
-              </p>
-            </div>
-
-            {/* Right Mascot Presence with Atmospheric Glow */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
-              {/* Fox Atmospheric Radial Glow */}
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-70"
-                style={{
-                  background: 'radial-gradient(circle at 50% 45%, rgba(227, 27, 35, 0.3) 0%, rgba(255, 255, 255, 0.05) 45%, transparent 70%)',
-                  filter: 'blur(35px)'
-                }}
-              />
-              <MascotBadge 
-                pose="arrow" 
-                size="xl" 
-                showBadge={false}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ============================================================ */}
       {/* 7. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
@@ -366,7 +302,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                 textDecoration: 'none'
               }}
             >
-              <span>ENROLL NOW</span>
+              <span>GET STARTED</span>
               <ArrowRight size={18} className="btn-arrow" />
             </Link>
           </div>
