@@ -116,7 +116,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                   NOW MAKE IT
                 </span>
                 <span className="block" style={{ color: '#FFFFFF' }}>
-                  WORK FOR <span className="hero-headline-emphasis hero-emphasis-you">YOU.</span>
+                  EARN FOR <span className="hero-headline-emphasis hero-emphasis-you">YOU.</span>
                 </span>
               </h1>
 

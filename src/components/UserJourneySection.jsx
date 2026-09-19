@@ -7,35 +7,80 @@ import MascotBadge from './MascotBadge';
 const STORIES_DATA = [
   {
     id: 1,
-    name: 'B. Deepak',
-    shortCode: 'BD',
-    role: 'Applied AI Builder',
-    quote: 'I started by helping with a few small projects. As I completed more work, I began receiving paid gigs regularly. I saved those earnings and bought my own laptop. That was the moment I felt I could genuinely build something for myself.',
-    avatar: null
+    name: 'Likitha',
+    shortCode: 'L',
+    avatar: dianaAvatar,
+    quote: 'I started working with AISCHOOL as a freelancer because I wanted to earn something in my free time. At first, I was a little unsure, but once I started working, I got comfortable with it. I learned new things and also earned some money for my personal expenses.'
   },
   {
     id: 2,
-    name: 'Likitha',
-    shortCode: 'L',
-    role: 'Autonomous Agent Handler · AgentHandlers Track',
-    quote: 'Zero prior coding background. Built client agents in 3 weeks with automated API workflows.',
-    avatar: dianaAvatar
+    name: 'Testimonial Name 1',
+    shortCode: 'T1',
+    avatar: '/assets/testimonial-01.webp',
+    quote: 'I was looking for something flexible that I could do in my free time. I liked that I could work whenever I was available. The work helped me learn new skills, and the extra income has been useful for my daily expenses.'
   },
   {
     id: 3,
-    name: 'Edward Alexander',
-    shortCode: 'EA',
-    role: 'Undergraduate Builder · ReelRush & Vibe Coder Track',
-    quote: 'Overall pleasurable experience. Pay a little first and Pay a little during the development of the app as milestones are achieved, which made me feel very confident and comfortable. Seamless and Easy process.',
-    avatar: null
+    name: 'Testimonial Name 2',
+    shortCode: 'T2',
+    avatar: '/assets/testimonial-02.webp',
+    quote: 'I didn’t expect much when I first started. I just wanted to make some extra money in my free time. Slowly, I got interested in the work and started learning new things. Now I feel much more confident than when I started.'
   },
   {
     id: 4,
-    name: 'Lauren Contreras',
-    shortCode: 'LC',
-    role: 'AI Annotation Specialist · DeepAnnotator Track',
-    quote: 'Been working with UpShift for a number of years now with a variety of different apps. They have my recommendation. They are a great team.',
-    avatar: null
+    name: 'Testimonial Name 3',
+    shortCode: 'T3',
+    avatar: '/assets/testimonial-03.webp',
+    quote: 'I wanted something I could do along with my regular studies, and this worked well for me. I could manage my own time and work when I was free. The money I earned helped me pay for a few things I wanted without always asking my parents.'
+  },
+  {
+    id: 5,
+    name: 'Testimonial Name 4',
+    shortCode: 'T4',
+    avatar: '/assets/testimonial-04.webp',
+    quote: 'I joined because I wanted to learn something new and earn at the same time. Working on different tasks helped me understand things better. I also started earning from my work, which felt really good because I could use some of it for myself.'
+  },
+  {
+    id: 6,
+    name: 'Testimonial Name 5',
+    shortCode: 'T5',
+    avatar: '/assets/testimonial-05.webp',
+    quote: 'When I first heard about the opportunity, I wasn’t sure if I could do the work. I decided to try it anyway. After completing a few tasks, I became more comfortable. Now I enjoy learning through the work and earning a little extra in my free time.'
+  },
+  {
+    id: 7,
+    name: 'Testimonial Name 6',
+    shortCode: 'T6',
+    avatar: '/assets/testimonial-06.webp',
+    quote: 'AISCHOOL has been a good experience for me. I don’t have to follow a fixed schedule, so I can work whenever I have time. I have learned a lot through the tasks, and the extra money has helped me with some of my monthly expenses.'
+  },
+  {
+    id: 8,
+    name: 'Testimonial Name 7',
+    shortCode: 'T7',
+    avatar: '/assets/testimonial-07.webp',
+    quote: 'I started because I wanted to use my free time in a better way. I learned new things while working on real tasks, and slowly started earning as well. I have used some of my earnings for shopping, travel, and other things I wanted.'
+  },
+  {
+    id: 9,
+    name: 'Testimonial Name 8',
+    shortCode: 'T8',
+    avatar: '/assets/testimonial-08.webp',
+    quote: 'For me, it is not only about earning. I have learned how to manage my time, complete work properly, and be responsible for what I do. At the same time, having my own small income feels really nice because I can spend it on things I need or want.'
+  },
+  {
+    id: 10,
+    name: 'Testimonial Name 9',
+    shortCode: 'T9',
+    avatar: dianaAvatar,
+    quote: 'I started with a simple goal of earning some extra money in my free time. I didn’t think I would learn so much along the way. Now I have more confidence in my skills, and it feels good to know that I can learn, work, and earn on my own.'
+  },
+  {
+    id: 11,
+    name: 'Testimonial Name 10',
+    shortCode: 'T10',
+    avatar: null,
+    quote: 'I started by helping with a few small projects. As I completed more work, I began receiving paid gigs regularly. I saved those earnings and bought my own laptop. That was the moment I felt I could genuinely build something for myself.'
   }
 ];
 

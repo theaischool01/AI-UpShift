@@ -1552,12 +1552,12 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .upshifter-mascot-wrapper .mascot-container > div {
-  height: clamp(370px, 32vw, 480px) !important;
+  height: clamp(300px, 26vw, 390px) !important;
   max-height: none !important;
 }
 
 .upshifter-mascot-wrapper .mascot-container img {
-  transform: scale(1.26);
+  transform: scale(1.02);
   transform-origin: center center;
   transition: transform 0.3s ease;
 }

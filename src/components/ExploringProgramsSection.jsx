@@ -127,6 +127,7 @@ export default function ExploringProgramsSection() {
         style={{
           maxWidth: '1540px',
           aspectRatio: '1672 / 941',
+          border: '1.5px solid #000000',
         }}
       >
         {/* Current Active Slide (slides out to the left) */}
