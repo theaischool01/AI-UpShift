@@ -12,7 +12,12 @@ import {
   Target, 
   ShieldCheck 
 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { 
+  fetchTracks as fetchTracksService, 
+  fetchGigById as fetchGigByIdService, 
+  createGig as createGigService, 
+  updateGig as updateGigService 
+} from '../../services/gigService';
 
 export default function AddGigPage() {
   const navigate = useNavigate();
@@ -51,27 +56,14 @@ export default function AddGigPage() {
   // Load tracks
   useEffect(() => {
     async function loadTracks() {
-      try {
-        let { data, error } = await supabase
-          .from('tracks')
-          .select('id, code, name, category')
-          .order('code', { ascending: true });
-
-        if (error) {
-          const fallbackRes = await supabase
-            .from('courses')
-            .select('id, code, name, category')
-            .order('code', { ascending: true });
-          if (fallbackRes.error) throw error;
-          data = fallbackRes.data;
-        }
-
-        setTracks(data || []);
-      } catch (err) {
-        console.warn('[AddGigPage] Failed to fetch tracks:', err);
-      } finally {
-        setLoadingTracks(false);
+      setLoadingTracks(true);
+      const { data, error } = await fetchTracksService();
+      if (!error && data) {
+        setTracks(data);
+      } else {
+        console.warn('[AddGigPage] Failed to fetch tracks:', error);
       }
+      setLoadingTracks(false);
     }
     loadTracks();
   }, []);
@@ -81,47 +73,39 @@ export default function AddGigPage() {
     if (!editGigId) return;
 
     async function loadGig() {
-      try {
-        setLoadingInitial(true);
-        const { data, error } = await supabase
-          .from('gigs')
-          .select('*')
-          .eq('id', editGigId)
-          .single();
+      setLoadingInitial(true);
+      const { data, error } = await fetchGigByIdService(editGigId);
 
-        if (error) throw error;
-        if (data) {
-          const respList = Array.isArray(data.responsibilities) && data.responsibilities.length > 0
-            ? data.responsibilities
-            : (typeof data.responsibilities === 'string' ? data.responsibilities.split('\n').filter(Boolean) : ['']);
+      if (error || !data) {
+        setInitialLoadError(error?.message || 'Unable to load opportunity for editing.');
+      } else {
+        const respList = Array.isArray(data.responsibilities) && data.responsibilities.length > 0
+          ? data.responsibilities
+          : (typeof data.responsibilities === 'string' ? data.responsibilities.split('\n').filter(Boolean) : ['']);
 
-          const delivList = Array.isArray(data.deliverables) && data.deliverables.length > 0
-            ? data.deliverables
-            : (typeof data.deliverables === 'string' ? data.deliverables.split('\n').filter(Boolean) : ['']);
+        const delivList = Array.isArray(data.deliverables) && data.deliverables.length > 0
+          ? data.deliverables
+          : (typeof data.deliverables === 'string' ? data.deliverables.split('\n').filter(Boolean) : ['']);
 
-          const reqList = Array.isArray(data.requirements) && data.requirements.length > 0
-            ? data.requirements
-            : (typeof data.requirements === 'string' ? data.requirements.split('\n').filter(Boolean) : ['']);
+        const reqList = Array.isArray(data.requirements) && data.requirements.length > 0
+          ? data.requirements
+          : (typeof data.requirements === 'string' ? data.requirements.split('\n').filter(Boolean) : ['']);
 
-          setFormData({
-            externalGigId: data.external_gig_id || '',
-            title: data.title || '',
-            trackId: data.track_id || data.course_id || '',
-            paymentAmount: data.payment_amount || '',
-            shortDescription: data.short_description || '',
-            overview: data.overview || '',
-            responsibilities: respList.length > 0 ? respList : [''],
-            deliverables: delivList.length > 0 ? delivList : [''],
-            requirements: reqList.length > 0 ? reqList : [''],
-            proofSpec: data.proof_spec || '',
-            originUrl: data.origin_url || '',
-          });
-        }
-      } catch (err) {
-        setInitialLoadError('Unable to load opportunity for editing.');
-      } finally {
-        setLoadingInitial(false);
+        setFormData({
+          externalGigId: data.external_gig_id || '',
+          title: data.title || '',
+          trackId: data.track_id || '',
+          paymentAmount: data.payment_amount || '',
+          shortDescription: data.short_description || '',
+          overview: data.overview || '',
+          responsibilities: respList.length > 0 ? respList : [''],
+          deliverables: delivList.length > 0 ? delivList : [''],
+          requirements: reqList.length > 0 ? reqList : [''],
+          proofSpec: data.proof_spec || '',
+          originUrl: data.origin_url || '',
+        });
       }
+      setLoadingInitial(false);
     }
 
     loadGig();
@@ -191,52 +175,12 @@ export default function AddGigPage() {
       };
 
       if (editGigId) {
-        let { data, error } = await supabase
-          .from('gigs')
-          .update(payload)
-          .eq('id', editGigId)
-          .select()
-          .single();
-
-        if (error && (error.message?.includes('track_id') || error.code === 'PGRST204')) {
-          const fallbackPayload = { ...payload, course_id: payload.track_id };
-          delete fallbackPayload.track_id;
-          const fallbackRes = await supabase
-            .from('gigs')
-            .update(fallbackPayload)
-            .eq('id', editGigId)
-            .select()
-            .single();
-          if (fallbackRes.error) throw fallbackRes.error;
-          data = fallbackRes.data;
-          error = null;
-        } else if (error) {
-          throw error;
-        }
-
+        const { error } = await updateGigService(editGigId, payload);
+        if (error) throw error;
         navigate('/admin/gigs');
       } else {
-        let { data, error } = await supabase
-          .from('gigs')
-          .insert([payload])
-          .select()
-          .single();
-
-        if (error && (error.message?.includes('track_id') || error.code === 'PGRST204')) {
-          const fallbackPayload = { ...payload, course_id: payload.track_id };
-          delete fallbackPayload.track_id;
-          const fallbackRes = await supabase
-            .from('gigs')
-            .insert([fallbackPayload])
-            .select()
-            .single();
-          if (fallbackRes.error) throw fallbackRes.error;
-          data = fallbackRes.data;
-          error = null;
-        } else if (error) {
-          throw error;
-        }
-
+        const { data, error } = await createGigService(payload);
+        if (error) throw error;
         setSuccessGig(data);
       }
     } catch (err) {

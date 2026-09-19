@@ -110,13 +110,13 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
               {/* Editorial Headline with EXACTLY 3 lines */}
               <h1 className="hero-title font-extrabold text-3xl sm:text-5xl lg:text-[52px] xl:text-[58px] tracking-tight leading-[1.1] mb-5">
                 <span className="block" style={{ color: '#FFFFFF' }}>
-                  YOU KNOW <span className="hero-headline-emphasis">AI.</span>
+                  YOU KNOW <span className="hero-headline-emphasis hero-emphasis-ai">AI.</span>
                 </span>
                 <span className="block" style={{ color: '#FFFFFF' }}>
                   NOW MAKE IT
                 </span>
                 <span className="block" style={{ color: '#FFFFFF' }}>
-                  WORK FOR <span className="hero-headline-emphasis">YOU.</span>
+                  WORK FOR <span className="hero-headline-emphasis hero-emphasis-you">YOU.</span>
                 </span>
               </h1>
 
@@ -208,13 +208,11 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       </section>
 
       {/* ============================================================ */}
-      {/* 2. PROGRAMS CIRCLE SECTION (Fox + Circular Badges)          */}
+      {/* 2. PROGRAM SHOWCASE SLIDESHOW (Cinematic 16:9 Full-Width)     */}
       {/* ============================================================ */}
-      <div id="programs" className="relative scroll-mt-28 md:scroll-mt-32 bg-[#FAF8F5]">
-        {/* Controlled subtle breathing space between Hero and Programs */}
-        <div className="w-full h-10 sm:h-12 md:h-14 bg-[#FAF8F5]" aria-hidden="true" />
+      <section id="programs" className="relative scroll-mt-20 md:scroll-mt-24 bg-[#FAF8F5] overflow-hidden">
         <ExploringProgramsSection />
-      </div>
+      </section>
 
       {/* ============================================================ */}
       {/* 3. PROGRAM EXPLORATION — FOX + ROTATING CARDS (DARK CINEMATIC) */}
@@ -235,7 +233,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
             <h2 className="font-heading text-xl sm:text-3xl lg:text-[34px] font-bold text-white tracking-tight leading-[1.12] mb-1 sm:mb-1.5">
               <span className="block text-white">BUILD WITH AI</span>
               <span className="block text-white">
-                CREATE YOUR PATH TO <span className="hero-headline-emphasis">EARNING</span>
+                CREATE YOUR PATH TO <span className="hero-headline-emphasis hero-emphasis-earning">EARNING</span>
               </span>
             </h2>
             <p className="text-xs sm:text-sm text-white/75 font-display leading-relaxed">

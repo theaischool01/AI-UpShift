@@ -33,29 +33,14 @@ export default function CoursesPage() {
           .select('id, track_id')
       ]);
 
-      let activeTracks = tracksRes.data;
-      if (tracksRes.error || !activeTracks) {
-        const fallbackRes = await supabase
-          .from('courses')
-          .select('id, code, name, category, tagline, color, bg_color, is_active, created_at')
-          .order('code', { ascending: true });
-        activeTracks = fallbackRes.data || [];
-      }
+      if (tracksRes.error) throw tracksRes.error;
 
-      let activeGigs = gigsRes.data;
-      if (gigsRes.error || !activeGigs) {
-        const fallbackRes = await supabase
-          .from('gigs')
-          .select('id, course_id');
-        activeGigs = (fallbackRes.data || []).map(g => ({
-          ...g,
-          track_id: g.course_id
-        }));
-      }
+      const activeTracks = tracksRes.data || [];
+      const activeGigs = gigsRes.data || [];
 
       const gigCounts = {};
-      (activeGigs || []).forEach(g => {
-        const tid = g.track_id || g.course_id;
+      activeGigs.forEach(g => {
+        const tid = g.track_id;
         if (tid) {
           gigCounts[tid] = (gigCounts[tid] || 0) + 1;
         }

@@ -411,8 +411,8 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
   const processedCards = OPPORTUNITY_MODULES.map(mod => {
     const targetTrackId = trackIdMap[mod.code];
     const matchingGigs = realGigs.filter(g => 
-      (g.track_id || g.course_id) === targetTrackId || 
-      (targetTrackId === 'agenthandlers' && (g.track_id || g.course_id) === 'agent-handlers')
+      g.track_id === targetTrackId || 
+      (targetTrackId === 'agenthandlers' && g.track_id === 'agent-handlers')
     );
     const primaryGig = matchingGigs[0];
 

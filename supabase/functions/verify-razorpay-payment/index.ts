@@ -213,35 +213,27 @@ Deno.serve(async (req: Request) => {
         role: 'learner',
       });
 
-    // 7. Resolve Track against public.tracks (fallback to public.courses if schema migration in flight)
-    let resolvedTrackId = 'reelrush-ai';
-    const targetTrackInput = trackId || learner.course_id || learner.track || 'reelrush-ai';
+    // 7. Resolve Track if optionally provided as specialization metadata
+    let resolvedTrackId: string | null = null;
+    const targetTrackInput = trackId || learner.track || null;
 
-    try {
-      const { data: trackData } = await adminClient
-        .from('tracks')
-        .select('id, code, name')
-        .or(`id.eq.${targetTrackInput},code.ilike.${targetTrackInput}`)
-        .maybeSingle();
-
-      if (trackData?.id) {
-        resolvedTrackId = trackData.id;
-      } else {
-        // Fallback for pre-migration table
-        const { data: courseData } = await adminClient
-          .from('courses')
+    if (targetTrackInput) {
+      try {
+        const { data: trackData } = await adminClient
+          .from('tracks')
           .select('id, code, name')
           .or(`id.eq.${targetTrackInput},code.ilike.${targetTrackInput}`)
           .maybeSingle();
-        if (courseData?.id) {
-          resolvedTrackId = courseData.id;
+
+        if (trackData?.id) {
+          resolvedTrackId = trackData.id;
         }
+      } catch (_tErr) {
+        resolvedTrackId = null;
       }
-    } catch (_tErr) {
-      resolvedTrackId = targetTrackInput;
     }
 
-    // 8. Upsert UpShift Complete Program Enrollment
+    // 8. Upsert UpShift Complete Program Enrollment (Authoritative program_id)
     let enrollmentId: string | null = null;
     const { data: existingEnrollment } = await adminClient
       .from('enrollments')
@@ -261,25 +253,10 @@ Deno.serve(async (req: Request) => {
         track_id: resolvedTrackId,
       };
 
-      const { error: updErr } = await adminClient
+      await adminClient
         .from('enrollments')
         .update(updatePayload)
         .eq('id', enrollmentId);
-
-      // Fallback if column still course_id
-      if (updErr && updErr.message?.includes('track_id')) {
-        await adminClient
-          .from('enrollments')
-          .update({
-            status: 'active',
-            payment_status: 'paid',
-            amount_paid: CANONICAL_AMOUNT_INR,
-            currency: 'INR',
-            payment_reference: razorpay_payment_id,
-            course_id: resolvedTrackId,
-          })
-          .eq('id', enrollmentId);
-      }
     } else {
       const insertPayload: Record<string, any> = {
         user_id: userId,
@@ -293,36 +270,13 @@ Deno.serve(async (req: Request) => {
         enrolled_at: new Date().toISOString(),
       };
 
-      let { data: newEnrollment, error: enrollErr } = await adminClient
+      const { data: newEnrollment } = await adminClient
         .from('enrollments')
         .insert(insertPayload)
         .select('id')
         .single();
 
-      // Fallback if column still course_id
-      if (enrollErr && enrollErr.message?.includes('track_id')) {
-        const legacyInsertPayload: Record<string, any> = {
-          user_id: userId,
-          program_id: PROGRAM_ID,
-          course_id: resolvedTrackId,
-          status: 'active',
-          payment_status: 'paid',
-          amount_paid: CANONICAL_AMOUNT_INR,
-          currency: 'INR',
-          payment_reference: razorpay_payment_id,
-          enrolled_at: new Date().toISOString(),
-        };
-
-        const res = await adminClient
-          .from('enrollments')
-          .insert(legacyInsertPayload)
-          .select('id')
-          .single();
-        newEnrollment = res.data;
-        enrollErr = res.error;
-      }
-
-      if (!enrollErr && newEnrollment) {
+      if (newEnrollment) {
         enrollmentId = newEnrollment.id;
       }
     }

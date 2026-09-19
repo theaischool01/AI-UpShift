@@ -35,16 +35,16 @@ export default function AdminDashboardPage() {
           .select('id, full_name, email, college, college_email, role, created_at')
           .eq('role', 'learner'),
 
-        // 2. Fetch all seeded tracks for relational mapping
+        // 2. Fetch all tracks for specialization metadata
         supabase
           .from('tracks')
-          .select('id, code, name, category, color, bg_color')
+          .select('id, code, name, color, bg_color, is_active')
           .order('code', { ascending: true }),
 
-        // 3. Fetch all enrollments sorted by enrolled_at desc
+        // 3. Fetch all program enrollments sorted by enrolled_at desc
         supabase
           .from('enrollments')
-          .select('id, user_id, track_id, enrolled_at, status')
+          .select('id, user_id, program_id, enrolled_at, status')
           .order('enrolled_at', { ascending: false }),
 
         // 4. Fetch live opportunities count
@@ -54,33 +54,13 @@ export default function AdminDashboardPage() {
           .eq('is_active', true),
       ]);
 
-      // Fallback if tracks table rename is in progress
-      let activeTracks = tracksRes.data;
-      if (tracksRes.error || !activeTracks) {
-        const fallbackRes = await supabase
-          .from('courses')
-          .select('id, code, name, category, color, bg_color')
-          .order('code', { ascending: true });
-        activeTracks = fallbackRes.data || [];
-      }
-
-      let activeEnrollments = enrollmentsRes.data;
-      if (enrollmentsRes.error || !activeEnrollments) {
-        const fallbackRes = await supabase
-          .from('enrollments')
-          .select('id, user_id, course_id, enrolled_at, status')
-          .order('enrolled_at', { ascending: false });
-        activeEnrollments = (fallbackRes.data || []).map(e => ({
-          ...e,
-          track_id: e.course_id
-        }));
-      }
-
       if (profilesRes.error) throw profilesRes.error;
+      if (tracksRes.error) throw tracksRes.error;
+      if (enrollmentsRes.error) throw enrollmentsRes.error;
 
       setLearners(profilesRes.data || []);
-      setTracks(activeTracks || []);
-      setEnrollments(activeEnrollments || []);
+      setTracks(tracksRes.data || []);
+      setEnrollments(enrollmentsRes.data || []);
       setGigsCount(gigsRes.data?.length || 0);
     } catch (err) {
       console.error('[UpShift Admin Dashboard] Data fetch error:', err);

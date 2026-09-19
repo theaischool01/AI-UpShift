@@ -103,41 +103,28 @@ export default function AddStudentPage() {
       };
 
       // Invoke the secure Edge Function using the authenticated session
-      let resultData = null;
-
       const { data, error } = await supabase.functions.invoke('admin-create-learner', {
         body: payload,
       });
 
       if (error) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const token = session?.access_token;
-
-        if (token && supabaseUrl) {
-          const res = await fetch(`${supabaseUrl}/functions/v1/admin-create-learner`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload),
-          });
-
-          const json = await res.json();
-          if (!res.ok) {
-            throw new Error(json.error || 'Failed to create student account.');
-          }
-          resultData = json;
-        } else {
-          throw new Error(error.message || 'Failed to communicate with student creation service.');
+        let errorMsg = error.message;
+        // In @supabase/supabase-js, when an edge function returns a non-2xx status,
+        // the response body can be extracted from error.context if it's a Response object
+        if (error.context && typeof error.context.json === 'function') {
+          try {
+            const errBody = await error.context.json();
+            if (errBody?.error) errorMsg = errBody.error;
+          } catch (_) {}
         }
-      } else {
-        resultData = data;
+        throw new Error(errorMsg || 'Failed to create student account.');
       }
 
-      if (!resultData?.success) {
-        throw new Error(resultData?.error || 'Unable to create student account. Please verify the input.');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Unable to create student account. Please verify the input.');
       }
+
+      const resultData = data;
 
       // Success: store created details and reset form
       setCreatedStudent(resultData.learner);

@@ -2,31 +2,21 @@ import React, { useRef } from 'react';
 import { 
   Search, 
   X, 
-  Sparkles, 
   Layers 
 } from 'lucide-react';
 
 export default function OpportunityFilters({
-  mode,
-  setMode,
   searchQuery,
   setSearchQuery,
   selectedTrack,
   setSelectedTrack,
   tracks = [],
-  assignedTrack = null,
-  // Backward-compatibility props
-  selectedCourse,
-  setSelectedCourse,
-  courses = [],
-  enrolledCourses = [],
   onFilterChange = () => {},
 }) {
   const debounceTimerRef = useRef(null);
-  const activeSelectedTrack = selectedTrack || selectedCourse || 'ALL';
-  const handleSelectTrack = setSelectedTrack || setSelectedCourse || (() => {});
-  const availableTracks = tracks.length > 0 ? tracks : courses;
-  const currentAssigned = assignedTrack || enrolledCourses[0] || null;
+  const activeSelectedTrack = selectedTrack || 'ALL';
+  const handleSelectTrack = setSelectedTrack || (() => {});
+  const availableTracks = tracks;
 
   const handleSearchInput = (e) => {
     const val = e.target.value;
@@ -43,50 +33,11 @@ export default function OpportunityFilters({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Top Mode Tabs: Recommended vs All */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E5E7EB]">
-        <div className="flex items-center gap-1.5 p-1 bg-[#F3F4F6] rounded-xl border border-[#E5E7EB] w-fit">
-          <button
-            type="button"
-            onClick={() => {
-              setMode('recommended');
-              onFilterChange();
-            }}
-            className={`learner-tab-btn ${mode === 'recommended' ? 'active' : ''}`}
-          >
-            <Sparkles className="w-4 h-4 text-[#E31B23]" />
-            <span>Recommended for You</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setMode('all');
-              onFilterChange();
-            }}
-            className={`learner-tab-btn ${mode === 'all' ? 'active' : ''}`}
-          >
-            <Layers className="w-4 h-4 text-[#6B7280]" />
-            <span>All Opportunities</span>
-          </button>
-        </div>
-
-        {/* Informative track note when in recommended mode */}
-        {mode === 'recommended' && currentAssigned && (
-          <div className="text-xs text-[#6B7280] flex items-center gap-1.5">
-            <span>Filtered for:</span>
-            <strong className="text-[#111827] font-semibold">
-              {currentAssigned.code} · {currentAssigned.name}
-            </strong>
-          </div>
-        )}
-      </div>
-
+    <div className="space-y-3">
       {/* Filter & Search Bar */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
         {/* Search Input */}
-        <div className="learner-search-wrap">
+        <div className="learner-search-wrap flex-1">
           <Search className="learner-search-icon" />
           <input
             type="text"
@@ -106,26 +57,25 @@ export default function OpportunityFilters({
           )}
         </div>
 
-        {/* Track Filter */}
-        {mode === 'all' && (
-          <div className="flex items-center">
-            <select
-              value={activeSelectedTrack}
-              onChange={(e) => {
-                handleSelectTrack(e.target.value);
-                onFilterChange();
-              }}
-              className="learner-select-filter"
-            >
-              <option value="ALL">All UpShift Tracks</option>
-              {availableTracks.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.code} — {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {/* Module / Capability Area Filter */}
+        <div className="flex items-center min-w-[240px]">
+          <select
+            value={activeSelectedTrack}
+            onChange={(e) => {
+              handleSelectTrack(e.target.value);
+              onFilterChange();
+            }}
+            className="learner-select-filter w-full"
+            aria-label="Filter by UpShift Module"
+          >
+            <option value="ALL">All Modules (M1–M6)</option>
+            {availableTracks.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.code} — {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

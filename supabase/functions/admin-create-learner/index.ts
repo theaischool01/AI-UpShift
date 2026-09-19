@@ -1,5 +1,6 @@
 // Supabase Edge Function: admin-create-learner
 // Secure server-side single and batch learner creation with compensating transactional rollback
+// Authoritative model: Learner enrolls in ONE UpShift Complete Program (upshift-complete-program).
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.8';
 
@@ -8,6 +9,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
+
+const UPSHIFT_PROGRAM_ID = 'upshift-complete-program';
+const UPSHIFT_PROGRAM_NAME = 'UpShift Complete Applied AI Program';
 
 Deno.serve(async (req: Request) => {
   // 1. Handle CORS Preflight
@@ -92,28 +96,14 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Pre-fetch all active tracks/courses for fallback association if schema requires non-null
-    let { data: activeTracks } = await adminClient
-      .from('tracks')
-      .select('id, code, name');
+    // Verify UpShift Complete Program exists in database
+    const { data: programRecord } = await adminClient
+      .from('programs')
+      .select('id, title, name')
+      .eq('id', UPSHIFT_PROGRAM_ID)
+      .maybeSingle();
 
-    if (!activeTracks || activeTracks.length === 0) {
-      const { data: fallbackCourses } = await adminClient
-        .from('courses')
-        .select('id, code, name');
-      activeTracks = fallbackCourses || [];
-    }
-
-    const defaultTrackId = activeTracks?.[0]?.id || 'reelrush-ai';
-
-    const trackMap = new Map();
-    (activeTracks || []).forEach((t: any) => {
-      trackMap.set(t.id, t);
-      trackMap.set(t.code.toLowerCase(), t);
-      trackMap.set(t.id.toLowerCase(), t);
-      trackMap.set(t.code, t);
-    });
-
+    const programTitle = programRecord?.title || programRecord?.name || UPSHIFT_PROGRAM_NAME;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Helper: Process a single learner with full validation and compensating rollback
@@ -123,8 +113,9 @@ Deno.serve(async (req: Request) => {
       const collegeEmail = rawLearner.college_email?.trim().toLowerCase();
       const college = rawLearner.college?.trim();
       const password = rawLearner.password;
-      const trackIdInput = rawLearner.track_id?.trim() || rawLearner.track?.trim() || rawLearner.course_id?.trim() || rawLearner.course?.trim();
+      const targetProgramId = rawLearner.program_id?.trim() || UPSHIFT_PROGRAM_ID;
 
+      // 5 core required fields only — NO course_id, NO track_id
       if (!fullName || !email || !collegeEmail || !college || !password) {
         return {
           success: false,
@@ -158,10 +149,7 @@ Deno.serve(async (req: Request) => {
         };
       }
 
-      const matchedTrack = trackIdInput ? (trackMap.get(trackIdInput) || trackMap.get(trackIdInput.toLowerCase())) : null;
-      const finalTrackId = matchedTrack?.id || defaultTrackId;
-
-      // Check existing email
+      // Check existing email in profiles
       const { data: existingProfile } = await adminClient
         .from('profiles')
         .select('id, email')
@@ -235,11 +223,10 @@ Deno.serve(async (req: Request) => {
           throw new Error(`Profile creation failed: ${profileUpsertError.message}`);
         }
 
-        // Step C: Create Single Program Enrollment
+        // Step C: Create ONE UpShift Program Enrollment (NO course_id, NO track_id)
         const enrollmentPayload: any = {
           user_id: createdUserId,
-          program_id: 'upshift-complete-program',
-          track_id: finalTrackId,
+          program_id: targetProgramId,
           status: 'active',
           payment_status: 'active',
           amount_paid: 4999.00,
@@ -247,19 +234,9 @@ Deno.serve(async (req: Request) => {
           enrolled_at: new Date().toISOString(),
         };
 
-        let { error: enrollmentError } = await adminClient
+        const { error: enrollmentError } = await adminClient
           .from('enrollments')
           .insert(enrollmentPayload);
-
-        if (enrollmentError && (enrollmentError.message?.includes('track_id') || (enrollmentError as any).code === 'PGRST204')) {
-          const fallbackEnrollmentPayload = {
-            ...enrollmentPayload,
-            course_id: finalTrackId,
-          };
-          delete fallbackEnrollmentPayload.track_id;
-          const fbRes = await adminClient.from('enrollments').insert(fallbackEnrollmentPayload);
-          enrollmentError = fbRes.error;
-        }
 
         if (enrollmentError) {
           throw new Error(`Enrollment creation failed: ${enrollmentError.message}`);
@@ -273,8 +250,8 @@ Deno.serve(async (req: Request) => {
             email,
             college,
             college_email: collegeEmail,
-            program_id: 'upshift-complete-program',
-            program_name: 'UpShift Complete Applied AI Program',
+            program_id: targetProgramId,
+            program_name: programTitle,
           },
         };
       } catch (transactionErr: any) {

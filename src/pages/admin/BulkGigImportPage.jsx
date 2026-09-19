@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { 
   UploadCloud, 
   FileText, 
@@ -13,6 +11,7 @@ import {
   Briefcase
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import { fetchTracks as fetchTracksService } from '../../services/gigService';
 
 function parseCSV(text) {
   const lines = [];
@@ -85,20 +84,8 @@ export default function BulkGigImportPage() {
   useEffect(() => {
     async function loadTracks() {
       try {
-        let { data, error } = await supabase
-          .from('tracks')
-          .select('id, code, name, category')
-          .order('code', { ascending: true });
-
-        if (error) {
-          const fallbackRes = await supabase
-            .from('courses')
-            .select('id, code, name, category')
-            .order('code', { ascending: true });
-          if (fallbackRes.error) throw error;
-          data = fallbackRes.data;
-        }
-
+        const { data, error } = await fetchTracksService();
+        if (error) throw error;
         setTracks(data || []);
 
         const map = new Map();
@@ -269,27 +256,12 @@ export default function BulkGigImportPage() {
     }));
 
     try {
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('gigs')
         .insert(payloadBatch)
         .select();
 
-      if (error && (error.message?.includes('track_id') || error.code === 'PGRST204')) {
-        const fallbackBatch = payloadBatch.map(item => {
-          const fb = { ...item, course_id: item.track_id };
-          delete fb.track_id;
-          return fb;
-        });
-        const fallbackRes = await supabase
-          .from('gigs')
-          .insert(fallbackBatch)
-          .select();
-        if (fallbackRes.error) throw fallbackRes.error;
-        data = fallbackRes.data;
-        error = null;
-      } else if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setImportProgress({
         current: validRowsToCreate.length,

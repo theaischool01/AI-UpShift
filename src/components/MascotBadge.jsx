@@ -19,7 +19,7 @@ export default function MascotBadge({
       title: "Creator & Builder"
     },
     arrow: {
-      src: "/assets/mascot/mascot_upshift_cutout.png",
+      src: "/assets/mascot/mascot_pointing_cutout1.png",
       alt: "Upshift Fox Mascot leaning on giant red UPSHIFT upward arrow",
       title: "Move Forward"
     },

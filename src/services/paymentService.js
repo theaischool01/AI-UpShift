@@ -92,8 +92,8 @@ export async function verifyRazorpayPayment({
         current_year: learnerData.currentYear,
         graduation_year: learnerData.graduationYear,
         heard_from: learnerData.heardFrom,
-        track_id: learnerData.trackId || learnerData.courseId || 'reelrush-ai',
-        course_id: learnerData.trackId || learnerData.courseId || 'reelrush-ai',
+        program_id: 'upshift-complete-program',
+        track_id: learnerData.trackId || null,
       },
     };
 
@@ -123,3 +123,43 @@ export async function verifyRazorpayPayment({
     throw err;
   }
 }
+
+// ==============================================================================
+// PROVIDER-AGNOSTIC PAYMENT INTERFACE (PREPARED FOR JUSPAY / MULTI-GATEWAY)
+// ==============================================================================
+
+/**
+ * Clean entry point to create a payment order with the active provider
+ */
+export async function createPaymentOrder(orderParams) {
+  // Currently routes to Razorpay; will support Juspay gateway switch seamlessly
+  return createRazorpayOrder(orderParams);
+}
+
+/**
+ * Clean entry point to verify payment server-side with the active provider
+ */
+export async function verifyPayment(verificationParams) {
+  // Currently routes to Razorpay; will support Juspay verification seamlessly
+  return verifyRazorpayPayment(verificationParams);
+}
+
+/**
+ * Unified payment failure handler
+ */
+export function handlePaymentFailure(error) {
+  console.warn('[paymentService] Payment failure event:', error);
+  return {
+    success: false,
+    error: error?.message || error?.description || 'Payment was declined or cancelled.'
+  };
+}
+
+/**
+ * Authoritative payment webhook receiver contract (to be wired for server-to-server confirmation)
+ */
+export function handlePaymentWebhook() {
+  // Webhook handler stub prepared for future provider reconciliation
+  return { status: 'pending_provider_discussion' };
+}
+

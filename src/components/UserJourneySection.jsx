@@ -296,7 +296,7 @@ export default function UserJourneySection() {
           id="outcomes"
           className="journey-testimonial-slider-card scroll-mt-28 md:scroll-mt-32"
           role="region"
-          aria-label="Our UpShift Stories Testimonials"
+          aria-label="Our UpShifter Stories Testimonials"
         >
           {/* Top Editorial Card Header */}
           <div className="journey-testimonial-header">
@@ -304,7 +304,7 @@ export default function UserJourneySection() {
               <div className="journey-testimonial-accent-bar" />
               <h3 className="journey-testimonial-title">
                 <span className="journey-testimonial-title-red">OUR</span>{' '}
-                <span className="journey-testimonial-title-dark">UPSHIFT STORIES</span>
+                <span className="journey-testimonial-title-dark">UPSHIFTER STORIES</span>
               </h3>
               <p className="journey-testimonial-desc">
                 See how people are turning AI capabilities into projects, opportunities and new career paths.

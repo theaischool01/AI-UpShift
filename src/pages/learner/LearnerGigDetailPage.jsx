@@ -10,7 +10,7 @@ import {
   Share2, 
   ShieldCheck 
 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { fetchGigById as fetchGigByIdService } from '../../services/gigService';
 
 function isValidExternalUrl(urlString) {
   if (!urlString || typeof urlString !== 'string') return false;
@@ -61,115 +61,15 @@ export default function LearnerGigDetailPage() {
       setLoading(true);
       setError(null);
 
-      try {
-        const { data, error: fetchErr } = await supabase
-          .from('gigs')
-          .select(`
-            id,
-            external_gig_id,
-            title,
-            track_id,
-            short_description,
-            overview,
-            responsibilities,
-            deliverables,
-            requirements,
-            proof_spec,
-            origin_url,
-            payment_amount,
-            created_at,
-            track:tracks (
-              id,
-              code,
-              name,
-              category,
-              color,
-              bg_color
-            )
-          `)
-          .eq('id', gigId)
-          .maybeSingle();
+      const { data, error: fetchErr } = await fetchGigByIdService(gigId);
 
-        if (fetchErr) {
-          console.warn('[LearnerGigDetailPage] Relational tracks query failed, trying courses relation fallback:', fetchErr);
-          let { data: courseData, error: courseErr } = await supabase
-            .from('gigs')
-            .select(`
-              id,
-              external_gig_id,
-              title,
-              course_id,
-              short_description,
-              overview,
-              responsibilities,
-              deliverables,
-              requirements,
-              proof_spec,
-              origin_url,
-              payment_amount,
-              created_at,
-              course:courses (
-                id,
-                code,
-                name,
-                category,
-                color,
-                bg_color
-              )
-            `)
-            .eq('id', gigId)
-            .maybeSingle();
-
-          if (!courseErr && courseData) {
-            setGig({
-              ...courseData,
-              track_id: courseData.course_id,
-              track: courseData.course
-            });
-            return;
-          }
-
-          console.warn('[LearnerGigDetailPage] Courses relation failed, trying flat query fallback:', courseErr);
-          const { data: flatData, error: flatErr } = await supabase
-            .from('gigs')
-            .select(`
-              id,
-              external_gig_id,
-              title,
-              short_description,
-              overview,
-              responsibilities,
-              deliverables,
-              requirements,
-              proof_spec,
-              origin_url,
-              payment_amount,
-              created_at
-            `)
-            .eq('id', gigId)
-            .maybeSingle();
-
-          if (flatErr) throw flatErr;
-
-          if (flatData) {
-            setGig({ ...flatData, track: null });
-          } else {
-            setGig(null);
-          }
-          return;
-        }
-
-        if (!data) {
-          setGig(null);
-        } else {
-          setGig(data);
-        }
-      } catch (err) {
-        console.error('[LearnerGigDetailPage] Load error:', err);
+      if (fetchErr) {
+        console.error('[LearnerGigDetailPage] Load error:', fetchErr);
         setError('Unable to load this opportunity. Please try again.');
-      } finally {
-        setLoading(false);
+      } else {
+        setGig(data || null);
       }
+      setLoading(false);
     }
 
     loadGigDetail();

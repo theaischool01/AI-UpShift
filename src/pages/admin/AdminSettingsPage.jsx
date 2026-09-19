@@ -24,7 +24,7 @@ export default function AdminSettingsPage() {
     const start = performance.now();
     try {
       const { data, error } = await supabase
-        .from('courses')
+        .from('tracks')
         .select('id')
         .limit(1);
 

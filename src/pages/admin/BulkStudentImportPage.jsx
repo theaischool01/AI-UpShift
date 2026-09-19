@@ -298,7 +298,16 @@ export default function BulkStudentImportPage() {
               body: payload,
             });
 
-            if (error) throw error;
+            if (error) {
+              let errorMsg = error.message;
+              if (error.context && typeof error.context.json === 'function') {
+                try {
+                  const errBody = await error.context.json();
+                  if (errBody?.error) errorMsg = errBody.error;
+                } catch (_) {}
+              }
+              throw new Error(errorMsg || 'Failed to create student record');
+            }
             if (!data?.success) throw new Error(data?.error || 'Failed to create student record');
             return data;
           })

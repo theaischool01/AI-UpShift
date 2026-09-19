@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 export default function OpportunityCard({ gig }) {
   if (!gig) return null;
 
-  const track = gig.track || gig.course;
+  const track = gig.track;
 
   return (
     <div className="learner-card group flex flex-col justify-between p-6 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">

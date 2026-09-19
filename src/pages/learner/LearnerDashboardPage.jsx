@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import { 
   Briefcase, 
   Sparkles, 
@@ -8,22 +7,18 @@ import {
   Loader2, 
   AlertCircle
 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { fetchGigs as fetchGigsService, fetchTracks as fetchTracksService } from '../../services/gigService';
 import OpportunityCard from '../../components/learner/OpportunityCard';
 import OpportunityFilters from '../../components/learner/OpportunityFilters';
 
 export default function LearnerDashboardPage() {
-  const context = useOutletContext() || {};
-  const assignedTrack = context.assignedTrack || context.enrolledCourses?.[0] || null;
-
   // Filter & Search states
-  const [mode, setMode] = useState('recommended'); // 'recommended' | 'all'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrack, setSelectedTrack] = useState('ALL');
 
   // Pagination states
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(24);
+  const [pageSize] = useState(24);
   const [totalGigs, setTotalGigs] = useState(0);
 
   // Data states
@@ -37,212 +32,36 @@ export default function LearnerDashboardPage() {
   // Load tracks for filter dropdown
   useEffect(() => {
     async function loadTracks() {
-      try {
-        let { data: tracksData, error } = await supabase
-          .from('tracks')
-          .select('id, code, name')
-          .order('code', { ascending: true });
-
-        if (error) {
-          const fallbackRes = await supabase
-            .from('courses')
-            .select('id, code, name')
-            .order('code', { ascending: true });
-          if (fallbackRes.error) throw error;
-          tracksData = fallbackRes.data;
-        }
-
-        setTracks(tracksData || []);
-      } catch (err) {
-        console.warn('[LearnerDashboard] Error loading tracks:', err);
+      const { data, error } = await fetchTracksService();
+      if (!error && data) {
+        setTracks(data);
       }
     }
     loadTracks();
   }, []);
 
-  // Primary server-side query with relational track join and resilient fallback
+  // Primary server-side query with relational track join
   const fetchGigs = useCallback(async () => {
     setLoadingGigs(true);
     setError(null);
 
-    try {
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
+    const { data, count, error: queryErr } = await fetchGigsService({
+      page,
+      pageSize,
+      search: searchQuery,
+      trackId: selectedTrack,
+      isActive: true,
+    });
 
-      // 1. Primary Relational Query with tracks
-      let query = supabase
-        .from('gigs')
-        .select(`
-          id,
-          external_gig_id,
-          title,
-          track_id,
-          short_description,
-          payment_amount,
-          origin_url,
-          created_at,
-          track:tracks (
-            id,
-            code,
-            name,
-            category,
-            color,
-            bg_color
-          )
-        `, { count: 'exact' });
-
-      // Track-Aware Filtering
-      if (mode === 'recommended') {
-        if (assignedTrack?.id) {
-          const targetIds = [
-            assignedTrack.id,
-            assignedTrack.id?.toLowerCase(),
-            assignedTrack.code,
-            assignedTrack.code?.toLowerCase(),
-            assignedTrack.code?.toUpperCase()
-          ].filter(Boolean);
-          query = query.in('track_id', Array.from(new Set(targetIds)));
-        }
-      } else {
-        if (selectedTrack !== 'ALL') {
-          const matchedTrackObj = tracks.find(t => t.id === selectedTrack || t.code === selectedTrack);
-          const matchIds = [
-            selectedTrack,
-            selectedTrack.toLowerCase(),
-            matchedTrackObj?.id,
-            matchedTrackObj?.code,
-            matchedTrackObj?.code?.toLowerCase(),
-            matchedTrackObj?.code?.toUpperCase()
-          ].filter(Boolean);
-          query = query.in('track_id', Array.from(new Set(matchIds)));
-        }
-      }
-
-      // Search filtering
-      const trimmedSearch = searchQuery.trim();
-      if (trimmedSearch) {
-        query = query.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
-      }
-
-      // Order & Paginate
-      let { data, count, error: queryErr } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (queryErr) {
-        console.warn('[LearnerDashboard] Relational tracks query failed, trying legacy courses fallback:', queryErr.message || queryErr);
-        
-        let legacyRelQuery = supabase
-          .from('gigs')
-          .select(`
-            id,
-            external_gig_id,
-            title,
-            course_id,
-            short_description,
-            payment_amount,
-            origin_url,
-            created_at,
-            course:courses (
-              id,
-              code,
-              name,
-              category,
-              color,
-              bg_color
-            )
-          `, { count: 'exact' });
-
-        if (mode === 'recommended') {
-          if (assignedTrack?.id) {
-            const targetIds = [
-              assignedTrack.id,
-              assignedTrack.id?.toLowerCase(),
-              assignedTrack.code,
-              assignedTrack.code?.toLowerCase(),
-              assignedTrack.code?.toUpperCase()
-            ].filter(Boolean);
-            legacyRelQuery = legacyRelQuery.in('course_id', Array.from(new Set(targetIds)));
-          }
-        } else {
-          if (selectedTrack !== 'ALL') {
-            const matchedTrackObj = tracks.find(t => t.id === selectedTrack || t.code === selectedTrack);
-            const matchIds = [
-              selectedTrack,
-              selectedTrack.toLowerCase(),
-              matchedTrackObj?.id,
-              matchedTrackObj?.code,
-              matchedTrackObj?.code?.toLowerCase(),
-              matchedTrackObj?.code?.toUpperCase()
-            ].filter(Boolean);
-            legacyRelQuery = legacyRelQuery.in('course_id', Array.from(new Set(matchIds)));
-          }
-        }
-
-        if (trimmedSearch) {
-          legacyRelQuery = legacyRelQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
-        }
-
-        const legacyRelRes = await legacyRelQuery
-          .order('created_at', { ascending: false })
-          .range(from, to);
-
-        if (!legacyRelRes.error && legacyRelRes.data) {
-          data = legacyRelRes.data.map(g => ({
-            ...g,
-            track_id: g.course_id,
-            track: g.course
-          }));
-          count = legacyRelRes.count;
-          queryErr = null;
-        } else {
-          console.warn('[LearnerDashboard] Relational legacy query failed, attempting flat query:', legacyRelRes.error?.message || legacyRelRes.error);
-          
-          let flatQuery = supabase
-            .from('gigs')
-            .select(`
-              id,
-              external_gig_id,
-              title,
-              short_description,
-              payment_amount,
-              origin_url,
-              created_at
-            `, { count: 'exact' });
-
-          if (trimmedSearch) {
-            flatQuery = flatQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
-          }
-
-          const flatRes = await flatQuery
-            .order('created_at', { ascending: false })
-            .range(from, to);
-
-          if (flatRes.error) {
-            console.error('[LearnerDashboard] Flat query error:', flatRes.error);
-            throw flatRes.error;
-          }
-
-          data = (flatRes.data || []).map(g => {
-            const trackMatch = tracks.find(t => t.id === g.track_id || t.id === g.course_id);
-            return {
-              ...g,
-              track: trackMatch || null
-            };
-          });
-          count = flatCount || data.length;
-        }
-      }
-
+    if (queryErr) {
+      console.error('[LearnerDashboard] Error fetching gigs:', queryErr);
+      setError('Unable to load commercial opportunities. Please refresh the page.');
+    } else {
       setGigs(data || []);
       setTotalGigs(count || 0);
-    } catch (err) {
-      console.error('[LearnerDashboard] Error fetching gigs:', err);
-      setError('Unable to load commercial opportunities. Please refresh the page.');
-    } finally {
-      setLoadingGigs(false);
     }
-  }, [mode, searchQuery, selectedTrack, page, pageSize, assignedTrack]);
+    setLoadingGigs(false);
+  }, [searchQuery, selectedTrack, page, pageSize]);
 
   useEffect(() => {
     fetchGigs();
@@ -264,54 +83,25 @@ export default function LearnerDashboardPage() {
               Commercial Opportunity Board
             </h1>
             <p className="text-xs sm:text-sm text-[#6B7280] mt-1 max-w-2xl">
-              {assignedTrack ? (
-                <>
-                  You are assigned to the <strong>{assignedTrack.code} · {assignedTrack.name}</strong> track. Build and apply for vetted freelance and contract briefs.
-                </>
-              ) : (
-                'Explore and apply for vetted freelance and contract briefs across UpShift tracks.'
-              )}
+              Explore and apply for vetted freelance, contract, and commercial briefs across UpShift specialization modules.
             </p>
           </div>
 
-          {assignedTrack && (
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] self-start md:self-auto">
-              <div 
-                className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
-                style={{
-                  backgroundColor: assignedTrack.bg_color || 'rgba(227, 27, 35, 0.1)',
-                  color: assignedTrack.color || '#E31B23',
-                }}
-              >
-                {assignedTrack.code}
-              </div>
-              <div className="text-left">
-                <span className="text-[11px] font-mono text-[#6B7280] uppercase tracking-wider block">
-                  Assigned Track
-                </span>
-                <span className="text-sm font-bold text-[#111827]">
-                  {assignedTrack.name}
-                </span>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] self-start md:self-auto text-xs font-mono text-[#4B5563]">
+            <Briefcase className="w-4 h-4 text-[#E31B23]" />
+            <span><strong>{totalGigs}</strong> Active {totalGigs === 1 ? 'Brief' : 'Briefs'}</span>
+          </div>
         </div>
       </div>
 
       {/* Filter Toolbar */}
       <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-6 shadow-xs">
         <OpportunityFilters
-          mode={mode}
-          setMode={(newMode) => {
-            setMode(newMode);
-            setPage(1);
-          }}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           selectedTrack={selectedTrack}
           setSelectedTrack={setSelectedTrack}
           tracks={tracks}
-          assignedTrack={assignedTrack}
           onFilterChange={() => setPage(1)}
         />
       </div>
@@ -347,19 +137,18 @@ export default function LearnerDashboardPage() {
             No Opportunities Found
           </h3>
           <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto mb-4">
-            {mode === 'recommended' && assignedTrack
-              ? `There are currently no active opportunities tagged specifically for your assigned track (${assignedTrack.code} · ${assignedTrack.name}). Switch to "All Opportunities" to view all available briefs.`
-              : 'No opportunities match your search criteria. Try clearing your search or track filter.'}
+            No opportunities match your search criteria. Try clearing your search query or module filter.
           </p>
-          {mode === 'recommended' && (
+          {(searchQuery || selectedTrack !== 'ALL') && (
             <button
               onClick={() => {
-                setMode('all');
+                setSearchQuery('');
+                setSelectedTrack('ALL');
                 setPage(1);
               }}
               className="learner-btn-primary inline-flex items-center gap-1.5"
             >
-              <span>Explore All Opportunities</span>
+              <span>Reset Filters</span>
             </button>
           )}
         </div>
@@ -388,8 +177,8 @@ export default function LearnerDashboardPage() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <span className="text-xs font-mono font-semibold px-2">
-                  {page} / {totalPages}
+                <span className="text-xs font-medium text-gray-700 px-2">
+                  Page {page} of {totalPages}
                 </span>
 
                 <button

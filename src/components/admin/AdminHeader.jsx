@@ -19,7 +19,7 @@ const routeMetadata = {
   },
   '/admin/students/new': {
     title: 'Add Student',
-    subtitle: 'Register a single learner account and assign initial course track.',
+    subtitle: 'Register a single learner account and enroll them into the UpShift Program.',
   },
   '/admin/students/import': {
     title: 'Bulk Student Import',

@@ -15,7 +15,7 @@ import {
   ChevronLeft, 
   ChevronRight
 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { fetchGigs as fetchGigsService, fetchTracks as fetchTracksService, deleteGig as deleteGigService } from '../../services/gigService';
 
 export default function GigsPage() {
   const navigate = useNavigate();
@@ -56,24 +56,9 @@ export default function GigsPage() {
   // Load tracks
   useEffect(() => {
     async function loadMetadata() {
-      try {
-        let { data: tracksData, error } = await supabase
-          .from('tracks')
-          .select('id, code, name')
-          .order('code', { ascending: true });
-
-        if (error) {
-          const fallbackRes = await supabase
-            .from('courses')
-            .select('id, code, name')
-            .order('code', { ascending: true });
-          if (fallbackRes.error) throw error;
-          tracksData = fallbackRes.data;
-        }
-
-        setTracks(tracksData || []);
-      } catch (err) {
-        console.warn('[GigsPage] Error loading filter metadata:', err);
+      const { data, error } = await fetchTracksService();
+      if (!error && data) {
+        setTracks(data);
       }
     }
     loadMetadata();
@@ -84,154 +69,20 @@ export default function GigsPage() {
     setLoading(true);
     setError(null);
 
-    try {
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
+    const { data, count, error: queryError } = await fetchGigsService({
+      page,
+      pageSize,
+      search: debouncedSearch,
+      trackId: selectedTrack,
+    });
 
-      // Primary query: Attempt relational join with tracks
-      let query = supabase
-        .from('gigs')
-        .select(`
-          id,
-          external_gig_id,
-          title,
-          track_id,
-          short_description,
-          overview,
-          responsibilities,
-          deliverables,
-          requirements,
-          proof_spec,
-          origin_url,
-          payment_amount,
-          created_at,
-          track:tracks (
-            id,
-            code,
-            name,
-            color
-          )
-        `, { count: 'exact' });
-
-      // Apply Search
-      if (debouncedSearch) {
-        query = query.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
-      }
-
-      // Apply Track Filter
-      if (selectedTrack !== 'ALL') {
-        query = query.eq('track_id', selectedTrack);
-      }
-
-      // Order & Paginate
-      let { data, count, error: queryError } = await query
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (queryError) {
-        console.warn('[GigsPage] Relational tracks query not available, trying courses relation fallback:', queryError.message || queryError);
-        
-        let legacyRelQuery = supabase
-          .from('gigs')
-          .select(`
-            id,
-            external_gig_id,
-            title,
-            course_id,
-            short_description,
-            overview,
-            responsibilities,
-            deliverables,
-            requirements,
-            proof_spec,
-            origin_url,
-            payment_amount,
-            created_at,
-            course:courses (
-              id,
-              code,
-              name,
-              color
-            )
-          `, { count: 'exact' });
-
-        if (debouncedSearch) {
-          legacyRelQuery = legacyRelQuery.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
-        }
-        if (selectedTrack !== 'ALL') {
-          legacyRelQuery = legacyRelQuery.eq('course_id', selectedTrack);
-        }
-
-        const legacyRelRes = await legacyRelQuery
-          .order('created_at', { ascending: false })
-          .range(from, to);
-
-        if (!legacyRelRes.error && legacyRelRes.data) {
-          data = legacyRelRes.data.map(g => ({
-            ...g,
-            track_id: g.course_id,
-            track: g.course
-          }));
-          count = legacyRelRes.count;
-          queryError = null;
-        } else {
-          console.warn('[GigsPage] Courses relation failed, attempting flat query:', legacyRelRes.error?.message || legacyRelRes.error);
-          
-          let flatQuery = supabase
-            .from('gigs')
-            .select(`
-              id,
-              external_gig_id,
-              title,
-              short_description,
-              overview,
-              responsibilities,
-              deliverables,
-              requirements,
-              proof_spec,
-              origin_url,
-              payment_amount,
-              created_at
-            `, { count: 'exact' });
-
-          if (debouncedSearch) {
-            flatQuery = flatQuery.or(`title.ilike.%${debouncedSearch}%,short_description.ilike.%${debouncedSearch}%`);
-          }
-
-          const flatRes = await flatQuery
-            .order('created_at', { ascending: false })
-            .range(from, to);
-
-          if (flatRes.error) {
-            console.error('[GigsPage] Diagnostic DB error details:', {
-              code: flatRes.error.code,
-              message: flatRes.error.message,
-              details: flatRes.error.details,
-              hint: flatRes.error.hint
-            });
-            throw flatRes.error;
-          }
-
-          data = (flatRes.data || []).map(g => {
-            const trackMatch = tracks.find(t => t.id === g.track_id || t.id === g.course_id);
-            return {
-              ...g,
-              track_id: g.track_id || g.course_id,
-              track: trackMatch || null
-            };
-          });
-          count = flatRes.count || data.length;
-        }
-      }
-
+    if (queryError) {
+      setError(`Unable to load commercial opportunities: ${queryError.message || 'Database connection error'}. Please refresh.`);
+    } else {
       setGigs(data || []);
       setTotalGigs(count || 0);
-    } catch (err) {
-      console.error('[GigsPage] Fetch gigs error:', err);
-      setError(`Unable to load commercial opportunities: ${err.message || 'Database connection error'}. Please refresh.`);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }, [page, pageSize, debouncedSearch, selectedTrack]);
 
   useEffect(() => {
@@ -243,23 +94,15 @@ export default function GigsPage() {
     if (!deletingGig || isDeleting) return;
     setIsDeleting(true);
 
-    try {
-      const { error: delError } = await supabase
-        .from('gigs')
-        .delete()
-        .eq('id', deletingGig.id);
-
-      if (delError) throw delError;
-
+    const { error: delError } = await deleteGigService(deletingGig.id);
+    if (delError) {
+      alert('Unable to delete opportunity record: ' + (delError.message || 'Unknown database error'));
+    } else {
       setGigs(prev => prev.filter(g => g.id !== deletingGig.id));
       setTotalGigs(prev => Math.max(0, prev - 1));
       setDeletingGig(null);
-    } catch (err) {
-      console.error('[GigsPage] Delete error:', err);
-      alert('Unable to delete opportunity record: ' + (err.message || 'Unknown database error'));
-    } finally {
-      setIsDeleting(false);
     }
+    setIsDeleting(false);
   };
 
   const totalPages = Math.max(1, Math.ceil(totalGigs / pageSize));
