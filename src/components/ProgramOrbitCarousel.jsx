@@ -575,7 +575,7 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
           </div>
 
           {/* Clean Mobile Cards Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
             {programs.map((prog) => {
               const ProgIcon = PROGRAM_ICONS[prog.id] || Sparkles;
 

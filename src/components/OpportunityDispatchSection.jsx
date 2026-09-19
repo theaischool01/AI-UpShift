@@ -569,22 +569,22 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
               )}
 
               {/* Meta Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
                 <span style={{ fontFamily: 'monospace', fontSize: '11px', fontWeight: 800, color: card.accentColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   {card.code} · {card.name.toUpperCase()}
                 </span>
-                <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(5, 150, 105, 0.12)', color: '#059669', border: '1px solid rgba(5, 150, 105, 0.25)' }}>
+                <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(5, 150, 105, 0.12)', color: '#059669', border: '1px solid rgba(5, 150, 105, 0.25)', whiteSpace: 'nowrap' }}>
                   ● {card.statusBadge.toUpperCase()}
                 </span>
               </div>
 
               {/* Role Title */}
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: 800, color: card.textPrimary, letterSpacing: '-0.02em', margin: '0 0 10px 0', lineHeight: 1.25 }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '19px', fontWeight: 800, color: card.textPrimary, letterSpacing: '-0.02em', margin: '0 0 10px 0', lineHeight: 1.25, wordBreak: 'break-word' }}>
                 {card.role}
               </h3>
 
               {/* Brief Snippet */}
-              <p style={{ fontSize: '13px', fontStyle: 'italic', color: card.textSecondary, lineHeight: 1.5, margin: '0 0 14px 0', paddingLeft: '12px', borderLeft: `2.5px solid ${card.accentColor}` }}>
+              <p style={{ fontSize: '13px', fontStyle: 'italic', color: card.textSecondary, lineHeight: 1.5, margin: '0 0 14px 0', paddingLeft: '12px', borderLeft: `2.5px solid ${card.accentColor}`, wordBreak: 'break-word' }}>
                 "{card.briefSnippet}"
               </p>
 
@@ -618,17 +618,22 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                   padding: '10px 14px',
                   marginBottom: '14px',
                   display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '10px',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  boxSizing: 'border-box',
+                  width: '100%',
+                  maxWidth: '100%'
                 }}
               >
-                <div>
+                <div style={{ minWidth: '120px', flex: '1 1 auto' }}>
                   <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>COMPENSATION</span>
-                  <span style={{ fontSize: '14px', fontWeight: 800, color: card.accentColor }}>{card.payment_amount}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: card.accentColor, wordBreak: 'break-word' }}>{card.payment_amount}</span>
                 </div>
-                <div>
+                <div style={{ flex: '0 0 auto' }}>
                   <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>VERIFICATION</span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669' }}>✓ Verified by UpShift</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', whiteSpace: 'nowrap' }}>✓ Verified by UpShift</span>
                 </div>
               </div>
 
@@ -641,19 +646,22 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                   borderRadius: '10px',
                   padding: '10px 14px',
                   marginBottom: '16px',
+                  boxSizing: 'border-box',
+                  width: '100%',
+                  maxWidth: '100%'
                 }}
               >
                 <span style={{ fontSize: '9.5px', fontFamily: 'monospace', fontWeight: 800, textTransform: 'uppercase', color: card.accentColor, display: 'block', marginBottom: '3px', letterSpacing: '0.08em' }}>
                   ★ REQUIRED PROOF SPEC
                 </span>
-                <p style={{ fontSize: '12px', color: card.boxText, margin: 0, lineHeight: 1.4 }}>
+                <p style={{ fontSize: '12px', color: card.boxText, margin: 0, lineHeight: 1.4, wordBreak: 'break-word' }}>
                   {card.proofRequirement}
                 </p>
               </div>
 
               {/* Action Footer */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingTop: '4px' }}>
-                <span style={{ fontFamily: 'monospace', fontSize: '11px', color: card.textMuted }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px', paddingTop: '4px', width: '100%', boxSizing: 'border-box' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: '11px', color: card.textMuted, flex: '1 1 auto', minWidth: '100px' }}>
                   {card.category}
                 </span>
                 <button
@@ -664,8 +672,8 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                     borderColor: card.accentColor,
                     color: '#FFFFFF',
                     borderRadius: '9999px',
-                    padding: '8px 18px',
-                    fontSize: '13px',
+                    padding: '8px 16px',
+                    fontSize: '12px',
                     fontWeight: 700,
                     border: '1px solid transparent',
                     cursor: 'pointer',
@@ -673,7 +681,11 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                     alignItems: 'center',
                     gap: '6px',
                     transition: 'all 0.2s ease',
-                    boxShadow: `0 4px 14px ${card.accentColor}35`
+                    boxShadow: `0 4px 14px ${card.accentColor}35`,
+                    whiteSpace: 'nowrap',
+                    flex: '0 0 auto',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box'
                   }}
                 >
                   <span>APPLY FOR THIS GIG</span>
