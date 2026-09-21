@@ -2,7 +2,43 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, CheckCircle2, AlertCircle, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 
-export default function UpShiftRegistrationModal({ isOpen, onClose }) {
+const INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+];
+
+export default function UpShiftRegistrationModal({ 
+  isOpen, 
+  onClose, 
+  preselectedCourse = 'reelrush-ai',
+  onSuccessRedirect 
+}) {
   const navigate = useNavigate();
   const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || '';
 
@@ -537,19 +573,22 @@ export default function UpShiftRegistrationModal({ isOpen, onClose }) {
                   <label htmlFor="reg-state" className="upshift-reg-label">
                     State <span className="upshift-reg-required">*</span>
                   </label>
-                  <input
+                  <select
                     id="reg-state"
                     name="state"
-                    type="text"
-                    autoComplete="address-level1"
                     required
                     value={formData.state}
                     onChange={handleChange}
-                    placeholder="e.g. Karnataka / Maharashtra"
                     aria-invalid={!!errors.state}
                     aria-describedby={errors.state ? "reg-state-err" : undefined}
                     className={`upshift-reg-input ${errors.state ? 'is-error' : ''}`}
-                  />
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <option value="">Select State</option>
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
                   {errors.state && <p id="reg-state-err" className="upshift-reg-error-msg">{errors.state}</p>}
                 </div>
               </div>

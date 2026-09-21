@@ -30,6 +30,37 @@ const GENDER_OPTIONS = [
   'Prefer not to say',
 ];
 
+const INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+];
+
 export default function EnrollmentPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -421,14 +452,17 @@ export default function EnrollmentPage() {
                   <label htmlFor="state" className="enroll-label">
                     State <span className="enroll-req">*</span>
                   </label>
-                  <input
+                  <select
                     id="state"
-                    type="text"
                     value={formData.state}
                     onChange={(e) => handleInputChange('state', e.target.value)}
-                    placeholder="e.g. Karnataka"
-                    className={`enroll-input ${errors.state ? 'enroll-input-error' : ''}`}
-                  />
+                    className={`enroll-select ${errors.state ? 'enroll-input-error' : ''}`}
+                  >
+                    <option value="">Select State</option>
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st} value={st}>{st}</option>
+                    ))}
+                  </select>
                   {errors.state && <p className="enroll-error-msg">{errors.state}</p>}
                 </div>
               </div>

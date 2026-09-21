@@ -1889,6 +1889,62 @@ h1, h2, h3, h4, .font-heading {
   }
 }
 
+/* Testimonial Bottom Pagination Dots (Bottom-Right Area) */
+.journey-testimonial-dots-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: clamp(18px, 2.2vw, 26px);
+  padding-top: 14px;
+  border-top: 1px solid #EAE7E1;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .journey-testimonial-dots-row {
+    justify-content: center;
+    gap: 7px;
+    margin-top: 16px;
+    padding-top: 10px;
+  }
+}
+
+.journey-testimonial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #CBD5E1;
+  background-color: #E2E8F0;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  display: inline-block;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.journey-testimonial-dot:hover {
+  border-color: #E31B23;
+  background-color: rgba(227, 27, 35, 0.3);
+  transform: scale(1.2);
+}
+
+.journey-testimonial-dot.is-active {
+  width: 20px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #E31B23;
+  border-color: #E31B23;
+  box-shadow: 0 1px 4px rgba(227, 27, 35, 0.35);
+}
+
+.journey-testimonial-dot:focus-visible {
+  outline: 2px solid #E31B23;
+  outline-offset: 2px;
+}
+
 /* Enrollment CTA Panel */
 .journey-enrollment-panel {
   max-width: 58rem;

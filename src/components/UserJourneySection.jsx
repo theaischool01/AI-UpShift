@@ -114,14 +114,14 @@ export default function UserJourneySection() {
     return () => observer.disconnect();
   }, []);
 
-  // Auto-rotate every exactly 3 seconds (3000ms) continuously
+  // Auto-rotate every approximately 6 seconds (6000ms) continuously; reset timer on activeStory change
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveStory((prev) => (prev + 1) % STORIES_DATA.length);
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [activeStory]);
 
   const currentStory = STORIES_DATA[activeStory];
 
@@ -406,6 +406,25 @@ export default function UserJourneySection() {
                 </blockquote>
               </div>
             </div>
+          </div>
+
+          {/* Bottom Pagination Dots Area (Bottom-Right) */}
+          <div className="journey-testimonial-dots-row" role="tablist" aria-label="Testimonial Navigation">
+            {STORIES_DATA.map((story, idx) => {
+              const isActive = activeStory === idx;
+              return (
+                <button
+                  key={`dot-${story.id || idx}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-current={isActive ? 'true' : undefined}
+                  aria-label={`Go to testimonial ${idx + 1}: ${story.name}`}
+                  className={`journey-testimonial-dot ${isActive ? 'is-active' : ''}`}
+                  onClick={() => setActiveStory(idx)}
+                />
+              );
+            })}
           </div>
         </div>
 
