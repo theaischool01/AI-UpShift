@@ -41,10 +41,10 @@ const SLIDES = [
 ];
 
 // Display timing:
-// Each image is shown for 3.5 seconds total.
-// Horizontal slide transition lasts ~750ms.
-const INTERVAL_MS = 3500;
-const TRANSITION_MS = 750;
+// Each image is shown for 10 seconds total.
+// Horizontal slide transition lasts ~800ms.
+const INTERVAL_MS = 10000;
+const TRANSITION_MS = 800;
 
 export default function ExploringProgramsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -82,7 +82,7 @@ export default function ExploringProgramsSection() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Single authoritative slideshow timer: advances every 3.5 seconds
+  // Single authoritative slideshow timer: advances every 10 seconds
   useEffect(() => {
     if (!isVisible) return;
 
@@ -120,42 +120,60 @@ export default function ExploringProgramsSection() {
   const incomingSlide = nextIndex !== null ? SLIDES[nextIndex] : null;
 
   return (
-    <div className="w-full relative overflow-hidden bg-[#FAF8F5] select-none flex items-center justify-center p-3 sm:p-5 md:p-6 lg:p-7">
-      {/* Cinematic Slideshow Container with matching 4-side framing */}
+    <div 
+      className="w-full relative select-none flex flex-col items-center justify-center box-border"
+      style={{
+        backgroundColor: '#FFFFFF',
+        width: '100%',
+        minHeight: '100svh',
+        padding: 'clamp(24px, 3.5vw, 48px) clamp(16px, 2.5vw, 36px)',
+      }}
+    >
+      {/* Multi-point Corner & Edge Atmospheric Soft Red Ambient Glows behind image */}
       <div
-        className="w-full mx-auto relative overflow-hidden rounded-xl sm:rounded-2xl shadow-sm"
+        className="absolute inset-0 pointer-events-none select-none overflow-hidden"
         style={{
-          maxWidth: '1540px',
-          aspectRatio: '1672 / 941',
-          border: '1.5px solid #000000',
+          backgroundImage: `
+            radial-gradient(circle at 12% 16%, rgba(227, 27, 35, 0.085) 0%, transparent 35%),
+            radial-gradient(circle at 88% 16%, rgba(227, 27, 35, 0.085) 0%, transparent 35%),
+            radial-gradient(circle at 12% 84%, rgba(227, 27, 35, 0.085) 0%, transparent 35%),
+            radial-gradient(circle at 88% 84%, rgba(227, 27, 35, 0.085) 0%, transparent 35%),
+            radial-gradient(ellipse 75% 65% at 50% 50%, rgba(227, 27, 35, 0.035) 0%, transparent 70%)
+          `,
         }}
-      >
-        {/* Current Active Slide (slides out to the left) */}
+        aria-hidden="true"
+      />
+
+      {/* Centered Framing System: Left Red Line + Image Frame + Right Red Line */}
+      <div className="relative z-20 flex items-center justify-center gap-4 sm:gap-6 md:gap-7 max-w-full">
+        {/* Left Decorative Vertical Editorial Red Line */}
         <div
-          className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
+          className="shrink-0 pointer-events-none select-none"
           style={{
-            transform: isSliding ? 'translateX(-100%)' : 'translateX(0%)',
-            transition: isSliding
-              ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
-              : 'none',
-            willChange: isSliding ? 'transform' : 'auto',
+            width: '2.5px',
+            height: 'clamp(220px, 58vh, 520px)',
+            backgroundColor: '#E31B23',
+            borderRadius: '9999px',
+            boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Cinematic Slideshow Container */}
+        <div
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl shrink-0 z-10"
+          style={{
+            width: 'min(1360px, calc(100vw - 120px), calc((100svh - 90px) * (1672 / 941)))',
+            aspectRatio: '1672 / 941',
+            maxHeight: 'calc(100svh - 90px)',
+            boxShadow: '0 14px 40px -12px rgba(227, 27, 35, 0.08), 0 4px 18px -4px rgba(0, 0, 0, 0.03)',
           }}
         >
-          <img
-            src={currentSlide.src}
-            alt={currentSlide.alt}
-            className="w-full h-full object-cover block select-none pointer-events-none"
-            loading="eager"
-            draggable={false}
-          />
-        </div>
-
-        {/* Incoming Slide (slides in from the right to center) */}
-        {incomingSlide && (
+          {/* Current Active Slide (slides out to the left) */}
           <div
             className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
             style={{
-              transform: isSliding ? 'translateX(0%)' : 'translateX(100%)',
+              transform: isSliding ? 'translateX(-100%)' : 'translateX(0%)',
               transition: isSliding
                 ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
                 : 'none',
@@ -163,14 +181,49 @@ export default function ExploringProgramsSection() {
             }}
           >
             <img
-              src={incomingSlide.src}
-              alt={incomingSlide.alt}
-              className="w-full h-full object-cover block select-none pointer-events-none"
+              src={currentSlide.src}
+              alt={currentSlide.alt}
+              className="w-full h-full object-contain block select-none pointer-events-none"
               loading="eager"
               draggable={false}
             />
           </div>
-        )}
+
+          {/* Incoming Slide (slides in from the right to center) */}
+          {incomingSlide && (
+            <div
+              className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
+              style={{
+                transform: isSliding ? 'translateX(0%)' : 'translateX(100%)',
+                transition: isSliding
+                  ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
+                  : 'none',
+                willChange: isSliding ? 'transform' : 'auto',
+              }}
+            >
+              <img
+                src={incomingSlide.src}
+                alt={incomingSlide.alt}
+                className="w-full h-full object-contain block select-none pointer-events-none"
+                loading="eager"
+                draggable={false}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Right Decorative Vertical Editorial Red Line */}
+        <div
+          className="shrink-0 pointer-events-none select-none"
+          style={{
+            width: '2.5px',
+            height: 'clamp(220px, 58vh, 520px)',
+            backgroundColor: '#E31B23',
+            borderRadius: '9999px',
+            boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
+          }}
+          aria-hidden="true"
+        />
       </div>
     </div>
   );

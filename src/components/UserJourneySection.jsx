@@ -7,79 +7,75 @@ import MascotBadge from './MascotBadge';
 const STORIES_DATA = [
   {
     id: 1,
-    name: 'Likitha',
+    name: 'P Likhitha',
     shortCode: 'L',
     avatar: dianaAvatar,
-    quote: 'I started working with AISCHOOL as a freelancer because I wanted to earn something in my free time. At first, I was a little unsure, but once I started working, I got comfortable with it. I learned new things and also earned some money for my personal expenses.'
+    quote: 'I didn’t expect much when I first started. I just wanted to make some extra money in my free time. Slowly, I got interested in the work and started learning new things. Now I feel much more confident than when I started.'
   },
   {
     id: 2,
-    name: 'Testimonial Name 1',
-    shortCode: 'T1',
+    name: 'Shaik Irshad',
+    shortCode: 'SI',
     avatar: '/assets/testimonial-01.webp',
     quote: 'I was looking for something flexible that I could do in my free time. I liked that I could work whenever I was available. The work helped me learn new skills, and the extra income has been useful for my daily expenses.'
   },
   {
     id: 3,
-    name: 'Testimonial Name 2',
-    shortCode: 'T2',
+    name: 'P Prathyusha',
+    shortCode: 'PP',
     avatar: '/assets/testimonial-02.webp',
-    quote: 'I didn’t expect much when I first started. I just wanted to make some extra money in my free time. Slowly, I got interested in the work and started learning new things. Now I feel much more confident than when I started.'
+    quote: 'I started working with The AISCHOOL as a freelancer because I wanted to earn something in my free time. At first, I was a little unsure, but once I started working, I got comfortable with it. I learned new things and also earned some money for my personal expenses.'
   },
   {
     id: 4,
-    name: 'Testimonial Name 3',
-    shortCode: 'T3',
-    avatar: '/assets/testimonial-03.webp',
-    quote: 'I wanted something I could do along with my regular studies, and this worked well for me. I could manage my own time and work when I was free. The money I earned helped me pay for a few things I wanted without always asking my parents.'
-  },
-  {
-    id: 5,
-    name: 'Testimonial Name 4',
-    shortCode: 'T4',
+    name: 'G Ruthwik',
+    shortCode: 'GR',
     avatar: '/assets/testimonial-04.webp',
     quote: 'I joined because I wanted to learn something new and earn at the same time. Working on different tasks helped me understand things better. I also started earning from my work, which felt really good because I could use some of it for myself.'
   },
   {
-    id: 6,
-    name: 'Testimonial Name 5',
-    shortCode: 'T5',
-    avatar: '/assets/testimonial-05.webp',
-    quote: 'When I first heard about the opportunity, I wasn’t sure if I could do the work. I decided to try it anyway. After completing a few tasks, I became more comfortable. Now I enjoy learning through the work and earning a little extra in my free time.'
+    id: 5,
+    name: 'K Anvitha',
+    shortCode: 'KA',
+    avatar: '/assets/testimonial-03.webp',
+    quote: 'I wanted something I could do along with my regular studies, and this worked well for me. I could manage my own time and work when I was free. The money I earned helped me pay for a few things I wanted without always asking my parents.'
   },
   {
-    id: 7,
-    name: 'Testimonial Name 6',
-    shortCode: 'T6',
+    id: 6,
+    name: 'M Sufian',
+    shortCode: 'MS',
     avatar: '/assets/testimonial-06.webp',
     quote: 'AISCHOOL has been a good experience for me. I don’t have to follow a fixed schedule, so I can work whenever I have time. I have learned a lot through the tasks, and the extra money has helped me with some of my monthly expenses.'
   },
   {
-    id: 8,
-    name: 'Testimonial Name 7',
-    shortCode: 'T7',
+    id: 7,
+    name: 'M Nandini',
+    shortCode: 'MN',
     avatar: '/assets/testimonial-07.webp',
     quote: 'I started because I wanted to use my free time in a better way. I learned new things while working on real tasks, and slowly started earning as well. I have used some of my earnings for shopping, travel, and other things I wanted.'
   },
   {
+    id: 8,
+    name: 'O Srinath',
+    shortCode: 'OS',
+    avatar: '/assets/testimonial-05.webp',
+    quote: 'When I first heard about the opportunity, I wasn’t sure if I could do the work. I decided to try it anyway. After completing a few tasks, I became more comfortable. Now I enjoy learning through the work and earning a little extra in my free time.'
+  },
+
+
+  {
     id: 9,
-    name: 'Testimonial Name 8',
-    shortCode: 'T8',
+    name: 'K Preethi',
+    shortCode: 'KP',
     avatar: '/assets/testimonial-08.webp',
     quote: 'For me, it is not only about earning. I have learned how to manage my time, complete work properly, and be responsible for what I do. At the same time, having my own small income feels really nice because I can spend it on things I need or want.'
   },
+
   {
     id: 10,
-    name: 'Testimonial Name 9',
-    shortCode: 'T9',
-    avatar: dianaAvatar,
-    quote: 'I started with a simple goal of earning some extra money in my free time. I didn’t think I would learn so much along the way. Now I have more confidence in my skills, and it feels good to know that I can learn, work, and earn on my own.'
-  },
-  {
-    id: 11,
-    name: 'Testimonial Name 10',
-    shortCode: 'T10',
-    avatar: null,
+    name: 'P Harish',
+    shortCode: 'PH',
+    avatar: '/assets/testimonial-10.png',
     quote: 'I started by helping with a few small projects. As I completed more work, I began receiving paid gigs regularly. I saved those earnings and bought my own laptop. That was the moment I felt I could genuinely build something for myself.'
   }
 ];
@@ -118,7 +114,7 @@ export default function UserJourneySection() {
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveStory((prev) => (prev + 1) % STORIES_DATA.length);
-    }, 6000);
+    }, 10000);
 
     return () => clearInterval(timer);
   }, [activeStory]);
@@ -275,56 +271,38 @@ export default function UserJourneySection() {
         {/* WHAT IS AN UPSHIFTER? — CINEMATIC BLACK + RED EDITORIAL CARD */}
         {/* ============================================================ */}
         <div id="upshifter" className="upshifter-editorial-card scroll-mt-28 md:scroll-mt-32">
-          {/* Matrix Pattern Overlay */}
-          <div className="upshifter-grid-mesh" aria-hidden="true" />
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             {/* Left Brand Narrative */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#E31B23]/15 border border-[#E31B23]/35 mb-2.5">
+            <div className="lg:col-span-7 flex flex-col items-start justify-start pt-1 pb-6 sm:pb-8 max-w-[580px]">
+              <div className="inline-flex items-center gap-2 mb-3.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E31B23]" />
                 <span className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#FF5A65]">
-                  The UpShifter Standard
+                  THE UPSHIFTER STANDARD
                 </span>
               </div>
 
-              <h2 className="upshifter-title mb-2.5 sm:mb-3">
+              <h2 className="upshifter-title mb-4 sm:mb-5">
                 <span className="text-white">WHAT IS AN</span><br />
                 <span style={{ color: '#E31B23' }}>UPSHIFTER?</span>
               </h2>
 
-              <p className="upshifter-quote mb-3 sm:mb-3.5">
+              <p className="upshifter-quote mb-4 sm:mb-5">
                 <span className="text-white">“An UpShifter doesn't just know AI.</span><br />
-                <span style={{ color: '#E31B23', fontWeight: 800 }}>They know what to do with it.”</span>
+                <span style={{ color: '#E31B23', fontWeight: 700 }}>They know what to do with it.”</span>
               </p>
 
-              {/* Compact Editorial Discipline Line with Red Separators */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 font-mono text-[11px] sm:text-xs text-[#E5E7EB] tracking-wider uppercase mb-3 sm:mb-3.5 select-none font-bold">
-                <span>CREATOR</span>
-                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
-                <span>BUILDER</span>
-                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
-                <span>RESEARCHER</span>
-                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
-                <span>OPERATOR</span>
-                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
-                <span>AUTOMATOR</span>
-                <span style={{ color: '#E31B23', fontWeight: 900 }}>·</span>
-                <span>GENERALIST</span>
-              </div>
-
-              <p className="upshifter-body max-w-[580px]">
-                The modern economy doesn't reward passive prompt typing. It rewards versatile operators who can translate messy real-world challenges into concrete digital assets, automated workflows, and verified commercial results.
+              <p className="upshifter-body max-w-[520px]">
+                Build practical AI skills, create real proof of work, and turn those skills into opportunities.
               </p>
             </div>
 
-            {/* Right Mascot Presence */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center relative py-1 lg:py-0">
+            {/* Right Mascot Presence (Fox + Rock anchored to bottom of card) */}
+            <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-end relative self-end">
               <div className="upshifter-mascot-wrapper">
                 <div className="upshifter-mascot-glow" aria-hidden="true" />
-                <MascotBadge 
-                  pose="arrow" 
-                  size="lg" 
+                <MascotBadge
+                  pose="arrow"
+                  size="lg"
                   showBadge={false}
                   className="relative z-10"
                 />

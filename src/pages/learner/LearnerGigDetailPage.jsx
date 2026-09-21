@@ -10,7 +10,10 @@ import {
   Share2, 
   ShieldCheck 
 } from 'lucide-react';
-import { fetchGigById as fetchGigByIdService } from '../../services/gigService';
+import { 
+  fetchGigById as fetchGigByIdService,
+  recordGigInteraction
+} from '../../services/gigService';
 
 function isValidExternalUrl(urlString) {
   if (!urlString || typeof urlString !== 'string') return false;
@@ -68,6 +71,10 @@ export default function LearnerGigDetailPage() {
         setError('Unable to load this opportunity. Please try again.');
       } else {
         setGig(data || null);
+        // Phase 14: Non-blocking detail_open telemetry recording
+        if (data?.id) {
+          recordGigInteraction({ gigId: data.id, eventType: 'detail_open' }).catch(() => {});
+        }
       }
       setLoading(false);
     }
@@ -77,6 +84,12 @@ export default function LearnerGigDetailPage() {
 
   const handleApplyClick = () => {
     if (!gig?.origin_url) return;
+    
+    // Phase 14: Telemetry must be non-critical. Never block redirect.
+    if (gig.id) {
+      recordGigInteraction({ gigId: gig.id, eventType: 'apply_click' }).catch(() => {});
+    }
+
     let url = gig.origin_url.trim();
     if (!/^https?:\/\//i.test(url)) {
       url = `https://${url}`;
@@ -85,6 +98,9 @@ export default function LearnerGigDetailPage() {
   };
 
   const handleCopyShareLink = () => {
+    if (gig?.id) {
+      recordGigInteraction({ gigId: gig.id, eventType: 'share' }).catch(() => {});
+    }
     navigator.clipboard.writeText(window.location.href);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
@@ -328,64 +344,71 @@ export default function LearnerGigDetailPage() {
           )}
         </article>
 
-        {/* RIGHT COLUMN: STICKY OPPORTUNITY GATEWAY / APPLY CARD */}
+        {/* RIGHT COLUMN: STICKY OPPORTUNITY SUMMARY & APPLY CARD */}
         <aside className="learner-detail-sidebar">
           <div className="learner-sidebar-card">
-            {/* Top Compensation Banner */}
-            <div className="learner-sidebar-top">
-              <span className="learner-sidebar-label">Estimated Compensation</span>
+            {/* 1. Compensation Header */}
+            <div className="learner-sidebar-compensation-block">
+              <span className="learner-sidebar-eyebrow">ESTIMATED COMPENSATION</span>
               <div className="learner-sidebar-price">
                 {gig.payment_amount && gig.payment_amount.trim() !== '' ? (
                   gig.payment_amount
                 ) : (
-                  <span style={{ fontSize: '15px', color: '#6B7280', fontWeight: 600 }}>
+                  <span className="learner-sidebar-price-fallback">
                     Competitive / Negotiable
                   </span>
                 )}
               </div>
-              <span className="learner-sidebar-subtext">Verified applied brief</span>
+              <div className="learner-sidebar-status-row">
+                <CheckCircle2 size={15} className="learner-status-icon-green" />
+                <span>Verified applied brief</span>
+              </div>
             </div>
 
+            {/* Divider */}
             <div className="learner-sidebar-divider" />
 
-            {/* Quick Summary Highlights */}
-            <div className="learner-sidebar-highlights">
-              <div className="learner-highlight-row">
-                <span className="learner-highlight-label">UpShift Track</span>
-                <span className="learner-highlight-value">
-                  {track ? `${track.code} · ${track.name}` : (gig.track_id || 'UpShift')}
+            {/* 2. Gig Details Metadata Rows */}
+            <div className="learner-sidebar-metadata-group">
+              <div className="learner-meta-item">
+                <span className="learner-meta-label">UPSHIFT TRACK</span>
+                <span className="learner-meta-value">
+                  {track ? `${track.code} · ${track.name}` : (gig.track_id || 'UpShift Specialization')}
                 </span>
               </div>
 
-              <div className="learner-highlight-row">
-                <span className="learner-highlight-label">Location</span>
-                <span className="learner-highlight-value">Remote (Global)</span>
+              <div className="learner-meta-item">
+                <span className="learner-meta-label">LOCATION</span>
+                <span className="learner-meta-value">Remote (Global)</span>
               </div>
 
-              <div className="learner-highlight-row">
-                <span className="learner-highlight-label">Vetting</span>
-                <span className="learner-highlight-value" style={{ color: '#059669' }}>
-                  ✓ Direct Gateway
+              <div className="learner-meta-item">
+                <span className="learner-meta-label">VETTING</span>
+                <span className="learner-meta-value learner-meta-value-green">
+                  <CheckCircle2 size={14} className="learner-status-icon-green" />
+                  <span>Direct Gateway</span>
                 </span>
               </div>
             </div>
 
-            {/* Primary Action Button: Apply Now Gateway */}
-            <div style={{ marginTop: '20px' }}>
+            {/* Divider */}
+            <div className="learner-sidebar-divider" />
+
+            {/* 3. Apply CTA Section */}
+            <div className="learner-sidebar-cta-block">
               <button
                 type="button"
                 onClick={handleApplyClick}
-                className="learner-btn-primary learner-btn-apply-lg"
+                className="learner-apply-button"
               >
-                <span>Apply Now</span>
+                <span>APPLY NOW</span>
                 <ArrowRight size={16} />
               </button>
-            </div>
 
-            {/* Verification & Safety Pill */}
-            <div className="learner-sidebar-trust">
-              <ShieldCheck size={14} style={{ color: '#059669', flexShrink: 0 }} />
-              <span>Direct application via UpShift Verified Gateway</span>
+              <div className="learner-sidebar-trust-note">
+                <CheckCircle2 size={13} className="learner-status-icon-green" />
+                <span>Direct application via UpShift Verified Gateway</span>
+              </div>
             </div>
           </div>
         </aside>

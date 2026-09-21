@@ -10,7 +10,8 @@ import {
   Trash2, 
   ListChecks, 
   Target, 
-  ShieldCheck 
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { 
   fetchTracks as fetchTracksService, 
@@ -30,6 +31,13 @@ export default function AddGigPage() {
     title: '',
     trackId: '',
     paymentAmount: '',
+    compensationType: 'fixed',
+    minAmount: '',
+    maxAmount: '',
+    currency: 'INR',
+    priority: '0',
+    isFeatured: false,
+    postedAt: '',
     shortDescription: '',
     overview: '',
     responsibilities: [''],
@@ -96,6 +104,13 @@ export default function AddGigPage() {
           title: data.title || '',
           trackId: data.track_id || '',
           paymentAmount: data.payment_amount || '',
+          compensationType: data.compensation_type || 'fixed',
+          minAmount: data.min_amount != null ? String(data.min_amount) : '',
+          maxAmount: data.max_amount != null ? String(data.max_amount) : '',
+          currency: data.currency || 'INR',
+          priority: String(data.priority || 0),
+          isFeatured: Boolean(data.is_featured),
+          postedAt: data.posted_at ? new Date(data.posted_at).toISOString().split('T')[0] : '',
           shortDescription: data.short_description || '',
           overview: data.overview || '',
           responsibilities: respList.length > 0 ? respList : [''],
@@ -160,11 +175,22 @@ export default function AddGigPage() {
       const cleanDeliverables = formData.deliverables.map(d => d.trim()).filter(Boolean);
       const cleanRequirements = formData.requirements.map(r => r.trim()).filter(Boolean);
 
+      const parsedMin = formData.minAmount.trim() !== '' && !isNaN(formData.minAmount) ? parseFloat(formData.minAmount) : null;
+      const parsedMax = formData.maxAmount.trim() !== '' && !isNaN(formData.maxAmount) ? parseFloat(formData.maxAmount) : (parsedMin || null);
+      const parsedPriority = formData.priority.trim() !== '' && !isNaN(formData.priority) ? parseInt(formData.priority, 10) : 0;
+
       const payload = {
         external_gig_id: formData.externalGigId.trim() || null,
         title: formData.title.trim(),
         track_id: formData.trackId,
         payment_amount: formData.paymentAmount.trim() || null,
+        compensation_type: formData.compensationType || 'fixed',
+        min_amount: parsedMin,
+        max_amount: parsedMax,
+        currency: formData.currency.trim() || 'INR',
+        priority: parsedPriority,
+        is_featured: formData.isFeatured,
+        posted_at: formData.postedAt.trim() || null,
         short_description: formData.shortDescription.trim() || null,
         overview: formData.overview.trim() || null,
         responsibilities: cleanResponsibilities,
@@ -209,7 +235,7 @@ export default function AddGigPage() {
             <span>{editGigId ? 'Edit Opportunity' : 'Add Opportunity'}</span>
           </h1>
           <p className="admin-page-description">
-            Create or modify an applied opportunity record assigned to an UpShift track.
+            Create or modify an applied opportunity record with marketplace priority and structured compensation.
           </p>
         </div>
 
@@ -268,6 +294,13 @@ export default function AddGigPage() {
                   title: '',
                   trackId: '',
                   paymentAmount: '',
+                  compensationType: 'fixed',
+                  minAmount: '',
+                  maxAmount: '',
+                  currency: 'INR',
+                  priority: '0',
+                  isFeatured: false,
+                  postedAt: '',
                   shortDescription: '',
                   overview: '',
                   responsibilities: [''],
@@ -315,7 +348,7 @@ export default function AddGigPage() {
               )}
             </div>
 
-            {/* Track & Compensation Grid */}
+            {/* Track & Priority Grid */}
             <div className="admin-form-grid">
               <div className="admin-form-group" style={{ marginBottom: 0 }}>
                 <label htmlFor="trackId" className="admin-form-label">
@@ -341,42 +374,174 @@ export default function AddGigPage() {
               </div>
 
               <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="priority" className="admin-form-label">
+                  Marketplace Priority
+                </label>
+                <select
+                  id="priority"
+                  value={formData.priority}
+                  onChange={(e) => handleChange('priority', e.target.value)}
+                  className="admin-select"
+                  disabled={isSubmitting}
+                >
+                  <option value="0">Standard (P0)</option>
+                  <option value="10">Elevated (P10)</option>
+                  <option value="20">High Priority (P20)</option>
+                  <option value="30">Urgent / Top Pick (P30)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Featured Checkbox & External ID */}
+            <div className="admin-form-grid" style={{ marginTop: '14px', alignItems: 'center' }}>
+              <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="externalGigId" className="admin-form-label">
+                  External Reference ID <span className="admin-form-optional">(Optional)</span>
+                </label>
+                <input
+                  id="externalGigId"
+                  type="text"
+                  value={formData.externalGigId}
+                  onChange={(e) => handleChange('externalGigId', e.target.value)}
+                  placeholder="e.g. GIG-RR-101"
+                  className="admin-input"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '18px' }}>
+                <input
+                  id="isFeatured"
+                  type="checkbox"
+                  checked={formData.isFeatured}
+                  onChange={(e) => handleChange('isFeatured', e.target.checked)}
+                  disabled={isSubmitting}
+                  style={{ width: '16px', height: '16px', accentColor: '#E31B23', cursor: 'pointer' }}
+                />
+                <label htmlFor="isFeatured" style={{ fontSize: '13px', fontWeight: 600, color: '#111827', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Sparkles size={13} style={{ color: '#E31B23' }} />
+                  <span>Highlight as Featured Opportunity</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Compensation Section */}
+            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#F9FAFB', borderRadius: '10px', border: '1px solid #E5E7EB' }}>
+              <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '0 0 12px 0' }}>
+                Compensation Details
+              </h4>
+
+              <div className="admin-form-group">
                 <label htmlFor="paymentAmount" className="admin-form-label">
-                  Rate / Compensation <span className="admin-form-optional">(Optional)</span>
+                  Display Rate / Compensation String <span className="admin-form-optional">(Visible on card)</span>
                 </label>
                 <input
                   id="paymentAmount"
                   type="text"
                   value={formData.paymentAmount}
                   onChange={(e) => handleChange('paymentAmount', e.target.value)}
-                  placeholder="e.g. $45 / hr or $600 fixed"
+                  placeholder="e.g. ₹35,000 / month or $45 / hr"
+                  className="admin-input"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                  <label htmlFor="compensationType" className="admin-form-label">Type</label>
+                  <select
+                    id="compensationType"
+                    value={formData.compensationType}
+                    onChange={(e) => handleChange('compensationType', e.target.value)}
+                    className="admin-select"
+                    disabled={isSubmitting}
+                  >
+                    <option value="fixed">Fixed Project</option>
+                    <option value="hourly">Hourly Rate</option>
+                    <option value="monthly">Monthly Retainer</option>
+                    <option value="milestone">Milestone</option>
+                    <option value="unspecified">Unspecified</option>
+                  </select>
+                </div>
+
+                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                  <label htmlFor="minAmount" className="admin-form-label">Min Amount</label>
+                  <input
+                    id="minAmount"
+                    type="number"
+                    value={formData.minAmount}
+                    onChange={(e) => handleChange('minAmount', e.target.value)}
+                    placeholder="e.g. 35000"
+                    className="admin-input"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                  <label htmlFor="maxAmount" className="admin-form-label">Max Amount</label>
+                  <input
+                    id="maxAmount"
+                    type="number"
+                    value={formData.maxAmount}
+                    onChange={(e) => handleChange('maxAmount', e.target.value)}
+                    placeholder="e.g. 50000"
+                    className="admin-input"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                  <label htmlFor="currency" className="admin-form-label">Currency</label>
+                  <input
+                    id="currency"
+                    type="text"
+                    value={formData.currency}
+                    onChange={(e) => handleChange('currency', e.target.value)}
+                    placeholder="INR / USD"
+                    className="admin-input"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Apply Gateway Origin URL & Date */}
+            <div className="admin-form-grid" style={{ marginTop: '16px' }}>
+              <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="originUrl" className="admin-form-label">
+                  Apply Gateway Origin URL <span className="admin-form-req">*</span>
+                </label>
+                <input
+                  id="originUrl"
+                  type="text"
+                  value={formData.originUrl}
+                  onChange={(e) => handleChange('originUrl', e.target.value)}
+                  placeholder="e.g. https://www.upwork.com/jobs/~0123456"
+                  className={`admin-input ${errors.originUrl ? 'has-error' : ''}`}
+                  disabled={isSubmitting}
+                />
+                {errors.originUrl && (
+                  <p className="admin-form-error">{errors.originUrl}</p>
+                )}
+              </div>
+
+              <div className="admin-form-group" style={{ marginBottom: 0 }}>
+                <label htmlFor="postedAt" className="admin-form-label">
+                  Original Posted Date <span className="admin-form-optional">(Optional)</span>
+                </label>
+                <input
+                  id="postedAt"
+                  type="date"
+                  value={formData.postedAt}
+                  onChange={(e) => handleChange('postedAt', e.target.value)}
                   className="admin-input"
                   disabled={isSubmitting}
                 />
               </div>
             </div>
 
-            {/* Apply Gateway Origin URL */}
-            <div className="admin-form-group">
-              <label htmlFor="originUrl" className="admin-form-label">
-                Apply Gateway Origin URL <span className="admin-form-req">*</span>
-              </label>
-              <input
-                id="originUrl"
-                type="text"
-                value={formData.originUrl}
-                onChange={(e) => handleChange('originUrl', e.target.value)}
-                placeholder="e.g. https://www.upwork.com/jobs/~0123456"
-                className={`admin-input ${errors.originUrl ? 'has-error' : ''}`}
-                disabled={isSubmitting}
-              />
-              {errors.originUrl && (
-                <p className="admin-form-error">{errors.originUrl}</p>
-              )}
-            </div>
-
             {/* Short Description */}
-            <div className="admin-form-group">
+            <div className="admin-form-group" style={{ marginTop: '16px' }}>
               <label htmlFor="shortDescription" className="admin-form-label">
                 Short Summary / Overview <span className="admin-form-optional">(Snippet)</span>
               </label>

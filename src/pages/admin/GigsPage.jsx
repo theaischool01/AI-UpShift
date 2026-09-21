@@ -13,17 +13,20 @@ import {
   Loader2, 
   AlertCircle, 
   ChevronLeft, 
-  ChevronRight
+  ChevronRight,
+  ArrowUpDown,
+  Sparkles
 } from 'lucide-react';
 import { fetchGigs as fetchGigsService, fetchTracks as fetchTracksService, deleteGig as deleteGigService } from '../../services/gigService';
 
 export default function GigsPage() {
   const navigate = useNavigate();
 
-  // Filter & Search states
+  // Filter, Search & Sort states
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedTrack, setSelectedTrack] = useState('ALL');
+  const [sortBy, setSortBy] = useState('priority');
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -64,7 +67,7 @@ export default function GigsPage() {
     loadMetadata();
   }, []);
 
-  // Primary server-side query with filters and pagination
+  // Primary server-side query with filters, sorting, and pagination
   const fetchGigs = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -74,6 +77,7 @@ export default function GigsPage() {
       pageSize,
       search: debouncedSearch,
       trackId: selectedTrack,
+      sortBy,
     });
 
     if (queryError) {
@@ -83,7 +87,7 @@ export default function GigsPage() {
       setTotalGigs(count || 0);
     }
     setLoading(false);
-  }, [page, pageSize, debouncedSearch, selectedTrack]);
+  }, [page, pageSize, debouncedSearch, selectedTrack, sortBy]);
 
   useEffect(() => {
     fetchGigs();
@@ -130,7 +134,7 @@ export default function GigsPage() {
             <span>Opportunities Directory</span>
           </h1>
           <p className="admin-page-description">
-            Manage commercial gigs, verify external apply gateways, and associate with UpShift tracks.
+            Manage commercial opportunities, marketplace ranking priority, and verify external apply gateways.
           </p>
         </div>
 
@@ -187,7 +191,8 @@ export default function GigsPage() {
             />
           </div>
 
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {/* Track Filter */}
             <select
               value={selectedTrack}
               onChange={(e) => {
@@ -203,6 +208,21 @@ export default function GigsPage() {
                   {t.code} — {t.name}
                 </option>
               ))}
+            </select>
+
+            {/* Sort Order Selector */}
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setPage(1);
+              }}
+              className="admin-select"
+              aria-label="Sort opportunities by"
+            >
+              <option value="priority">Sort: Priority & Featured</option>
+              <option value="newest">Sort: Newest Posted</option>
+              <option value="pay">Sort: Highest Pay</option>
             </select>
           </div>
         </div>
@@ -242,17 +262,19 @@ export default function GigsPage() {
               <thead>
                 <tr>
                   <th>Opportunity</th>
-                  <th>Gig ID</th>
+                  <th>Priority</th>
                   <th>Module</th>
                   <th>Compensation</th>
                   <th>Gateway</th>
-                  <th>Created</th>
+                  <th>Posted / Created</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {gigs.map((gig) => {
                   const track = gig.track || tracks.find(t => t.id === gig.track_id);
+                  const isFeatured = gig.is_featured;
+                  const priorityVal = gig.priority || 0;
 
                   return (
                     <tr key={gig.id}>
@@ -262,26 +284,31 @@ export default function GigsPage() {
                           {gig.title}
                         </div>
                         {gig.short_description && (
-                          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, maxWidth: '380px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, maxWidth: '360px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {gig.short_description}
                           </p>
                         )}
                       </td>
 
-                      {/* Gig ID */}
+                      {/* Priority / Featured Badge */}
                       <td>
-                        <span style={{ 
-                          display: 'inline-flex', 
-                          padding: '2px 6px', 
-                          borderRadius: '4px', 
-                          fontSize: '11px', 
-                          fontWeight: 700, 
-                          fontFamily: 'monospace',
-                          backgroundColor: '#F3F4F6',
-                          color: '#4B5563'
-                        }}>
-                          {gig.external_gig_id || '—'}
-                        </span>
+                        {isFeatured ? (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 7px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 800, backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA' }}>
+                            <Sparkles size={11} /> Featured
+                          </span>
+                        ) : priorityVal >= 20 ? (
+                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 700, backgroundColor: '#FEF3C7', color: '#B45309' }}>
+                            High (P{priorityVal})
+                          </span>
+                        ) : priorityVal >= 10 ? (
+                          <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 700, backgroundColor: '#EFF6FF', color: '#1D4ED8' }}>
+                            Elevated (P{priorityVal})
+                          </span>
+                        ) : (
+                          <span style={{ color: '#9CA3AF', fontSize: '11px' }}>
+                            Standard
+                          </span>
+                        )}
                       </td>
 
                       {/* Module Code / Badge */}
@@ -305,8 +332,13 @@ export default function GigsPage() {
                       {/* Compensation */}
                       <td>
                         <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#047857' }}>
-                          {gig.payment_amount || '—'}
+                          {gig.payment_amount || (gig.max_amount ? `${gig.currency || 'INR'} ${gig.max_amount}` : '—')}
                         </span>
+                        {gig.compensation_type && gig.compensation_type !== 'unspecified' && (
+                          <span style={{ display: 'block', fontSize: '10px', color: '#6B7280', textTransform: 'capitalize' }}>
+                            {gig.compensation_type}
+                          </span>
+                        )}
                       </td>
 
                       {/* Apply Gateway */}
@@ -328,9 +360,9 @@ export default function GigsPage() {
                         )}
                       </td>
 
-                      {/* Created Date */}
+                      {/* Created / Posted Date */}
                       <td style={{ fontSize: '12px', color: '#6B7280', whiteSpace: 'nowrap' }}>
-                        {formatDate(gig.created_at)}
+                        {formatDate(gig.posted_at || gig.created_at)}
                       </td>
 
                       {/* Action Buttons */}
@@ -348,7 +380,7 @@ export default function GigsPage() {
                           <Link
                             to={`/admin/gigs/new?id=${gig.id}`}
                             className="admin-btn-icon"
-                            title="Edit opportunity"
+                            title="Edit opportunity details"
                           >
                             <Edit size={13} />
                           </Link>
@@ -357,7 +389,7 @@ export default function GigsPage() {
                             type="button"
                             onClick={() => setDeletingGig(gig)}
                             className="admin-btn-icon admin-btn-icon-danger"
-                            title="Delete opportunity"
+                            title="Delete opportunity record"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -371,8 +403,8 @@ export default function GigsPage() {
           </div>
         )}
 
-        {/* Pagination Bar */}
-        {!loading && totalPages > 1 && (
+        {/* Pagination Footer */}
+        {totalPages > 1 && (
           <div style={{ padding: '12px 20px', borderTop: '1px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FAFAFA' }}>
             <span style={{ fontSize: '12px', color: '#6B7280', fontFamily: 'monospace' }}>
               Showing {((page - 1) * pageSize) + 1}–{Math.min(page * pageSize, totalGigs)} of {totalGigs} opportunities
@@ -384,13 +416,13 @@ export default function GigsPage() {
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="admin-btn admin-btn-sm admin-btn-secondary"
+                aria-label="Previous Page"
               >
                 <ChevronLeft size={13} />
-                <span>Prev</span>
               </button>
 
-              <span style={{ fontSize: '12px', fontWeight: 600, padding: '0 8px', fontFamily: 'monospace' }}>
-                {page} / {totalPages}
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#374151', padding: '0 4px' }}>
+                Page {page} of {totalPages}
               </span>
 
               <button
@@ -398,8 +430,8 @@ export default function GigsPage() {
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="admin-btn admin-btn-sm admin-btn-secondary"
+                aria-label="Next Page"
               >
-                <span>Next</span>
                 <ChevronRight size={13} />
               </button>
             </div>
@@ -407,181 +439,22 @@ export default function GigsPage() {
         )}
       </div>
 
-      {/* Detail Preview Modal */}
-      {viewingGig && (
-        <div className="admin-modal-overlay" onClick={() => setViewingGig(null)}>
-          <div className="admin-modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Briefcase size={17} style={{ color: '#E31B23' }} />
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#111827' }}>
-                  Opportunity Details
-                </h3>
-              </div>
-              <button
-                onClick={() => setViewingGig(null)}
-                className="admin-btn-icon"
-              >
-                <X size={15} />
-              </button>
-            </div>
-
-            <div className="admin-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                  Title
-                </span>
-                <h4 style={{ margin: '2px 0 0 0', fontSize: '16px', fontWeight: 800, color: '#111827' }}>
-                  {viewingGig.title}
-                </h4>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    UpShift Track
-                  </span>
-                  <div style={{ marginTop: '2px', fontSize: '13px', fontWeight: 700, fontFamily: 'monospace' }}>
-                    {viewingGig.track?.name ? `${viewingGig.track.code} · ${viewingGig.track.name}` : (viewingGig.track_id || '—')}
-                  </div>
-                </div>
-
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    Compensation
-                  </span>
-                  <div style={{ marginTop: '2px', fontSize: '13px', fontWeight: 700, color: '#047857' }}>
-                    {viewingGig.payment_amount || '—'}
-                  </div>
-                </div>
-              </div>
-
-              {viewingGig.origin_url && (
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    Apply Gateway Origin URL
-                  </span>
-                  <div style={{ marginTop: '2px' }}>
-                    <a
-                      href={viewingGig.origin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ fontSize: '12px', color: '#4F46E5', wordBreak: 'break-all' }}
-                    >
-                      {viewingGig.origin_url}
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {viewingGig.overview && (
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    About the Role
-                  </span>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                    {viewingGig.overview}
-                  </p>
-                </div>
-              )}
-
-              {Array.isArray(viewingGig.responsibilities) && viewingGig.responsibilities.length > 0 && (
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    Responsibilities
-                  </span>
-                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12.5px', color: '#374151', lineHeight: 1.6 }}>
-                    {viewingGig.responsibilities.map((r, i) => (
-                      <li key={i}>{r}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {Array.isArray(viewingGig.deliverables) && viewingGig.deliverables.length > 0 && (
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    Deliverables
-                  </span>
-                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12.5px', color: '#374151', lineHeight: 1.6 }}>
-                    {viewingGig.deliverables.map((d, i) => (
-                      <li key={i}>{d}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {Array.isArray(viewingGig.requirements) && viewingGig.requirements.length > 0 && (
-                <div>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6B7280', fontWeight: 700 }}>
-                    Requirements
-                  </span>
-                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '18px', fontSize: '12.5px', color: '#374151', lineHeight: 1.6 }}>
-                    {viewingGig.requirements.map((req, i) => (
-                      <li key={i}>{req}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {viewingGig.proof_spec && (
-                <div style={{ backgroundColor: '#F9FAFB', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E5E7EB' }}>
-                  <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#4B5563', fontWeight: 700 }}>
-                    Required Proof Specification
-                  </span>
-                  <p style={{ margin: '3px 0 0 0', fontSize: '12px', color: '#111827', fontWeight: 500 }}>
-                    {viewingGig.proof_spec}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="admin-modal-footer">
-              <Link
-                to={`/admin/gigs/new?id=${viewingGig.id}`}
-                className="admin-btn admin-btn-primary"
-              >
-                <Edit size={13} />
-                <span>Edit Opportunity</span>
-              </Link>
-
-              <button
-                onClick={() => setViewingGig(null)}
-                className="admin-btn admin-btn-secondary"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal */}
       {deletingGig && (
-        <div className="admin-modal-overlay" onClick={() => setDeletingGig(null)}>
-          <div className="admin-modal-container admin-modal-compact" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#DC2626' }}>
-                <Trash2 size={17} />
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#111827' }}>
-                  Delete Opportunity?
-                </h3>
-              </div>
-              <button
-                onClick={() => setDeletingGig(null)}
-                className="admin-btn-icon"
-              >
-                <X size={15} />
-              </button>
+        <div className="admin-modal-overlay" onClick={() => !isDeleting && setDeletingGig(null)}>
+          <div className="admin-modal-card" onClick={e => e.stopPropagation()}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#FEF2F2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+              <AlertCircle size={20} />
             </div>
 
-            <div className="admin-modal-body">
-              <p style={{ fontSize: '13px', color: '#4B5563', lineHeight: 1.5, margin: 0 }}>
-                Are you sure you want to delete <strong>{deletingGig.title}</strong>? This will permanently remove the commercial opportunity from learner feeds.
-              </p>
-            </div>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#111827', margin: '0 0 6px 0' }}>
+              Delete Commercial Opportunity?
+            </h3>
+            <p style={{ fontSize: '13px', color: '#6B7280', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+              Are you sure you want to delete <strong>{deletingGig.title}</strong>? This will remove the opportunity from learner boards.
+            </p>
 
-            <div className="admin-modal-footer">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
                 type="button"
                 onClick={() => setDeletingGig(null)}
@@ -590,21 +463,81 @@ export default function GigsPage() {
               >
                 Cancel
               </button>
-
               <button
                 type="button"
                 onClick={confirmDeleteGig}
                 disabled={isDeleting}
-                className="admin-btn admin-btn-danger"
+                className="admin-btn admin-btn-primary"
+                style={{ backgroundColor: '#DC2626', borderColor: '#DC2626' }}
               >
-                {isDeleting ? (
-                  <>
-                    <Loader2 size={13} className="animate-spin" />
-                    <span>Deleting...</span>
-                  </>
-                ) : (
-                  <span>Yes, Delete</span>
-                )}
+                {isDeleting ? 'Deleting...' : 'Delete Opportunity'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Preview Modal */}
+      {viewingGig && (
+        <div className="admin-modal-overlay" onClick={() => setViewingGig(null)}>
+          <div className="admin-modal-card admin-modal-card-wide" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid #E5E7EB', paddingBottom: '14px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, color: '#E31B23', textTransform: 'uppercase' }}>
+                  Opportunity Specification Preview
+                </span>
+                <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#111827', margin: '2px 0 0 0' }}>
+                  {viewingGig.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingGig(null)}
+                className="admin-btn-icon"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '60vh', overflowY: 'auto' }}>
+              {viewingGig.payment_amount && (
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Compensation</label>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#047857' }}>{viewingGig.payment_amount}</span>
+                </div>
+              )}
+
+              {viewingGig.short_description && (
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Short Description</label>
+                  <p style={{ fontSize: '13px', color: '#1F2937', margin: 0, lineHeight: 1.5 }}>{viewingGig.short_description}</p>
+                </div>
+              )}
+
+              {viewingGig.overview && (
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Role Overview</label>
+                  <p style={{ fontSize: '13px', color: '#1F2937', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-line' }}>{viewingGig.overview}</p>
+                </div>
+              )}
+
+              {viewingGig.origin_url && (
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Apply Gateway</label>
+                  <a href={viewingGig.origin_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12.5px', color: '#4F46E5', wordBreak: 'break-all' }}>
+                    {viewingGig.origin_url}
+                  </a>
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: '20px', paddingTop: '14px', borderTop: '1px solid #E5E7EB', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setViewingGig(null)}
+                className="admin-btn admin-btn-secondary"
+              >
+                Close Preview
               </button>
             </div>
           </div>

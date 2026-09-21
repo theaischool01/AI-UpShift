@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function OpportunityCard({ gig }) {
   if (!gig) return null;
@@ -10,7 +10,7 @@ export default function OpportunityCard({ gig }) {
   return (
     <div className="learner-card group flex flex-col justify-between p-6 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">
       <div>
-        {/* Top: Track Code & Name Badge */}
+        {/* Top: Track Code & Name Badge + Featured Indicator */}
         <div className="flex items-center justify-between gap-2 mb-3.5">
           {track ? (
             <span
@@ -25,6 +25,13 @@ export default function OpportunityCard({ gig }) {
             </span>
           ) : (
             <span className="learner-badge-chip text-xs">UpShift Track</span>
+          )}
+
+          {gig.is_featured && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-amber-50 text-amber-700 border border-amber-200">
+              <Sparkles className="w-3 h-3 text-amber-500" />
+              <span>Featured</span>
+            </span>
           )}
         </div>
 

@@ -210,7 +210,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* ============================================================ */}
       {/* 2. PROGRAM SHOWCASE SLIDESHOW (Cinematic 16:9 Full-Width)     */}
       {/* ============================================================ */}
-      <section id="programs" className="relative scroll-mt-20 md:scroll-mt-24 bg-[#FAF8F5] overflow-hidden">
+      <section id="programs" className="relative scroll-mt-20 md:scroll-mt-24 bg-white">
         <ExploringProgramsSection />
       </section>
 

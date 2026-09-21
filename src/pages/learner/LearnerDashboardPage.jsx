@@ -15,6 +15,7 @@ export default function LearnerDashboardPage() {
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrack, setSelectedTrack] = useState('ALL');
+  const [sortBy, setSortBy] = useState('priority');
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -51,6 +52,7 @@ export default function LearnerDashboardPage() {
       search: searchQuery,
       trackId: selectedTrack,
       isActive: true,
+      sortBy,
     });
 
     if (queryErr) {
@@ -61,7 +63,7 @@ export default function LearnerDashboardPage() {
       setTotalGigs(count || 0);
     }
     setLoadingGigs(false);
-  }, [searchQuery, selectedTrack, page, pageSize]);
+  }, [searchQuery, selectedTrack, sortBy, page, pageSize]);
 
   useEffect(() => {
     fetchGigs();
@@ -101,6 +103,8 @@ export default function LearnerDashboardPage() {
           setSearchQuery={setSearchQuery}
           selectedTrack={selectedTrack}
           setSelectedTrack={setSelectedTrack}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
           tracks={tracks}
           onFilterChange={() => setPage(1)}
         />

@@ -2,7 +2,9 @@ import React, { useRef } from 'react';
 import { 
   Search, 
   X, 
-  Layers 
+  Layers,
+  ArrowUpDown,
+  Sparkles
 } from 'lucide-react';
 
 export default function OpportunityFilters({
@@ -10,6 +12,8 @@ export default function OpportunityFilters({
   setSearchQuery,
   selectedTrack,
   setSelectedTrack,
+  sortBy = 'priority',
+  setSortBy = () => {},
   tracks = [],
   onFilterChange = () => {},
 }) {
@@ -34,7 +38,7 @@ export default function OpportunityFilters({
 
   return (
     <div className="space-y-3">
-      {/* Filter & Search Bar */}
+      {/* Filter, Search & Sort Bar */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
         {/* Search Input */}
         <div className="learner-search-wrap flex-1">
@@ -57,24 +61,45 @@ export default function OpportunityFilters({
           )}
         </div>
 
-        {/* Module / Capability Area Filter */}
-        <div className="flex items-center min-w-[240px]">
-          <select
-            value={activeSelectedTrack}
-            onChange={(e) => {
-              handleSelectTrack(e.target.value);
-              onFilterChange();
-            }}
-            className="learner-select-filter w-full"
-            aria-label="Filter by UpShift Module"
-          >
-            <option value="ALL">All Modules (M1–M6)</option>
-            {availableTracks.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.code} — {t.name}
-              </option>
-            ))}
-          </select>
+        {/* Controls Group: Track Module Filter + Marketplace Sort */}
+        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+          {/* Module / Capability Area Filter */}
+          <div className="flex-1 sm:flex-none sm:min-w-[210px]">
+            <select
+              value={activeSelectedTrack}
+              onChange={(e) => {
+                handleSelectTrack(e.target.value);
+                onFilterChange();
+              }}
+              className="learner-select-filter w-full"
+              aria-label="Filter by UpShift Module"
+            >
+              <option value="ALL">All Modules (M1–M6)</option>
+              {availableTracks.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.code} — {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Marketplace Sort Selector */}
+          <div className="flex-1 sm:flex-none sm:min-w-[190px]">
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                onFilterChange();
+              }}
+              className="learner-select-filter w-full font-medium"
+              aria-label="Sort marketplace opportunities"
+            >
+              <option value="priority">Priority (Featured)</option>
+              <option value="newest">Newest Posted</option>
+              <option value="pay">Most Pay</option>
+              <option value="trending">Trending</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>

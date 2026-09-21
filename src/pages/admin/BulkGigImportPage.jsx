@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   UploadCloud, 
   FileText, 
@@ -10,8 +12,7 @@ import {
   AlertTriangle,
   Briefcase
 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
-import { fetchTracks as fetchTracksService } from '../../services/gigService';
+import { fetchTracks as fetchTracksService, importGigsBatch } from '../../services/gigService';
 
 function parseCSV(text) {
   const lines = [];
@@ -61,7 +62,6 @@ function parseCSV(text) {
 }
 
 export default function BulkGigImportPage() {
-  const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
   const [tracks, setTracks] = useState([]);
@@ -106,10 +106,68 @@ export default function BulkGigImportPage() {
   }, []);
 
   const handleDownloadTemplate = () => {
-    const headers = ['title', 'track_id', 'payment_amount', 'origin_url', 'short_description', 'overview', 'responsibilities', 'deliverables', 'requirements', 'proof_spec'];
+    const headers = [
+      'external_gig_id',
+      'title',
+      'track_id',
+      'payment_amount',
+      'compensation_type',
+      'min_amount',
+      'max_amount',
+      'currency',
+      'priority',
+      'is_featured',
+      'posted_at',
+      'origin_url',
+      'short_description',
+      'overview',
+      'responsibilities',
+      'deliverables',
+      'requirements',
+      'proof_spec'
+    ];
+
     const sampleRows = [
-      ['AI Reels Content Producer', 'M1', '$45 / hr', 'https://www.upwork.com/jobs/~0111', 'Produce scroll-stopping reels using AI workflows.', 'Develop recurring short-form video content.', 'Script AI scenes||Edit reels', '15 production assets', 'Composition skills', 'Public video portfolio link'],
-      ['Brand Asset Generator', 'M2', '$600 fixed', 'https://www.upwork.com/jobs/~0222', 'Generate commercial image assets.', 'Create high-res visuals.', 'Prompt engineering||Color matching', '20 hero visuals', 'Midjourney experience', 'Behance portfolio link']
+      [
+        'GIG-RR-101',
+        'AI Reels Content Producer',
+        'M1',
+        '$45 / hr',
+        'hourly',
+        '45',
+        '45',
+        'USD',
+        '20',
+        'true',
+        '2026-09-18',
+        'https://www.upwork.com/jobs/~0111',
+        'Produce scroll-stopping reels using AI workflows.',
+        'Develop recurring short-form video content.',
+        'Script AI scenes||Edit reels||Audio sync',
+        '15 production assets per sprint',
+        'Composition skills||CapCut/Premiere',
+        'Public video portfolio link'
+      ],
+      [
+        'GIG-VF-102',
+        'Brand Asset Generator',
+        'M2',
+        '$600 fixed',
+        'fixed',
+        '600',
+        '600',
+        'USD',
+        '10',
+        'false',
+        '2026-09-19',
+        'https://www.upwork.com/jobs/~0222',
+        'Generate commercial image assets.',
+        'Create high-res visuals for product campaigns.',
+        'Prompt engineering||Color matching',
+        '20 hero visuals in 4K',
+        'Midjourney & Flux experience',
+        'Behance or Figma portfolio link'
+      ]
     ];
 
     const csvContent = [
@@ -121,7 +179,7 @@ export default function BulkGigImportPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'upshift_gig_roster_template.csv');
+    link.setAttribute('download', 'upshift_opportunities_template.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -152,16 +210,24 @@ export default function BulkGigImportPage() {
 
       const rawHeaders = parsedMatrix[0].map(h => h.toLowerCase().trim().replace(/[\s\-]+/g, '_'));
       const colMap = {
-        title: rawHeaders.findIndex(h => h === 'title' || h === 'gig_title' || h === 'opportunity_title'),
-        track: rawHeaders.findIndex(h => h === 'track_id' || h === 'track' || h === 'course_id' || h === 'course'),
-        rate: rawHeaders.findIndex(h => h === 'payment_amount' || h === 'rate' || h === 'compensation'),
+        externalId: rawHeaders.findIndex(h => h === 'external_gig_id' || h === 'external_id' || h === 'gig_id' || h === 'id'),
+        title: rawHeaders.findIndex(h => h === 'title' || h === 'gig_title' || h === 'opportunity_title' || h === 'name'),
+        track: rawHeaders.findIndex(h => h === 'track_id' || h === 'track' || h === 'course_id' || h === 'course' || h === 'module' || h === 'track_code'),
+        rate: rawHeaders.findIndex(h => h === 'payment_amount' || h === 'rate' || h === 'compensation' || h === 'payment' || h === 'stipend' || h === 'price'),
+        compType: rawHeaders.findIndex(h => h === 'compensation_type' || h === 'pay_type' || h === 'type' || h === 'pricing_type'),
+        minAmount: rawHeaders.findIndex(h => h === 'min_amount' || h === 'min_pay' || h === 'min_rate'),
+        maxAmount: rawHeaders.findIndex(h => h === 'max_amount' || h === 'max_pay' || h === 'max_rate' || h === 'amount'),
+        currency: rawHeaders.findIndex(h => h === 'currency'),
+        priority: rawHeaders.findIndex(h => h === 'priority' || h === 'rank'),
+        isFeatured: rawHeaders.findIndex(h => h === 'is_featured' || h === 'featured'),
+        postedAt: rawHeaders.findIndex(h => h === 'posted_at' || h === 'published_at' || h === 'date'),
         originUrl: rawHeaders.findIndex(h => h === 'origin_url' || h === 'url' || h === 'apply_url' || h === 'link'),
-        shortDesc: rawHeaders.findIndex(h => h === 'short_description' || h === 'summary'),
-        overview: rawHeaders.findIndex(h => h === 'overview' || h === 'description'),
-        responsibilities: rawHeaders.findIndex(h => h === 'responsibilities'),
-        deliverables: rawHeaders.findIndex(h => h === 'deliverables'),
-        requirements: rawHeaders.findIndex(h => h === 'requirements'),
-        proofSpec: rawHeaders.findIndex(h => h === 'proof_spec' || h === 'required_proof'),
+        shortDesc: rawHeaders.findIndex(h => h === 'short_description' || h === 'summary' || h === 'short_desc'),
+        overview: rawHeaders.findIndex(h => h === 'overview' || h === 'description' || h === 'long_description' || h === 'about'),
+        responsibilities: rawHeaders.findIndex(h => h === 'responsibilities' || h === 'tasks' || h === 'duties'),
+        deliverables: rawHeaders.findIndex(h => h === 'deliverables' || h === 'outputs'),
+        requirements: rawHeaders.findIndex(h => h === 'requirements' || h === 'skills' || h === 'qualifications'),
+        proofSpec: rawHeaders.findIndex(h => h === 'proof_spec' || h === 'required_proof' || h === 'proof' || h === 'proof_of_work'),
       };
 
       if (colMap.title === -1 || colMap.track === -1 || colMap.originUrl === -1) {
@@ -177,9 +243,17 @@ export default function BulkGigImportPage() {
         const row = parsedMatrix[idx];
         if (row.length === 0 || row.every(c => c.length === 0)) continue;
 
+        const externalGigId = colMap.externalId !== -1 ? row[colMap.externalId] || '' : '';
         const title = row[colMap.title] || '';
         const rawTrack = row[colMap.track] || '';
         const paymentAmount = colMap.rate !== -1 ? row[colMap.rate] || '' : '';
+        const compensationType = colMap.compType !== -1 ? row[colMap.compType] || 'fixed' : 'fixed';
+        const rawMin = colMap.minAmount !== -1 ? row[colMap.minAmount] || '' : '';
+        const rawMax = colMap.maxAmount !== -1 ? row[colMap.maxAmount] || '' : '';
+        const currency = colMap.currency !== -1 ? row[colMap.currency] || 'INR' : 'INR';
+        const rawPriority = colMap.priority !== -1 ? row[colMap.priority] || '0' : '0';
+        const rawFeatured = colMap.isFeatured !== -1 ? row[colMap.isFeatured] || 'false' : 'false';
+        const postedAt = colMap.postedAt !== -1 ? row[colMap.postedAt] || '' : '';
         const originUrl = row[colMap.originUrl] || '';
         const shortDescription = colMap.shortDesc !== -1 ? row[colMap.shortDesc] || '' : '';
         const overview = colMap.overview !== -1 ? row[colMap.overview] || '' : '';
@@ -190,8 +264,8 @@ export default function BulkGigImportPage() {
 
         const rowErrors = [];
 
-        if (!title) rowErrors.push('Missing Title');
-        if (!originUrl) rowErrors.push('Missing Origin URL');
+        if (!title.trim()) rowErrors.push('Missing Title');
+        if (!originUrl.trim()) rowErrors.push('Missing Origin URL');
 
         const matchedTrack = trackMap.get(rawTrack.toLowerCase()) || trackMap.get(rawTrack);
         if (!matchedTrack) {
@@ -202,21 +276,41 @@ export default function BulkGigImportPage() {
         if (isValid) validCount++;
         else invalidCount++;
 
-        const parseList = (str) => str ? str.split('||').map(s => s.trim()).filter(Boolean) : [];
+        // Flexible array parsing: support || or newlines
+        const parseList = (str) => {
+          if (!str) return [];
+          return str
+            .split(/\n|\|\|/)
+            .map(s => s.replace(/^[•\-\*\s]+/, '').trim())
+            .filter(Boolean);
+        };
+
+        const parsedMin = rawMin && !isNaN(parseFloat(rawMin)) ? parseFloat(rawMin) : null;
+        const parsedMax = rawMax && !isNaN(parseFloat(rawMax)) ? parseFloat(rawMax) : (parsedMin || null);
+        const parsedPriority = rawPriority && !isNaN(parseInt(rawPriority, 10)) ? Math.max(0, parseInt(rawPriority, 10)) : 0;
+        const parsedIsFeatured = rawFeatured.toLowerCase() === 'true' || rawFeatured === '1';
 
         validatedList.push({
           rowNumber: idx + 1,
-          title,
+          externalGigId: externalGigId.trim() || null,
+          title: title.trim(),
           trackId: matchedTrack?.id || rawTrack,
           trackCode: matchedTrack?.code || rawTrack,
-          paymentAmount,
-          originUrl,
-          shortDescription,
-          overview,
+          paymentAmount: paymentAmount.trim(),
+          compensationType: compensationType.trim() || 'fixed',
+          minAmount: parsedMin,
+          maxAmount: parsedMax,
+          currency: currency.trim() || 'INR',
+          priority: parsedPriority,
+          isFeatured: parsedIsFeatured,
+          postedAt: postedAt.trim() || null,
+          originUrl: originUrl.trim(),
+          shortDescription: shortDescription.trim(),
+          overview: overview.trim(),
           responsibilities: parseList(rawResp),
           deliverables: parseList(rawDeliv),
           requirements: parseList(rawReq),
-          proofSpec,
+          proofSpec: proofSpec.trim(),
           isValid,
           errors: rowErrors,
         });
@@ -243,9 +337,17 @@ export default function BulkGigImportPage() {
     setImportProgress({ current: 0, total: validRowsToCreate.length, created: 0, failed: 0 });
 
     const payloadBatch = validRowsToCreate.map(r => ({
+      external_gig_id: r.externalGigId,
       title: r.title,
       track_id: r.trackId,
       payment_amount: r.paymentAmount || null,
+      compensation_type: r.compensationType || 'fixed',
+      min_amount: r.minAmount,
+      max_amount: r.maxAmount,
+      currency: r.currency || 'INR',
+      priority: r.priority || 0,
+      is_featured: r.isFeatured || false,
+      posted_at: r.postedAt || null,
       origin_url: r.originUrl,
       short_description: r.shortDescription || null,
       overview: r.overview || null,
@@ -256,19 +358,18 @@ export default function BulkGigImportPage() {
     }));
 
     try {
-      const { data, error } = await supabase
-        .from('gigs')
-        .insert(payloadBatch)
-        .select();
-
-      if (error) throw error;
+      const result = await importGigsBatch(payloadBatch);
 
       setImportProgress({
         current: validRowsToCreate.length,
         total: validRowsToCreate.length,
-        created: (data || []).length,
-        failed: 0,
+        created: result.created,
+        failed: result.failed,
       });
+
+      if (result.errors && result.errors.length > 0) {
+        setImportFailures(result.errors);
+      }
       setImportComplete(true);
     } catch (err) {
       console.error('[BulkGigImport] Insert error:', err);
@@ -289,7 +390,7 @@ export default function BulkGigImportPage() {
             <span>Bulk Opportunity CSV Import</span>
           </h1>
           <p className="admin-page-description">
-            Upload multiple commercial opportunities via CSV assigned to UpShift tracks.
+            Upload and batch-import commercial opportunities assigned to UpShift tracks.
           </p>
         </div>
 
@@ -428,9 +529,9 @@ export default function BulkGigImportPage() {
 
           {/* Import Complete Card */}
           {importComplete && (
-            <div className="admin-card" style={{ backgroundColor: '#F0FDF4', borderColor: '#BBF7D0', padding: '24px' }}>
+            <div className="admin-card" style={{ backgroundColor: importProgress.failed === 0 ? '#F0FDF4' : '#FFFBEB', borderColor: importProgress.failed === 0 ? '#BBF7D0' : '#FDE68A', padding: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '16px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: importProgress.failed === 0 ? '#DCFCE7' : '#FEF3C7', color: importProgress.failed === 0 ? '#15803D' : '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <CheckCircle2 size={20} />
                 </div>
                 <div>
@@ -438,8 +539,16 @@ export default function BulkGigImportPage() {
                     Batch Import Completed
                   </h3>
                   <p style={{ fontSize: '12.5px', color: '#4B5563', margin: 0, lineHeight: 1.5 }}>
-                    Successfully imported <strong>{importProgress.created}</strong> opportunities into UpShift tracks.
+                    Successfully processed: <strong>{importProgress.created}</strong> created/updated
+                    {importProgress.failed > 0 && <span style={{ color: '#DC2626' }}> · {importProgress.failed} failed</span>}.
                   </p>
+                  {importFailures.length > 0 && (
+                    <div style={{ marginTop: '8px', padding: '8px 12px', backgroundColor: '#FEF2F2', borderRadius: '6px', fontSize: '11px', color: '#991B1B' }}>
+                      {importFailures.map((f, i) => (
+                        <div key={i}>Row {f.row}: {f.error}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -488,6 +597,7 @@ export default function BulkGigImportPage() {
                       <th>Opportunity Title</th>
                       <th>Track Code</th>
                       <th>Compensation</th>
+                      <th>Priority</th>
                       <th>Issues</th>
                     </tr>
                   </thead>
@@ -513,6 +623,15 @@ export default function BulkGigImportPage() {
                           </span>
                         </td>
                         <td style={{ fontFamily: 'monospace' }}>{r.paymentAmount || '—'}</td>
+                        <td>
+                          {r.priority > 0 || r.isFeatured ? (
+                            <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#E31B23', backgroundColor: '#FEF2F2', padding: '2px 6px', borderRadius: '4px' }}>
+                              {r.isFeatured ? '★ Featured' : `P${r.priority}`}
+                            </span>
+                          ) : (
+                            <span style={{ color: '#9CA3AF', fontSize: '11px' }}>Standard</span>
+                          )}
+                        </td>
                         <td>
                           {r.errors.length > 0 ? (
                             <span style={{ color: '#DC2626', fontSize: '11px', fontWeight: 500 }}>
