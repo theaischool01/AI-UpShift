@@ -381,14 +381,6 @@ export default function LearnerGigDetailPage() {
                 <span className="learner-meta-label">LOCATION</span>
                 <span className="learner-meta-value">Remote (Global)</span>
               </div>
-
-              <div className="learner-meta-item">
-                <span className="learner-meta-label">VETTING</span>
-                <span className="learner-meta-value learner-meta-value-green">
-                  <CheckCircle2 size={14} className="learner-status-icon-green" />
-                  <span>Direct Gateway</span>
-                </span>
-              </div>
             </div>
 
             {/* Divider */}
@@ -404,11 +396,6 @@ export default function LearnerGigDetailPage() {
                 <span>APPLY NOW</span>
                 <ArrowRight size={16} />
               </button>
-
-              <div className="learner-sidebar-trust-note">
-                <CheckCircle2 size={13} className="learner-status-icon-green" />
-                <span>Direct application via UpShift Verified Gateway</span>
-              </div>
             </div>
           </div>
         </aside>

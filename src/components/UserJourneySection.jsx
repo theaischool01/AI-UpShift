@@ -67,7 +67,7 @@ const STORIES_DATA = [
     id: 9,
     name: 'K Preethi',
     shortCode: 'KP',
-    avatar: '/assets/testimonial-08.webp',
+    avatar: '/assets/testimonial-08.png',
     quote: 'For me, it is not only about earning. I have learned how to manage my time, complete work properly, and be responsible for what I do. At the same time, having my own small income feels really nice because I can spend it on things I need or want.'
   },
 

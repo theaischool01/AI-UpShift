@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UpShiftWordmark from './common/UpShiftWordmark';
 
 export default function Navbar({ onOpenRegistration }) {
   const { user, role } = useAuth();
+  const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -25,6 +26,11 @@ export default function Navbar({ onOpenRegistration }) {
 
   // Track active section as user scrolls through sections
   useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveSection('');
+      return;
+    }
+
     const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'opportunities', 'upshifter'];
 
     const observer = new IntersectionObserver(
@@ -47,7 +53,7 @@ export default function Navbar({ onOpenRegistration }) {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [location.pathname]);
 
   const navItems = [
     { id: 'programs', label: 'Programs' },
@@ -62,11 +68,11 @@ export default function Navbar({ onOpenRegistration }) {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.location.href = `/#${sectionId}`;
     }
   };
 
-  const isHero = activeSection === 'hero';
+  const isHero = location.pathname === '/' && activeSection === 'hero';
 
   return (
     <header className="nav-floating-wrapper">

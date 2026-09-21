@@ -119,6 +119,18 @@ export default function ExploringProgramsSection() {
   const currentSlide = SLIDES[currentIndex];
   const incomingSlide = nextIndex !== null ? SLIDES[nextIndex] : null;
 
+  const goToSlide = (idx) => {
+    if (idx === currentIndex || isSliding) return;
+    if (prefersReducedMotion) {
+      setCurrentIndex(idx);
+    } else {
+      setNextIndex(idx);
+      requestAnimationFrame(() => {
+        setIsSliding(true);
+      });
+    }
+  };
+
   return (
     <div 
       className="w-full relative select-none flex flex-col items-center justify-center box-border"
@@ -145,56 +157,36 @@ export default function ExploringProgramsSection() {
       />
 
       {/* Centered Framing System: Left Red Line + Image Frame + Right Red Line */}
-      <div className="relative z-20 flex items-center justify-center gap-4 sm:gap-6 md:gap-7 max-w-full">
-        {/* Left Decorative Vertical Editorial Red Line */}
-        <div
-          className="shrink-0 pointer-events-none select-none"
-          style={{
-            width: '2.5px',
-            height: 'clamp(220px, 58vh, 520px)',
-            backgroundColor: '#E31B23',
-            borderRadius: '9999px',
-            boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Cinematic Slideshow Container */}
-        <div
-          className="relative overflow-hidden rounded-xl sm:rounded-2xl shrink-0 z-10"
-          style={{
-            width: 'min(1360px, calc(100vw - 120px), calc((100svh - 90px) * (1672 / 941)))',
-            aspectRatio: '1672 / 941',
-            maxHeight: 'calc(100svh - 90px)',
-            boxShadow: '0 14px 40px -12px rgba(227, 27, 35, 0.08), 0 4px 18px -4px rgba(0, 0, 0, 0.03)',
-          }}
-        >
-          {/* Current Active Slide (slides out to the left) */}
+      <div className="relative z-20 flex flex-col items-center justify-center gap-5 max-w-full">
+        <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-7 max-w-full">
+          {/* Left Decorative Vertical Editorial Red Line */}
           <div
-            className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
+            className="shrink-0 pointer-events-none select-none"
             style={{
-              transform: isSliding ? 'translateX(-100%)' : 'translateX(0%)',
-              transition: isSliding
-                ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
-                : 'none',
-              willChange: isSliding ? 'transform' : 'auto',
+              width: '2.5px',
+              height: 'clamp(220px, 58vh, 520px)',
+              backgroundColor: '#E31B23',
+              borderRadius: '9999px',
+              boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
+            }}
+            aria-hidden="true"
+          />
+
+          {/* Cinematic Slideshow Container */}
+          <div
+            className="relative overflow-hidden rounded-xl sm:rounded-2xl shrink-0 z-10"
+            style={{
+              width: 'min(1360px, calc(100vw - 120px), calc((100svh - 90px) * (1672 / 941)))',
+              aspectRatio: '1672 / 941',
+              maxHeight: 'calc(100svh - 90px)',
+              boxShadow: '0 14px 40px -12px rgba(227, 27, 35, 0.08), 0 4px 18px -4px rgba(0, 0, 0, 0.03)',
             }}
           >
-            <img
-              src={currentSlide.src}
-              alt={currentSlide.alt}
-              className="w-full h-full object-contain block select-none pointer-events-none"
-              loading="eager"
-              draggable={false}
-            />
-          </div>
-
-          {/* Incoming Slide (slides in from the right to center) */}
-          {incomingSlide && (
+            {/* Current Active Slide (slides out to the left) */}
             <div
               className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
               style={{
-                transform: isSliding ? 'translateX(0%)' : 'translateX(100%)',
+                transform: isSliding ? 'translateX(-100%)' : 'translateX(0%)',
                 transition: isSliding
                   ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
                   : 'none',
@@ -202,28 +194,84 @@ export default function ExploringProgramsSection() {
               }}
             >
               <img
-                src={incomingSlide.src}
-                alt={incomingSlide.alt}
+                src={currentSlide.src}
+                alt={currentSlide.alt}
                 className="w-full h-full object-contain block select-none pointer-events-none"
                 loading="eager"
                 draggable={false}
               />
             </div>
-          )}
+
+            {/* Incoming Slide (slides in from the right to center) */}
+            {incomingSlide && (
+              <div
+                className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
+                style={{
+                  transform: isSliding ? 'translateX(0%)' : 'translateX(100%)',
+                  transition: isSliding
+                    ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
+                    : 'none',
+                  willChange: isSliding ? 'transform' : 'auto',
+                }}
+              >
+                <img
+                  src={incomingSlide.src}
+                  alt={incomingSlide.alt}
+                  className="w-full h-full object-contain block select-none pointer-events-none"
+                  loading="eager"
+                  draggable={false}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Right Decorative Vertical Editorial Red Line */}
+          <div
+            className="shrink-0 pointer-events-none select-none"
+            style={{
+              width: '2.5px',
+              height: 'clamp(220px, 58vh, 520px)',
+              backgroundColor: '#E31B23',
+              borderRadius: '9999px',
+              boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
+            }}
+            aria-hidden="true"
+          />
         </div>
 
-        {/* Right Decorative Vertical Editorial Red Line */}
-        <div
-          className="shrink-0 pointer-events-none select-none"
-          style={{
-            width: '2.5px',
-            height: 'clamp(220px, 58vh, 520px)',
-            backgroundColor: '#E31B23',
-            borderRadius: '9999px',
-            boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
-          }}
-          aria-hidden="true"
-        />
+        {/* Reusable 6-Dot Pagination Navigation matching the Testimonial Style */}
+        <div 
+          className="flex items-center justify-center gap-2 pt-2 z-20"
+          role="tablist"
+          aria-label="Exploring Programs Slideshow Navigation"
+        >
+          {SLIDES.map((slide, idx) => {
+            const isActive = currentIndex === idx;
+            return (
+              <button
+                key={`slide-dot-${slide.code || idx}`}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Go to slide ${idx + 1}: ${slide.name}`}
+                onClick={() => goToSlide(idx)}
+                style={{
+                  width: isActive ? '20px' : '8px',
+                  height: '8px',
+                  borderRadius: '9999px',
+                  backgroundColor: isActive ? '#E31B23' : '#CBD5E1',
+                  border: isActive ? '1px solid #E31B23' : '1px solid #94A3B8',
+                  boxShadow: isActive ? '0 1px 6px rgba(227, 27, 35, 0.45)' : 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  flexShrink: 0,
+                }}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

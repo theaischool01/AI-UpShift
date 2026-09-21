@@ -2,13 +2,13 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import ProgramDetailModal from './components/ProgramDetailModal';
 import UpShiftRegistrationModal from './components/UpShiftRegistrationModal';
 import HomePage from './pages/HomePage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
-// Dynamic code splitting for auth and dashboard routes
+// Dynamic code splitting for routes
+const ProgramDetailPage = lazy(() => import('./pages/ProgramDetailPage'));
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
 const EnrollmentPage = lazy(() => import('./pages/enroll/EnrollmentPage'));
 const PaymentPage = lazy(() => import('./pages/enroll/PaymentPage'));
@@ -99,7 +99,6 @@ class AppErrorBoundary extends React.Component {
 }
 
 function PublicHomePage() {
-  const [selectedProgram, setSelectedProgram] = useState(null);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
 
   // Handle URL hash changes to smoothly scroll to sections
@@ -140,18 +139,9 @@ function PublicHomePage() {
       {/* Consolidated 7-Section Experience */}
       <main className="flex-grow">
         <HomePage 
-          onSelectProgram={(p) => setSelectedProgram(p)} 
           onOpenRegistration={() => setIsRegistrationOpen(true)}
         />
       </main>
-
-      {/* Program Detail Deep Dive Modal */}
-      {selectedProgram && (
-        <ProgramDetailModal 
-          program={selectedProgram} 
-          onClose={() => setSelectedProgram(null)} 
-        />
-      )}
 
       {/* UpShift Cohort Registration Modal */}
       <UpShiftRegistrationModal 
@@ -194,6 +184,10 @@ export default function App() {
             <Routes>
               {/* Public Marketing Landing Page */}
               <Route path="/" element={<PublicHomePage />} />
+
+              {/* Dedicated Standalone Program Details Page */}
+              <Route path="/programs/:trackId" element={<ProgramDetailPage />} />
+              <Route path="/programs" element={<Navigate to="/#courses" replace />} />
 
               {/* Public Enrollment & Payment Flow */}
               <Route path="/enroll" element={<EnrollmentPage />} />

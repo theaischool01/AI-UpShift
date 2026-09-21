@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowUpRight, CheckCircle2, Sparkles, Layers, Briefcase, Eye } from 'lucide-react';
 import { PROGRAMS_DATA } from '../data/programsData';
 import MascotBadge from '../components/MascotBadge';
@@ -99,13 +100,13 @@ export default function ProgramsPage({ onSelectProgram, setActivePage }) {
 
                     {/* Action Button */}
                     <div className="flex flex-wrap items-center gap-4">
-                      <button
-                        onClick={() => onSelectProgram(program)}
+                      <Link
+                        to={`/programs/${program.id}`}
                         className="btn btn-primary btn-md group"
                       >
                         <span>View Program Curriculum</span>
                         <ArrowUpRight size={15} className="btn-arrow" />
-                      </button>
+                      </Link>
                       <span className="text-xs font-mono text-[#88857F]">
                         Project-first evaluation · 100% Tangible
                       </span>

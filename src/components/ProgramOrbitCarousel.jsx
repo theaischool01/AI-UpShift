@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowUpRight, 
   Play, 
@@ -21,6 +22,7 @@ const PROGRAM_ICONS = {
 };
 
 export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
+  const navigate = useNavigate();
   // Check if desktop viewport (1024px+)
   const [isDesktop, setIsDesktop] = useState(
     typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
@@ -503,6 +505,7 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (onSelectProgram) onSelectProgram(prog);
+                        navigate(`/programs/${prog.id}`);
                       }}
                       style={{
                         width: '100%',
@@ -523,14 +526,16 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                         transition: 'all 0.2s',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#111111';
-                        e.currentTarget.style.borderColor = '#111111';
+                        e.currentTarget.style.backgroundColor = '#E31B23';
+                        e.currentTarget.style.borderColor = '#E31B23';
                         e.currentTarget.style.color = '#FFFFFF';
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(227, 27, 35, 0.35)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = '#FFFFFF';
                         e.currentTarget.style.borderColor = '#E0DDD7';
                         e.currentTarget.style.color = '#111111';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       <span>View Track Details</span>
@@ -681,7 +686,10 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                   </div>
 
                   <button
-                    onClick={() => onSelectProgram && onSelectProgram(prog)}
+                    onClick={() => {
+                      if (onSelectProgram) onSelectProgram(prog);
+                      navigate(`/programs/${prog.id}`);
+                    }}
                     style={{
                       width: '100%',
                       marginTop: 'auto',
@@ -698,6 +706,19 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                       justifyContent: 'center',
                       gap: '6px',
                       cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#E31B23';
+                      e.currentTarget.style.borderColor = '#E31B23';
+                      e.currentTarget.style.color = '#FFFFFF';
+                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(227, 27, 35, 0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.borderColor = '#E0DDD7';
+                      e.currentTarget.style.color = '#111111';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     <span>View Track Details</span>
