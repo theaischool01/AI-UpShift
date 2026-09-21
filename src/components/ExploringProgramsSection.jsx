@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Exact ordered array of 6 cinematic specialization track slides
 const SLIDES = [
@@ -49,9 +49,13 @@ const TRANSITION_MS = 800;
 export default function ExploringProgramsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(null);
+  const [slideDirection, setSlideDirection] = useState('next');
   const [isSliding, setIsSliding] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
 
   // Preload all 6 images immediately on mount so no slide flashes blank
   useEffect(() => {
@@ -89,6 +93,7 @@ export default function ExploringProgramsSection() {
     const delay = prefersReducedMotion ? INTERVAL_MS : INTERVAL_MS - TRANSITION_MS;
     const timer = setTimeout(() => {
       const upcoming = (currentIndex + 1) % SLIDES.length;
+      setSlideDirection('next');
 
       if (prefersReducedMotion) {
         setCurrentIndex(upcoming);
@@ -119,8 +124,9 @@ export default function ExploringProgramsSection() {
   const currentSlide = SLIDES[currentIndex];
   const incomingSlide = nextIndex !== null ? SLIDES[nextIndex] : null;
 
-  const goToSlide = (idx) => {
+  const goToSlide = (idx, direction = 'next') => {
     if (idx === currentIndex || isSliding) return;
+    setSlideDirection(direction);
     if (prefersReducedMotion) {
       setCurrentIndex(idx);
     } else {
@@ -131,16 +137,52 @@ export default function ExploringProgramsSection() {
     }
   };
 
+  const handleNext = () => {
+    if (isSliding) return;
+    const upcoming = (currentIndex + 1) % SLIDES.length;
+    goToSlide(upcoming, 'next');
+  };
+
+  const handlePrev = () => {
+    if (isSliding) return;
+    const upcoming = (currentIndex - 1 + SLIDES.length) % SLIDES.length;
+    goToSlide(upcoming, 'prev');
+  };
+
+  // Native horizontal touch swipe handling for mobile
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches.length > 0) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const dx = touchEndX - touchStartX.current;
+    const dy = touchEndY - touchStartY.current;
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    // Detect if gesture is predominantly horizontal and exceeds threshold ~45px
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= 45) {
+      if (dx < 0) {
+        // Swipe Left -> Next Slide
+        handleNext();
+      } else {
+        // Swipe Right -> Previous Slide
+        handlePrev();
+      }
+    }
+  };
+
   return (
-    <div 
-      className="w-full relative select-none flex flex-col items-center justify-center box-border"
-      style={{
-        backgroundColor: '#FFFFFF',
-        width: '100%',
-        minHeight: '100svh',
-        padding: 'clamp(24px, 3.5vw, 48px) clamp(16px, 2.5vw, 36px)',
-      }}
-    >
+    <div className="exploring-programs-section">
       {/* Multi-point Corner & Edge Atmospheric Soft Red Ambient Glows behind image */}
       <div
         className="absolute inset-0 pointer-events-none select-none overflow-hidden"
@@ -156,12 +198,12 @@ export default function ExploringProgramsSection() {
         aria-hidden="true"
       />
 
-      {/* Centered Framing System: Left Red Line + Image Frame + Right Red Line */}
+      {/* Centered Framing System: Left Red Line (desktop only) + Image Frame + Right Red Line (desktop only) */}
       <div className="relative z-20 flex flex-col items-center justify-center gap-5 max-w-full">
         <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-7 max-w-full">
-          {/* Left Decorative Vertical Editorial Red Line */}
+          {/* Left Decorative Vertical Editorial Red Line - Hidden completely on mobile */}
           <div
-            className="shrink-0 pointer-events-none select-none"
+            className="hidden md:block shrink-0 pointer-events-none select-none"
             style={{
               width: '2.5px',
               height: 'clamp(220px, 58vh, 520px)',
@@ -172,21 +214,26 @@ export default function ExploringProgramsSection() {
             aria-hidden="true"
           />
 
-          {/* Cinematic Slideshow Container */}
+          {/* Cinematic Slideshow Container with Touch Swipe */}
           <div
             className="relative overflow-hidden rounded-xl sm:rounded-2xl shrink-0 z-10"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             style={{
-              width: 'min(1360px, calc(100vw - 120px), calc((100svh - 90px) * (1672 / 941)))',
+              width: 'min(1360px, calc(100vw - 32px), calc((100svh - 90px) * (1672 / 941)))',
               aspectRatio: '1672 / 941',
               maxHeight: 'calc(100svh - 90px)',
               boxShadow: '0 14px 40px -12px rgba(227, 27, 35, 0.08), 0 4px 18px -4px rgba(0, 0, 0, 0.03)',
+              touchAction: 'pan-y',
             }}
           >
-            {/* Current Active Slide (slides out to the left) */}
+            {/* Current Active Slide */}
             <div
               className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
               style={{
-                transform: isSliding ? 'translateX(-100%)' : 'translateX(0%)',
+                transform: isSliding 
+                  ? (slideDirection === 'next' ? 'translateX(-100%)' : 'translateX(100%)') 
+                  : 'translateX(0%)',
                 transition: isSliding
                   ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
                   : 'none',
@@ -202,12 +249,14 @@ export default function ExploringProgramsSection() {
               />
             </div>
 
-            {/* Incoming Slide (slides in from the right to center) */}
+            {/* Incoming Slide */}
             {incomingSlide && (
               <div
                 className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
                 style={{
-                  transform: isSliding ? 'translateX(0%)' : 'translateX(100%)',
+                  transform: isSliding 
+                    ? 'translateX(0%)' 
+                    : (slideDirection === 'next' ? 'translateX(100%)' : 'translateX(-100%)'),
                   transition: isSliding
                     ? `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 1, 0.5, 1)`
                     : 'none',
@@ -225,9 +274,9 @@ export default function ExploringProgramsSection() {
             )}
           </div>
 
-          {/* Right Decorative Vertical Editorial Red Line */}
+          {/* Right Decorative Vertical Editorial Red Line - Hidden completely on mobile */}
           <div
-            className="shrink-0 pointer-events-none select-none"
+            className="hidden md:block shrink-0 pointer-events-none select-none"
             style={{
               width: '2.5px',
               height: 'clamp(220px, 58vh, 520px)',
@@ -254,7 +303,7 @@ export default function ExploringProgramsSection() {
                 role="tab"
                 aria-selected={isActive}
                 aria-label={`Go to slide ${idx + 1}: ${slide.name}`}
-                onClick={() => goToSlide(idx)}
+                onClick={() => goToSlide(idx, idx > currentIndex ? 'next' : 'prev')}
                 style={{
                   width: isActive ? '20px' : '8px',
                   height: '8px',
@@ -276,3 +325,4 @@ export default function ExploringProgramsSection() {
     </div>
   );
 }
+

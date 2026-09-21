@@ -85,6 +85,9 @@ export default function UserJourneySection() {
   const [isVisible, setIsVisible] = useState(false);
   const [activeStory, setActiveStory] = useState(0);
 
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
+
   useEffect(() => {
     // Respect prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -110,7 +113,7 @@ export default function UserJourneySection() {
     return () => observer.disconnect();
   }, []);
 
-  // Auto-rotate every approximately 6 seconds (6000ms) continuously; reset timer on activeStory change
+  // Auto-rotate every 10 seconds continuously; reset timer on activeStory change
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveStory((prev) => (prev + 1) % STORIES_DATA.length);
@@ -118,6 +121,38 @@ export default function UserJourneySection() {
 
     return () => clearInterval(timer);
   }, [activeStory]);
+
+  // Native horizontal touch swipe navigation for testimonials on mobile
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches.length > 0) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const dx = touchEndX - touchStartX.current;
+    const dy = touchEndY - touchStartY.current;
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    // Detect if gesture is predominantly horizontal and exceeds threshold ~45px
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= 45) {
+      if (dx < 0) {
+        // Swipe Left -> Next Testimonial (wrap-around)
+        setActiveStory((prev) => (prev + 1) % STORIES_DATA.length);
+      } else {
+        // Swipe Right -> Previous Testimonial (wrap-around)
+        setActiveStory((prev) => (prev - 1 + STORIES_DATA.length) % STORIES_DATA.length);
+      }
+    }
+  };
 
   const currentStory = STORIES_DATA[activeStory];
 
@@ -320,6 +355,9 @@ export default function UserJourneySection() {
           className="journey-testimonial-slider-card scroll-mt-28 md:scroll-mt-32"
           role="region"
           aria-label="Our UpShifter Stories Testimonials"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          style={{ touchAction: 'pan-y' }}
         >
           {/* Top Editorial Card Header */}
           <div className="journey-testimonial-header">
