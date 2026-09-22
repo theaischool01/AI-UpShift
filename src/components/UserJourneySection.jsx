@@ -31,7 +31,7 @@ const STORIES_DATA = [
     id: 4,
     name: 'G Ruthwik',
     shortCode: 'GR',
-    avatar: '/assets/testimonial-04.webp',
+    avatar: '/assets/testimonial-04.png',
     quote: 'I joined because I wanted to learn something new and earn at the same time. Working on different tasks helped me understand things better. I also started earning from my work, which felt really good because I could use some of it for myself.'
   },
   {
@@ -52,7 +52,7 @@ const STORIES_DATA = [
     id: 7,
     name: 'M Nandini',
     shortCode: 'MN',
-    avatar: '/assets/testimonial-07.webp',
+    avatar: '/assets/testimonial-07.png',
     quote: 'I started because I wanted to use my free time in a better way. I learned new things while working on real tasks, and slowly started earning as well. I have used some of my earnings for shopping, travel, and other things I wanted.'
   },
   {
