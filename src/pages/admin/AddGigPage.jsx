@@ -11,7 +11,8 @@ import {
   ListChecks, 
   Target, 
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Store
 } from 'lucide-react';
 import { 
   fetchTracks as fetchTracksService, 
@@ -37,6 +38,7 @@ export default function AddGigPage() {
     currency: 'INR',
     priority: '0',
     isFeatured: false,
+    isLocalBusiness: false,
     postedAt: '',
     shortDescription: '',
     overview: '',
@@ -110,6 +112,7 @@ export default function AddGigPage() {
           currency: data.currency || 'INR',
           priority: String(data.priority || 0),
           isFeatured: Boolean(data.is_featured),
+          isLocalBusiness: Boolean(data.is_local_business),
           postedAt: data.posted_at ? new Date(data.posted_at).toISOString().split('T')[0] : '',
           shortDescription: data.short_description || '',
           overview: data.overview || '',
@@ -190,6 +193,7 @@ export default function AddGigPage() {
         currency: formData.currency.trim() || 'INR',
         priority: parsedPriority,
         is_featured: formData.isFeatured,
+        is_local_business: formData.isLocalBusiness,
         posted_at: formData.postedAt.trim() || null,
         short_description: formData.shortDescription.trim() || null,
         overview: formData.overview.trim() || null,
@@ -300,6 +304,7 @@ export default function AddGigPage() {
                   currency: 'INR',
                   priority: '0',
                   isFeatured: false,
+                  isLocalBusiness: false,
                   postedAt: '',
                   shortDescription: '',
                   overview: '',
@@ -392,7 +397,7 @@ export default function AddGigPage() {
               </div>
             </div>
 
-            {/* Featured Checkbox & External ID */}
+            {/* Featured Checkbox, Local Business & External ID */}
             <div className="admin-form-grid" style={{ marginTop: '14px', alignItems: 'center' }}>
               <div className="admin-form-group" style={{ marginBottom: 0 }}>
                 <label htmlFor="externalGigId" className="admin-form-label">
@@ -409,19 +414,36 @@ export default function AddGigPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '18px' }}>
-                <input
-                  id="isFeatured"
-                  type="checkbox"
-                  checked={formData.isFeatured}
-                  onChange={(e) => handleChange('isFeatured', e.target.checked)}
-                  disabled={isSubmitting}
-                  style={{ width: '16px', height: '16px', accentColor: '#E31B23', cursor: 'pointer' }}
-                />
-                <label htmlFor="isFeatured" style={{ fontSize: '13px', fontWeight: 600, color: '#111827', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <Sparkles size={13} style={{ color: '#E31B23' }} />
-                  <span>Highlight as Featured Opportunity</span>
-                </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '18px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    id="isFeatured"
+                    type="checkbox"
+                    checked={formData.isFeatured}
+                    onChange={(e) => handleChange('isFeatured', e.target.checked)}
+                    disabled={isSubmitting}
+                    style={{ width: '16px', height: '16px', accentColor: '#E31B23', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="isFeatured" style={{ fontSize: '13px', fontWeight: 600, color: '#111827', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Sparkles size={13} style={{ color: '#E31B23' }} />
+                    <span>Featured Opportunity</span>
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    id="isLocalBusiness"
+                    type="checkbox"
+                    checked={formData.isLocalBusiness}
+                    onChange={(e) => handleChange('isLocalBusiness', e.target.checked)}
+                    disabled={isSubmitting}
+                    style={{ width: '16px', height: '16px', accentColor: '#059669', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="isLocalBusiness" style={{ fontSize: '13px', fontWeight: 600, color: '#111827', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Store size={13} style={{ color: '#059669' }} />
+                    <span>Local Business</span>
+                  </label>
+                </div>
               </div>
             </div>
 

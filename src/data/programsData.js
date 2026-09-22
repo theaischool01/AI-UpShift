@@ -137,7 +137,7 @@ export const PROGRAMS_DATA = [
   {
     id: "vibe-coder",
     code: "M4",
-    name: "Vibe Coder",
+    name: "VibeCoder",
     category: "AI-Assisted Development",
     tagline: "Build. Automate. Ship Faster.",
     image: "/Page-2/VibeCoder.png",
@@ -145,7 +145,7 @@ export const PROGRAMS_DATA = [
     bgColor: "#EEF2FF",
     badge: "Flagship Software Track",
     oneSentence: "Leverage AI code generation tools to build real responsive web apps, interactive landing experiences, micro-tools, and automated APIs at lightning speed.",
-    overview: "Coding has entered the era of architectural directing. Vibe Coder trains you to think like a product architect: writing precise technical prompts, debugging logic, deploying to live URLs, and crafting bespoke functional web experiences without getting stuck in syntax.",
+    overview: "Coding has entered the era of architectural directing. VibeCoder trains you to think like a product architect: writing precise technical prompts, debugging logic, deploying to live URLs, and crafting bespoke functional web experiences without getting stuck in syntax.",
     skills: [
       "AI-Assisted Architecture & Scaffolding",
       "Component Development (React/Vite)",

@@ -26,21 +26,31 @@ export default function LearnerHeader() {
       <div className="flex items-center gap-4">
         <Link 
           to="/learner/dashboard" 
-          className="flex items-center gap-3 no-underline group select-none text-inherit hover:no-underline"
+          className="flex items-center gap-2.5 sm:gap-3 no-underline group select-none text-inherit hover:no-underline min-w-0"
         >
-          {/* Clean UpShift Arrow Brand Mark */}
+          {/* UpShift Fox Mascot Avatar */}
           <div 
-            className="rounded-lg bg-[#E31B23] flex items-center justify-center text-white font-bold text-sm shadow-xs flex-shrink-0 select-none"
-            style={{ width: '34px', height: '34px', minWidth: '34px', minHeight: '34px', backgroundColor: '#E31B23' }}
+            className="rounded-full overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 shadow-xs flex-shrink-0 select-none p-[1.5px]"
+            style={{ width: '36px', height: '36px', minWidth: '36px', minHeight: '36px' }}
           >
-            ↑
+            <img 
+              src="/assets/mascot/mascot_avatar.jpg" 
+              alt="UpShift Mascot" 
+              className="w-full h-full object-cover rounded-full select-none"
+            />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[15px] font-extrabold tracking-tight text-[#111827] leading-none">
-              <UpShiftWordmark theme="light" />
+          <div className="flex flex-col justify-center min-w-0">
+            <span 
+              className="text-[18px] sm:text-[19px] font-black tracking-[-0.03em] leading-none text-[#111111]"
+              style={{ 
+                fontFamily: 'var(--font-heading, var(--font-display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif))',
+                fontWeight: 900 
+              }}
+            >
+              <UpShiftWordmark theme="light" style={{ fontWeight: 900 }} />
             </span>
-            <span className="text-[10px] font-mono font-bold tracking-[0.14em] text-[#6B7280] uppercase mt-1">
-              Opportunities
+            <span className="text-[9.5px] sm:text-[10px] font-mono font-semibold tracking-[0.14em] text-[#6B7280] uppercase mt-1 leading-none">
+              OPPORTUNITIES
             </span>
           </div>
         </Link>

@@ -26,7 +26,7 @@ const INCLUDED_PROGRAMS = [
   { code: 'M1', name: 'ReelRush AI', domain: 'AI Video & Dynamic Reels', icon: Play, color: '#E91D2B', bg: '#FFF1F1' },
   { code: 'M2', name: 'VisualForge AI', domain: 'Visual Assets & Generative Art', icon: Palette, color: '#8B5CF6', bg: '#F5F3FF' },
   { code: 'M3', name: 'DeepAnnotator', domain: 'Data Quality & AI Evaluation', icon: Database, color: '#059669', bg: '#ECFDF5' },
-  { code: 'M4', name: 'Vibe Coder', domain: 'Full-Stack Apps with AI Coding', icon: Code, color: '#2563EB', bg: '#EFF6FF' },
+  { code: 'M4', name: 'VibeCoder', domain: 'Full-Stack Apps with AI Coding', icon: Code, color: '#2563EB', bg: '#EFF6FF' },
   { code: 'M5', name: 'BrandBuzz AI', domain: 'Growth Campaigns & Viral Copy', icon: Megaphone, color: '#D97706', bg: '#FFFBEB' },
   { code: 'M6', name: 'AgentHandlers', domain: 'Autonomous Multi-Agent Systems', icon: Bot, color: '#0D9488', bg: '#F0FDFA' },
 ];

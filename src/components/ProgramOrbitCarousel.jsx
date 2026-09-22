@@ -512,9 +512,9 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                         marginTop: 'auto',
                         padding: '6px 8px',
                         borderRadius: '7px',
-                        border: '1px solid #E0DDD7',
-                        backgroundColor: '#FFFFFF',
-                        color: '#111111',
+                        border: '1px solid #E31B23',
+                        backgroundColor: '#E31B23',
+                        color: '#FFFFFF',
                         fontSize: '10.5px',
                         fontFamily: 'monospace',
                         fontWeight: 700,
@@ -523,23 +523,26 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                         justifyContent: 'center',
                         gap: '5px',
                         cursor: 'pointer',
-                        transition: 'all 0.2s',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 2px 8px rgba(227, 27, 35, 0.25)',
                       }}
                       onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#C7141C';
+                        e.currentTarget.style.borderColor = '#C7141C';
+                        e.currentTarget.style.color = '#FFFFFF';
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(227, 27, 35, 0.45)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = '#E31B23';
                         e.currentTarget.style.borderColor = '#E31B23';
                         e.currentTarget.style.color = '#FFFFFF';
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(227, 27, 35, 0.35)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#FFFFFF';
-                        e.currentTarget.style.borderColor = '#E0DDD7';
-                        e.currentTarget.style.color = '#111111';
-                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(227, 27, 35, 0.25)';
+                        e.currentTarget.style.transform = 'none';
                       }}
                     >
                       <span>View Track Details</span>
-                      <ArrowUpRight size={12} />
+                      <ArrowUpRight size={12} color="#FFFFFF" />
                     </button>
                   </div>
                 </div>
@@ -695,9 +698,9 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                       marginTop: 'auto',
                       padding: '8px 12px',
                       borderRadius: '9px',
-                      border: '1px solid #E0DDD7',
-                      backgroundColor: '#FFFFFF',
-                      color: '#111111',
+                      border: '1px solid #E31B23',
+                      backgroundColor: '#E31B23',
+                      color: '#FFFFFF',
                       fontSize: '11.5px',
                       fontFamily: 'monospace',
                       fontWeight: 700,
@@ -707,22 +710,23 @@ export default function ProgramOrbitCarousel({ programs, onSelectProgram }) {
                       gap: '6px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(227, 27, 35, 0.25)',
                     }}
                     onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#C7141C';
+                      e.currentTarget.style.borderColor = '#C7141C';
+                      e.currentTarget.style.color = '#FFFFFF';
+                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(227, 27, 35, 0.45)';
+                    }}
+                    onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = '#E31B23';
                       e.currentTarget.style.borderColor = '#E31B23';
                       e.currentTarget.style.color = '#FFFFFF';
-                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(227, 27, 35, 0.35)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#FFFFFF';
-                      e.currentTarget.style.borderColor = '#E0DDD7';
-                      e.currentTarget.style.color = '#111111';
-                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(227, 27, 35, 0.25)';
                     }}
                   >
                     <span>View Track Details</span>
-                    <ArrowUpRight size={13} />
+                    <ArrowUpRight size={13} color="#FFFFFF" />
                   </button>
                 </div>
               );

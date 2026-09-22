@@ -390,7 +390,7 @@ export default function UpShiftRegistrationModal({
                   </div>
                 </div>
                 <p style={{ margin: 0, fontSize: '12px', color: '#555555', lineHeight: '1.45' }}>
-                  Complete access to all 6 applied AI tracks: <strong>M1 ReelRush</strong> · <strong>M2 VisualForge</strong> · <strong>M3 DeepAnnotator</strong> · <strong>M4 Vibe Coder</strong> · <strong>M5 BrandBuzz</strong> · <strong>M6 AgentHandlers</strong>.
+                  Complete access to all 6 applied AI tracks: <strong>M1 ReelRush</strong> · <strong>M2 VisualForge</strong> · <strong>M3 DeepAnnotator</strong> · <strong>M4 VibeCoder</strong> · <strong>M5 BrandBuzz</strong> · <strong>M6 AgentHandlers</strong>.
                 </p>
               </div>
 

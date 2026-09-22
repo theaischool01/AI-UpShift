@@ -60,7 +60,7 @@ export const PROOF_PROJECTS = [
     title: "KiteDesk — AI-Powered Client Intake & Proposal Engine",
     category: "CODE",
     format: "Browser Window",
-    program: "Vibe Coder",
+    program: "VibeCoder",
     accentColor: "#4F46E5",
     author: "Upshifter Leo T.",
     role: "AI Web Builder",

@@ -10,7 +10,8 @@ import {
   Loader2, 
   ArrowLeft, 
   AlertTriangle,
-  Briefcase
+  Briefcase,
+  Store
 } from 'lucide-react';
 import { fetchTracks as fetchTracksService, importGigsBatch } from '../../services/gigService';
 
@@ -117,6 +118,7 @@ export default function BulkGigImportPage() {
       'currency',
       'priority',
       'is_featured',
+      'is_local_business',
       'posted_at',
       'origin_url',
       'short_description',
@@ -139,6 +141,7 @@ export default function BulkGigImportPage() {
         'USD',
         '20',
         'true',
+        'YES',
         '2026-09-18',
         'https://www.upwork.com/jobs/~0111',
         'Produce scroll-stopping reels using AI workflows.',
@@ -159,6 +162,7 @@ export default function BulkGigImportPage() {
         'USD',
         '10',
         'false',
+        'NO',
         '2026-09-19',
         'https://www.upwork.com/jobs/~0222',
         'Generate commercial image assets.',
@@ -220,6 +224,7 @@ export default function BulkGigImportPage() {
         currency: rawHeaders.findIndex(h => h === 'currency'),
         priority: rawHeaders.findIndex(h => h === 'priority' || h === 'rank'),
         isFeatured: rawHeaders.findIndex(h => h === 'is_featured' || h === 'featured'),
+        isLocalBusiness: rawHeaders.findIndex(h => h === 'is_local_business' || h === 'local_business' || h === 'is_local'),
         postedAt: rawHeaders.findIndex(h => h === 'posted_at' || h === 'published_at' || h === 'date'),
         originUrl: rawHeaders.findIndex(h => h === 'origin_url' || h === 'url' || h === 'apply_url' || h === 'link'),
         shortDesc: rawHeaders.findIndex(h => h === 'short_description' || h === 'summary' || h === 'short_desc'),
@@ -253,6 +258,7 @@ export default function BulkGigImportPage() {
         const currency = colMap.currency !== -1 ? row[colMap.currency] || 'INR' : 'INR';
         const rawPriority = colMap.priority !== -1 ? row[colMap.priority] || '0' : '0';
         const rawFeatured = colMap.isFeatured !== -1 ? row[colMap.isFeatured] || 'false' : 'false';
+        const rawLocalBusiness = colMap.isLocalBusiness !== -1 ? row[colMap.isLocalBusiness] || '' : '';
         const postedAt = colMap.postedAt !== -1 ? row[colMap.postedAt] || '' : '';
         const originUrl = row[colMap.originUrl] || '';
         const shortDescription = colMap.shortDesc !== -1 ? row[colMap.shortDesc] || '' : '';
@@ -270,6 +276,23 @@ export default function BulkGigImportPage() {
         const matchedTrack = trackMap.get(rawTrack.toLowerCase()) || trackMap.get(rawTrack);
         if (!matchedTrack) {
           rowErrors.push(`Unrecognized Track: "${rawTrack}"`);
+        }
+
+        // Parse & Validate is_local_business
+        let parsedIsLocal = false;
+        const trimmedLocal = rawLocalBusiness.trim();
+        if (trimmedLocal === '') {
+          parsedIsLocal = false;
+        } else {
+          const lowerLocal = trimmedLocal.toLowerCase();
+          if (lowerLocal === 'yes' || lowerLocal === 'true' || lowerLocal === '1') {
+            parsedIsLocal = true;
+          } else if (lowerLocal === 'no' || lowerLocal === 'false' || lowerLocal === '0') {
+            parsedIsLocal = false;
+          } else {
+            rowErrors.push('is_local_business must be YES, NO, or blank.');
+            parsedIsLocal = false;
+          }
         }
 
         const isValid = rowErrors.length === 0;
@@ -303,6 +326,8 @@ export default function BulkGigImportPage() {
           currency: currency.trim() || 'INR',
           priority: parsedPriority,
           isFeatured: parsedIsFeatured,
+          isLocalBusiness: parsedIsLocal,
+          rawLocalBusiness: trimmedLocal,
           postedAt: postedAt.trim() || null,
           originUrl: originUrl.trim(),
           shortDescription: shortDescription.trim(),
@@ -347,6 +372,7 @@ export default function BulkGigImportPage() {
       currency: r.currency || 'INR',
       priority: r.priority || 0,
       is_featured: r.isFeatured || false,
+      is_local_business: r.isLocalBusiness || false,
       posted_at: r.postedAt || null,
       origin_url: r.originUrl,
       short_description: r.shortDescription || null,
@@ -597,6 +623,7 @@ export default function BulkGigImportPage() {
                       <th>Opportunity Title</th>
                       <th>Track Code</th>
                       <th>Compensation</th>
+                      <th>Local Biz</th>
                       <th>Priority</th>
                       <th>Issues</th>
                     </tr>
@@ -623,6 +650,15 @@ export default function BulkGigImportPage() {
                           </span>
                         </td>
                         <td style={{ fontFamily: 'monospace' }}>{r.paymentAmount || '—'}</td>
+                        <td>
+                          {r.isLocalBusiness ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 6px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 700, backgroundColor: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0' }}>
+                              <Store size={11} /> YES
+                            </span>
+                          ) : (
+                            <span style={{ color: '#9CA3AF', fontSize: '11px', fontFamily: 'monospace' }}>NO</span>
+                          )}
+                        </td>
                         <td>
                           {r.priority > 0 || r.isFeatured ? (
                             <span style={{ fontSize: '10.5px', fontWeight: 700, color: '#E31B23', backgroundColor: '#FEF2F2', padding: '2px 6px', borderRadius: '4px' }}>

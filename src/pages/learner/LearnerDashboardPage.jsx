@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Briefcase, 
   Sparkles, 
@@ -10,6 +10,7 @@ import {
 import { fetchGigs as fetchGigsService, fetchTracks as fetchTracksService } from '../../services/gigService';
 import OpportunityCard from '../../components/learner/OpportunityCard';
 import OpportunityFilters from '../../components/learner/OpportunityFilters';
+import OpportunityCategoryNav from '../../components/learner/OpportunityCategoryNav';
 
 export default function LearnerDashboardPage() {
   // Filter & Search states
@@ -69,6 +70,55 @@ export default function LearnerDashboardPage() {
     fetchGigs();
   }, [fetchGigs]);
 
+  // Compute dynamic category counts from dataset
+  const categoryCounts = useMemo(() => {
+    if (!gigs || gigs.length === 0) {
+      return { priority: 0, newest: 0, pay: 0, trending: 0 };
+    }
+
+    const getCompVal = (g) => {
+      if (g.max_amount !== null && g.max_amount !== undefined && Number(g.max_amount) > 0) return Number(g.max_amount);
+      if (g.min_amount !== null && g.min_amount !== undefined && Number(g.min_amount) > 0) return Number(g.min_amount);
+      if (g.payment_amount && typeof g.payment_amount === 'string') {
+        const match = g.payment_amount.replace(/,/g, '').match(/(\d+(?:\.\d+)?)/);
+        if (match) return parseFloat(match[1]);
+      }
+      return 0;
+    };
+
+    // 1. Priority count
+    const priorityGigs = gigs.filter(g => g.is_featured || (Number(g.priority) > 0));
+    const priorityCount = priorityGigs.length > 0 ? priorityGigs.length : gigs.length;
+
+    // 2. New posted count
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const recentGigs = gigs.filter(g => {
+      const d = new Date(g.posted_at || g.created_at).getTime();
+      return !isNaN(d) && d >= thirtyDaysAgo;
+    });
+    const newestCount = recentGigs.length > 0 ? recentGigs.length : gigs.length;
+
+    // 3. Most Pay count
+    const paidGigs = gigs.filter(g => getCompVal(g) > 0);
+    const payCount = paidGigs.length > 0 ? paidGigs.length : gigs.length;
+
+    // 4. Trending count
+    const trendingGigs = gigs.filter(g => g.is_featured || (Number(g.priority) >= 1));
+    const trendingCount = trendingGigs.length > 0 ? trendingGigs.length : Math.max(1, Math.ceil(gigs.length * 0.7));
+
+    // 5. Local Businesses count
+    const localBizGigs = gigs.filter(g => Boolean(g.is_local_business));
+    const localBusinessCount = localBizGigs.length;
+
+    return {
+      priority: priorityCount,
+      newest: newestCount,
+      pay: payCount,
+      trending: trendingCount,
+      local_business: localBusinessCount,
+    };
+  }, [gigs]);
+
   const totalPages = Math.max(1, Math.ceil(totalGigs / pageSize));
 
   return (
@@ -96,8 +146,8 @@ export default function LearnerDashboardPage() {
         </div>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-6 shadow-xs">
+      {/* Unified Opportunity Marketplace Control Bar */}
+      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5">
         <OpportunityFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -108,6 +158,28 @@ export default function LearnerDashboardPage() {
           tracks={tracks}
           onFilterChange={() => setPage(1)}
         />
+
+        {/* Quick Discovery Chips / Tabs */}
+        <div className="pt-2 border-t border-[#F3F4F6] space-y-2">
+          <div className="text-[11px] font-mono font-bold tracking-wider text-[#6B7280] uppercase">
+            QUICK DISCOVERY
+          </div>
+          <OpportunityCategoryNav
+            sortBy={sortBy}
+            onSelectSort={(newSort) => {
+              setSortBy(newSort);
+              setPage(1);
+            }}
+            counts={categoryCounts}
+          />
+        </div>
+
+        {/* Result Counter Summary */}
+        <div className="pt-1.5 border-t border-[#F3F4F6] flex items-center justify-between text-xs sm:text-[13px] text-[#6B7280] font-medium">
+          <span>
+            Showing <strong className="text-[#111827] font-bold">{gigs.length}</strong> of <strong className="text-[#111827] font-bold">{totalGigs}</strong> {totalGigs === 1 ? 'opportunity' : 'opportunities'}
+          </span>
+        </div>
       </div>
 
       {/* Error Alert */}

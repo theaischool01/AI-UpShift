@@ -30,7 +30,7 @@ export const STUDIO_BRIEFS = [
   {
     id: "brief-3",
     sheetNumber: "BRIEF // 204",
-    track: "VIBE CODER",
+    track: "VIBECODER",
     title: "AI Interactive Pricing & Proposal Web App",
     client: "Studio Metric · Creative Engineering Agency",
     promptSeed: "Figma wireframe + pricing calculation rubric",

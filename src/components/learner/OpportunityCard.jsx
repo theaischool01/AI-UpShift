@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Store } from 'lucide-react';
 
 export default function OpportunityCard({ gig }) {
   if (!gig) return null;
@@ -10,22 +10,31 @@ export default function OpportunityCard({ gig }) {
   return (
     <div className="learner-card group flex flex-col justify-between p-6 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">
       <div>
-        {/* Top: Track Code & Name Badge + Featured Indicator */}
-        <div className="flex items-center justify-between gap-2 mb-3.5">
-          {track ? (
-            <span
-              className="learner-badge-track inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md"
-              style={{
-                backgroundColor: track.bg_color || 'rgba(227, 27, 35, 0.08)',
-                color: track.color || '#E31B23',
-                border: `1px solid ${track.color ? `${track.color}33` : 'rgba(227, 27, 35, 0.25)'}`,
-              }}
-            >
-              {track.code} · {track.name}
-            </span>
-          ) : (
-            <span className="learner-badge-chip text-xs">UpShift Track</span>
-          )}
+        {/* Top: Track Code & Name Badge + Local Biz & Featured Indicators */}
+        <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {track ? (
+              <span
+                className="learner-badge-track inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md"
+                style={{
+                  backgroundColor: track.bg_color || 'rgba(227, 27, 35, 0.08)',
+                  color: track.color || '#E31B23',
+                  border: `1px solid ${track.color ? `${track.color}33` : 'rgba(227, 27, 35, 0.25)'}`,
+                }}
+              >
+                {track.code} · {track.name}
+              </span>
+            ) : (
+              <span className="learner-badge-chip text-xs">UpShift Track</span>
+            )}
+
+            {gig.is_local_business && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-bold tracking-tight bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <Store className="w-3 h-3 text-emerald-600" />
+                <span>Local Business</span>
+              </span>
+            )}
+          </div>
 
           {gig.is_featured && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-amber-50 text-amber-700 border border-amber-200">

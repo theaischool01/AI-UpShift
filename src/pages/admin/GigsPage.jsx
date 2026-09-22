@@ -15,7 +15,8 @@ import {
   ChevronLeft, 
   ChevronRight,
   ArrowUpDown,
-  Sparkles
+  Sparkles,
+  Store
 } from 'lucide-react';
 import { fetchGigs as fetchGigsService, fetchTracks as fetchTracksService, deleteGig as deleteGigService } from '../../services/gigService';
 
@@ -280,8 +281,15 @@ export default function GigsPage() {
                     <tr key={gig.id}>
                       {/* Title & Short Description */}
                       <td>
-                        <div style={{ fontWeight: 700, color: '#111827', fontSize: '13.5px', marginBottom: '2px' }}>
-                          {gig.title}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '2px' }}>
+                          <span style={{ fontWeight: 700, color: '#111827', fontSize: '13.5px' }}>
+                            {gig.title}
+                          </span>
+                          {gig.is_local_business && (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '1px 5px', borderRadius: '4px', fontSize: '10px', fontWeight: 700, backgroundColor: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0' }}>
+                              <Store size={10} /> Local
+                            </span>
+                          )}
                         </div>
                         {gig.short_description && (
                           <p style={{ fontSize: '12px', color: '#6B7280', margin: 0, maxWidth: '360px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -504,6 +512,15 @@ export default function GigsPage() {
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Compensation</label>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: '#047857' }}>{viewingGig.payment_amount}</span>
+                </div>
+              )}
+
+              {viewingGig.is_local_business && (
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4B5563', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Opportunity Classification</label>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '3px 8px', borderRadius: '6px', border: '1px solid #A7F3D0' }}>
+                    <Store size={12} /> Local Business Opportunity
+                  </span>
                 </div>
               )}
 

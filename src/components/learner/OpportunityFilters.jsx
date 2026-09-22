@@ -48,15 +48,15 @@ function CustomDropdown({
         aria-label={ariaLabel}
         className="learner-custom-dropdown-trigger"
         style={{
-          height: '44px',
+          height: '46px',
           width: '100%',
           padding: '0 14px',
-          fontSize: '12.5px',
+          fontSize: '13px',
           fontWeight: 600,
           color: '#111827',
           backgroundColor: '#FFFFFF',
-          border: `1px solid ${isOpen ? '#E31B23' : '#D1D5DB'}`,
-          borderRadius: '12px',
+          border: `1px solid ${isOpen ? '#E31B23' : '#D9DEE6'}`,
+          borderRadius: '11px',
           outline: 'none',
           boxSizing: 'border-box',
           display: 'flex',
@@ -64,14 +64,14 @@ function CustomDropdown({
           justifyContent: 'space-between',
           gap: '8px',
           cursor: 'pointer',
-          boxShadow: isOpen ? '0 0 0 3px rgba(227, 27, 35, 0.12)' : '0 1px 2px rgba(0, 0, 0, 0.03)',
-          transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+          boxShadow: isOpen ? '0 0 0 3px rgba(227, 27, 35, 0.1)' : '0 1px 2px rgba(0, 0, 0, 0.02)',
+          transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
           {Icon && (
             <Icon 
-              size={14} 
+              size={15} 
               style={{ color: isOpen || (value && value !== 'ALL' && value !== 'priority') ? '#E31B23' : '#6B7280', flexShrink: 0 }} 
             />
           )}
@@ -86,7 +86,7 @@ function CustomDropdown({
             color: '#6B7280', 
             flexShrink: 0,
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease',
+            transition: 'transform 0.18s ease',
           }} 
         />
       </button>
@@ -102,16 +102,15 @@ function CustomDropdown({
             left: 0,
             minWidth: '100%',
             width: 'max-content',
-            maxWidth: '300px',
+            maxWidth: '320px',
             backgroundColor: '#FFFFFF',
-            border: '1px solid #E5E7EB',
-            borderRadius: '14px',
+            border: '1px solid #E2E5EA',
+            borderRadius: '12px',
             padding: '6px',
-            boxShadow: '0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04)',
+            boxShadow: '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
             zIndex: 60,
             maxHeight: '280px',
             overflowY: 'auto',
-            animation: 'fadeInMenu 0.15s ease-out',
           }}
         >
           {options.map((opt) => {
@@ -123,8 +122,9 @@ function CustomDropdown({
                 aria-selected={isSelected}
                 onClick={() => handleSelect(opt.value)}
                 style={{
-                  padding: '8px 12px',
-                  borderRadius: '9px',
+                  height: '40px',
+                  padding: '0 12px',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -132,7 +132,7 @@ function CustomDropdown({
                   cursor: 'pointer',
                   backgroundColor: isSelected ? '#FFF1F1' : 'transparent',
                   color: isSelected ? '#E31B23' : '#111827',
-                  fontSize: '12.5px',
+                  fontSize: '13px',
                   fontWeight: isSelected ? 700 : 500,
                   transition: 'background-color 0.12s ease, color 0.12s ease',
                   margin: '1px 0',
@@ -154,7 +154,7 @@ function CustomDropdown({
                       style={{
                         padding: '1px 6px',
                         borderRadius: '4px',
-                        fontSize: '10px',
+                        fontSize: '10.5px',
                         fontFamily: 'monospace',
                         fontWeight: 800,
                         backgroundColor: isSelected ? '#E31B23' : '#F3F4F6',
@@ -248,24 +248,25 @@ export default function OpportunityFilters({
 
   // Format priority / sorting options
   const sortOptions = [
-    { value: 'priority', label: 'Priority (Featured)' },
+    { value: 'priority', label: 'Priority' },
     { value: 'newest', label: 'Newest Posted' },
     { value: 'pay', label: 'Most Pay' },
-    { value: 'trending', label: 'Trending' }
+    { value: 'trending', label: 'Trending' },
+    { value: 'local_business', label: 'Local Businesses' }
   ];
 
   return (
-    <div ref={containerRef} className="space-y-3">
-      {/* Filter, Search & Sort Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+    <div ref={containerRef} className="w-full">
+      {/* Search, Track Module Filter + Marketplace Sort */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
         {/* Search Input */}
-        <div className="learner-search-wrap flex-1" style={{ position: 'relative' }}>
+        <div className="learner-search-wrap flex-1" style={{ position: 'relative', minWidth: '240px' }}>
           <Search className="learner-search-icon" />
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearchInput}
-            placeholder="Search opportunities by title or description..."
+            placeholder="Search opportunities..."
             className="learner-search-input"
           />
           {searchQuery && (
@@ -294,9 +295,9 @@ export default function OpportunityFilters({
         </div>
 
         {/* Controls Group: Track Module Filter + Marketplace Sort */}
-        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
-          {/* Module / Capability Area Filter */}
-          <div className="flex-1 sm:flex-none sm:min-w-[210px]">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Module Filter */}
+          <div className="flex-1 sm:flex-none sm:w-[185px]">
             <CustomDropdown
               id="track"
               value={activeSelectedTrack}
@@ -314,7 +315,7 @@ export default function OpportunityFilters({
           </div>
 
           {/* Marketplace Sort Selector */}
-          <div className="flex-1 sm:flex-none sm:min-w-[190px]">
+          <div className="flex-1 sm:flex-none sm:w-[175px]">
             <CustomDropdown
               id="sort"
               value={sortBy}
@@ -324,7 +325,7 @@ export default function OpportunityFilters({
               }}
               options={sortOptions}
               icon={Sparkles}
-              placeholder="Priority (Featured)"
+              placeholder="Priority"
               openDropdown={openDropdown}
               setOpenDropdown={setOpenDropdown}
               ariaLabel="Sort marketplace opportunities"

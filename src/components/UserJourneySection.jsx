@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import dianaAvatar from '../assets/diana_johnston.jpg';
 import MascotBadge from './MascotBadge';
+import OurPeopleSection from './OurPeopleSection';
 
 const STORIES_DATA = [
   {
@@ -443,6 +444,11 @@ export default function UserJourneySection() {
             })}
           </div>
         </div>
+
+        {/* ============================================================ */}
+        {/* THE PEOPLE BEHIND UPSHIFT (Leadership & Mentors)             */}
+        {/* ============================================================ */}
+        <OurPeopleSection />
 
         {/* ============================================================ */}
         {/* ENROLLMENT CTA PANEL                                         */}

@@ -8,7 +8,8 @@ import {
   Loader2, 
   CheckCircle2, 
   Share2, 
-  ShieldCheck 
+  ShieldCheck,
+  Store
 } from 'lucide-react';
 import { 
   fetchGigById as fetchGigByIdService,
@@ -241,6 +242,13 @@ export default function LearnerGigDetailPage() {
             </span>
           )}
 
+          {gig.is_local_business && (
+            <span className="learner-detail-chip" style={{ backgroundColor: '#ECFDF5', borderColor: '#A7F3D0', color: '#065F46' }}>
+              <Store size={13} style={{ color: '#059669' }} />
+              <span>Local Business</span>
+            </span>
+          )}
+
           <span className="learner-detail-chip learner-chip-verified">
             <ShieldCheck size={14} style={{ color: '#059669' }} />
             <span>Verified by UpShift</span>
@@ -381,6 +389,16 @@ export default function LearnerGigDetailPage() {
                 <span className="learner-meta-label">LOCATION</span>
                 <span className="learner-meta-value">Remote (Global)</span>
               </div>
+
+              {gig.is_local_business && (
+                <div className="learner-meta-item">
+                  <span className="learner-meta-label">CLASSIFICATION</span>
+                  <span className="learner-meta-value" style={{ color: '#059669', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Store size={13} />
+                    <span>Local Business</span>
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Divider */}

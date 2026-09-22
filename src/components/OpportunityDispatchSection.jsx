@@ -8,38 +8,216 @@ import {
   Terminal,
   TrendingUp,
   Cpu,
-  MapPin,
-  Clock,
   Sparkles,
-  Building,
-  Zap,
-  Briefcase,
-  Code
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
-import { CONCEPTUAL_CLASSIFIEDS } from '../data/opportunitiesData';
 
-// Discipline Icon Map for Modules (Unified Red/Black/Green Theme)
-const TRACK_ICONS = {
-  'M1': Film,
-  'M2': Palette,
-  'M3': Database,
-  'M4': Terminal,
-  'M5': TrendingUp,
-  'M6': Cpu,
+// ==========================================================================
+// CENTRALIZED MODULE THEMES (M1–M6) — 6 DISTINCT COLOR FAMILIES
+// ==========================================================================
+
+const MODULE_THEMES = {
+  'M1': {
+    code: 'M1',
+    name: 'ReelRush AI',
+    accent: '#E31B23', // 1. Crimson Red
+    cardBorder: 'rgba(227, 27, 35, 0.28)',
+    cardBgTint: 'linear-gradient(135deg, #FFFFFF 65%, rgba(227, 27, 35, 0.05) 100%)',
+    badgeBg: '#E31B23',
+    badgeText: '#FFFFFF',
+    badgeBorder: '#E31B23',
+    iconBg: '#FFF1F1',
+    iconBorder: '#FECACA',
+    arrowBg: '#FFF1F1',
+    arrowBorder: '#FECACA',
+    arrowColor: '#E31B23',
+    glow: 'rgba(227, 27, 35, 0.22)',
+    icon: Film,
+    watermark: 'wave',
+  },
+  'M2': {
+    code: 'M2',
+    name: 'VisualForge AI',
+    accent: '#2563EB', // 2. Royal Blue
+    cardBorder: 'rgba(37, 99, 235, 0.28)',
+    cardBgTint: 'linear-gradient(135deg, #FFFFFF 65%, rgba(37, 99, 235, 0.06) 100%)',
+    badgeBg: '#2563EB',
+    badgeText: '#FFFFFF',
+    badgeBorder: '#2563EB',
+    iconBg: '#EFF6FF',
+    iconBorder: '#BFDBFE',
+    arrowBg: '#EFF6FF',
+    arrowBorder: '#BFDBFE',
+    arrowColor: '#2563EB',
+    glow: 'rgba(37, 99, 235, 0.22)',
+    icon: Palette,
+    watermark: 'grid',
+  },
+  'M3': {
+    code: 'M3',
+    name: 'DeepAnnotator',
+    accent: '#059669', // 3. Emerald Green
+    cardBorder: 'rgba(5, 150, 105, 0.28)',
+    cardBgTint: 'linear-gradient(135deg, #FFFFFF 65%, rgba(5, 150, 105, 0.06) 100%)',
+    badgeBg: '#059669',
+    badgeText: '#FFFFFF',
+    badgeBorder: '#059669',
+    iconBg: '#ECFDF5',
+    iconBorder: '#A7F3D0',
+    arrowBg: '#ECFDF5',
+    arrowBorder: '#A7F3D0',
+    arrowColor: '#059669',
+    glow: 'rgba(5, 150, 105, 0.22)',
+    icon: Database,
+    watermark: 'matrix',
+  },
+  'M4': {
+    code: 'M4',
+    name: 'VibeCoder',
+    accent: '#7C3AED', // 4. Electric Purple
+    cardBorder: 'rgba(124, 58, 237, 0.28)',
+    cardBgTint: 'linear-gradient(135deg, #FFFFFF 65%, rgba(124, 58, 237, 0.06) 100%)',
+    badgeBg: '#7C3AED',
+    badgeText: '#FFFFFF',
+    badgeBorder: '#7C3AED',
+    iconBg: '#F5F3FF',
+    iconBorder: '#DDD6FE',
+    arrowBg: '#F5F3FF',
+    arrowBorder: '#DDD6FE',
+    arrowColor: '#7C3AED',
+    glow: 'rgba(124, 58, 237, 0.22)',
+    icon: Terminal,
+    watermark: 'terminal',
+  },
+  'M5': {
+    code: 'M5',
+    name: 'BrandBuzz AI',
+    accent: '#EA580C', // 5. Vibrant Orange / Amber
+    cardBorder: 'rgba(234, 88, 12, 0.28)',
+    cardBgTint: 'linear-gradient(135deg, #FFFFFF 65%, rgba(234, 88, 12, 0.06) 100%)',
+    badgeBg: '#EA580C',
+    badgeText: '#FFFFFF',
+    badgeBorder: '#EA580C',
+    iconBg: '#FFF7ED',
+    iconBorder: '#FED7AA',
+    arrowBg: '#FFF7ED',
+    arrowBorder: '#FED7AA',
+    arrowColor: '#EA580C',
+    glow: 'rgba(234, 88, 12, 0.22)',
+    icon: TrendingUp,
+    watermark: 'growth',
+  },
+  'M6': {
+    code: 'M6',
+    name: 'AgentHandlers',
+    accent: '#0891B2', // 6. Cyan / Aqua
+    cardBorder: 'rgba(8, 145, 178, 0.28)',
+    cardBgTint: 'linear-gradient(135deg, #FFFFFF 65%, rgba(8, 145, 178, 0.06) 100%)',
+    badgeBg: '#0891B2',
+    badgeText: '#FFFFFF',
+    badgeBorder: '#0891B2',
+    iconBg: '#ECFEFF',
+    iconBorder: '#A5F3FC',
+    arrowBg: '#ECFEFF',
+    arrowBorder: '#A5F3FC',
+    arrowColor: '#0891B2',
+    glow: 'rgba(8, 145, 178, 0.22)',
+    icon: Cpu,
+    watermark: 'workflow',
+  },
 };
 
-// Custom Graphic Systems (Enforcing UpShift Palette: Red, Black, White, Green)
+// ==========================================================================
+// SUBTLE CARD WATERMARK DECORATIONS (High-detail SVG, aria-hidden)
+// ==========================================================================
+
+function CardWatermark({ watermark, accentColor }) {
+  if (watermark === 'wave') {
+    // M1: Audio Waveform & Frame Marks (Red)
+    return (
+      <svg className="opp-card-watermark" viewBox="0 0 160 80" fill="none" aria-hidden="true">
+        <path d="M10 40 L25 40 L30 15 L35 65 L40 20 L45 60 L50 30 L55 50 L60 40 L150 40" stroke={accentColor} strokeWidth="1.6" strokeLinecap="round" />
+        <rect x="115" y="8" width="36" height="24" rx="4" stroke={accentColor} strokeWidth="1.4" strokeDasharray="3 2" />
+        <line x1="133" y1="4" x2="133" y2="8" stroke={accentColor} strokeWidth="1.4" />
+        <line x1="133" y1="32" x2="133" y2="36" stroke={accentColor} strokeWidth="1.4" />
+      </svg>
+    );
+  }
+  if (watermark === 'grid') {
+    // M2: Vector / Grid / Design Geometry (Blue)
+    return (
+      <svg className="opp-card-watermark" viewBox="0 0 160 80" fill="none" aria-hidden="true">
+        <circle cx="120" cy="40" r="28" stroke={accentColor} strokeWidth="1.4" strokeDasharray="4 3" />
+        <rect x="92" y="12" width="56" height="56" rx="4" stroke={accentColor} strokeWidth="1.2" />
+        <line x1="92" y1="40" x2="148" y2="40" stroke={accentColor} strokeWidth="1.2" />
+        <line x1="120" y1="12" x2="120" y2="68" stroke={accentColor} strokeWidth="1.2" />
+      </svg>
+    );
+  }
+  if (watermark === 'matrix') {
+    // M3: Data Node / Matrix Pattern (Green)
+    return (
+      <svg className="opp-card-watermark" viewBox="0 0 160 80" fill="none" aria-hidden="true">
+        <circle cx="105" cy="22" r="3.5" fill={accentColor} />
+        <circle cx="140" cy="22" r="3.5" fill={accentColor} />
+        <circle cx="122" cy="50" r="4" fill={accentColor} />
+        <circle cx="145" cy="65" r="3" fill={accentColor} />
+        <line x1="105" y1="22" x2="140" y2="22" stroke={accentColor} strokeWidth="1.4" strokeDasharray="2 2" />
+        <line x1="105" y1="22" x2="122" y2="50" stroke={accentColor} strokeWidth="1.4" />
+        <line x1="140" y1="22" x2="122" y2="50" stroke={accentColor} strokeWidth="1.4" />
+        <line x1="122" y1="50" x2="145" y2="65" stroke={accentColor} strokeWidth="1.4" strokeDasharray="2 2" />
+      </svg>
+    );
+  }
+  if (watermark === 'terminal') {
+    // M4: Code Brackets & Terminal Lines (Purple)
+    return (
+      <svg className="opp-card-watermark" viewBox="0 0 160 80" fill="none" aria-hidden="true">
+        <path d="M95 24 L82 40 L95 56" stroke={accentColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M142 24 L155 40 L142 56" stroke={accentColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="125" y1="20" x2="112" y2="60" stroke={accentColor} strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (watermark === 'growth') {
+    // M5: Growth Graph / Signal Lines (Orange)
+    return (
+      <svg className="opp-card-watermark" viewBox="0 0 160 80" fill="none" aria-hidden="true">
+        <path d="M85 65 Q 110 58 125 35 T 155 16" stroke={accentColor} strokeWidth="2" strokeLinecap="round" />
+        <circle cx="155" cy="16" r="3.5" fill={accentColor} />
+        <line x1="85" y1="65" x2="155" y2="65" stroke={accentColor} strokeWidth="1.2" strokeDasharray="3 2" />
+      </svg>
+    );
+  }
+  if (watermark === 'workflow') {
+    // M6: Workflow Nodes / Connection Paths (Cyan)
+    return (
+      <svg className="opp-card-watermark" viewBox="0 0 160 80" fill="none" aria-hidden="true">
+        <rect x="86" y="26" width="24" height="24" rx="4" stroke={accentColor} strokeWidth="1.4" />
+        <line x1="110" y1="38" x2="128" y2="38" stroke={accentColor} strokeWidth="1.4" strokeDasharray="3 2" />
+        <rect x="128" y="26" width="24" height="24" rx="4" stroke={accentColor} strokeWidth="1.4" fill={accentColor} fillOpacity="0.25" />
+      </svg>
+    );
+  }
+  return null;
+}
+
+// ==========================================================================
+// TECHNICAL GRAPHIC SYSTEMS (Clean Dark Expanded Surface)
+// ==========================================================================
+
 function GraphicReelRush({ accentColor }) {
   return (
-    <div style={{ width: '100%', height: '110px', background: '#FFF5F5', border: '1px solid #FEE2E2', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div className="opp-graphic-container">
       <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
-        <rect x="15" y="10" width="40" height="60" rx="6" stroke="#E31B23" strokeWidth="1.5" fill="rgba(227,27,35,0.08)" />
+        <rect x="15" y="10" width="40" height="60" rx="6" stroke="#E31B23" strokeWidth="1.5" fill="rgba(227,27,35,0.12)" />
         <circle cx="35" cy="40" r="10" stroke="#E31B23" strokeWidth="1" />
         <polygon points="32,35 41,40 32,45" fill="#E31B23" />
-        <line x1="70" y1="20" x2="225" y2="20" stroke="#D1D5DB" strokeWidth="2" strokeLinecap="round" />
+        <line x1="70" y1="20" x2="225" y2="20" stroke="#374151" strokeWidth="2" strokeLinecap="round" />
         <line x1="70" y1="35" x2="190" y2="35" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" />
-        <line x1="70" y1="50" x2="215" y2="50" stroke="#D1D5DB" strokeWidth="2" strokeLinecap="round" />
+        <line x1="70" y1="50" x2="215" y2="50" stroke="#374151" strokeWidth="2" strokeLinecap="round" />
         <line x1="70" y1="65" x2="160" y2="65" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
         <circle cx="190" cy="35" r="4" fill="#E31B23" />
         <text x="70" y="12" fill="#E31B23" fontSize="8" fontFamily="monospace" fontWeight="bold">AUDIO TIMELINE • 9:16 HOOK</text>
@@ -50,13 +228,13 @@ function GraphicReelRush({ accentColor }) {
 
 function GraphicVisualForge({ accentColor }) {
   return (
-    <div style={{ width: '100%', height: '110px', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div className="opp-graphic-container">
       <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
-        <rect x="20" y="12" width="55" height="56" rx="6" stroke="#111111" strokeWidth="1.4" fill="rgba(17,17,17,0.05)" />
-        <circle cx="47" cy="40" r="14" stroke="#E31B23" strokeWidth="1.2" strokeDasharray="2 2" />
-        <rect x="95" y="15" width="130" height="22" rx="4" fill="#111111" stroke="#333333" strokeWidth="1" />
-        <text x="105" y="29" fill="#FFFFFF" fontSize="8.5" fontFamily="monospace" fontWeight="bold">BRAND SEED: #E31B23</text>
-        <rect x="95" y="44" width="130" height="22" rx="4" fill="#111111" stroke="#333333" strokeWidth="1" />
+        <rect x="20" y="12" width="55" height="56" rx="6" stroke="#2563EB" strokeWidth="1.4" fill="rgba(37,99,235,0.12)" />
+        <circle cx="47" cy="40" r="14" stroke="#2563EB" strokeWidth="1.2" strokeDasharray="2 2" />
+        <rect x="95" y="15" width="130" height="22" rx="4" fill="#18181B" stroke="#27272A" strokeWidth="1" />
+        <text x="105" y="29" fill="#A1A1AA" fontSize="8.5" fontFamily="monospace" fontWeight="bold">BRAND SEED: <tspan fill="#3B82F6">#2563EB</tspan></text>
+        <rect x="95" y="44" width="130" height="22" rx="4" fill="#18181B" stroke="#27272A" strokeWidth="1" />
         <text x="105" y="58" fill="#10B981" fontSize="8.5" fontFamily="monospace" fontWeight="bold">VECTOR LAYERS: 300 DPI</text>
       </svg>
     </div>
@@ -65,16 +243,16 @@ function GraphicVisualForge({ accentColor }) {
 
 function GraphicDeepAnnotator({ accentColor }) {
   return (
-    <div style={{ width: '100%', height: '110px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div className="opp-graphic-container">
       <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
-        <circle cx="35" cy="40" r="22" stroke="#059669" strokeWidth="1.5" fill="rgba(5,150,105,0.12)" />
-        <text x="35" y="44" fill="#059669" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">RLHF</text>
-        <line x1="75" y1="25" x2="225" y2="25" stroke="#A7F3D0" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="35" cy="40" r="22" stroke="#059669" strokeWidth="1.5" fill="rgba(5,150,105,0.15)" />
+        <text x="35" y="44" fill="#34D399" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">RLHF</text>
+        <line x1="75" y1="25" x2="225" y2="25" stroke="#1F2937" strokeWidth="3" strokeLinecap="round" />
         <line x1="75" y1="25" x2="195" y2="25" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
-        <line x1="75" y1="52" x2="225" y2="52" stroke="#A7F3D0" strokeWidth="3" strokeLinecap="round" />
+        <line x1="75" y1="52" x2="225" y2="52" stroke="#1F2937" strokeWidth="3" strokeLinecap="round" />
         <line x1="75" y1="52" x2="210" y2="52" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
-        <text x="75" y="15" fill="#065F46" fontSize="7.5" fontFamily="monospace" fontWeight="bold">PRECISION: 99.4%</text>
-        <text x="75" y="44" fill="#065F46" fontSize="7.5" fontFamily="monospace" fontWeight="bold">RED-TEAM RESILIENCE: 98.1%</text>
+        <text x="75" y="15" fill="#34D399" fontSize="7.5" fontFamily="monospace" fontWeight="bold">PRECISION: 99.4%</text>
+        <text x="75" y="44" fill="#34D399" fontSize="7.5" fontFamily="monospace" fontWeight="bold">RED-TEAM RESILIENCE: 98.1%</text>
       </svg>
     </div>
   );
@@ -82,15 +260,15 @@ function GraphicDeepAnnotator({ accentColor }) {
 
 function GraphicVibeCoder({ accentColor }) {
   return (
-    <div style={{ width: '100%', height: '110px', background: '#0A0A0A', border: '1px solid #222222', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div className="opp-graphic-container">
       <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
-        <rect x="15" y="12" width="210" height="56" rx="6" fill="#141414" stroke="#333333" strokeWidth="1" />
+        <rect x="15" y="12" width="210" height="56" rx="6" fill="#141414" stroke="#262626" strokeWidth="1" />
         <circle cx="28" cy="22" r="2.5" fill="#E31B23" />
         <circle cx="36" cy="22" r="2.5" fill="#F59E0B" />
         <circle cx="44" cy="22" r="2.5" fill="#10B981" />
-        <text x="24" y="38" fill="#E31B23" fontSize="8" fontFamily="monospace">&gt; const app = await vibe.build(prompt);</text>
+        <text x="24" y="38" fill="#A78BFA" fontSize="8" fontFamily="monospace">&gt; const app = await vibe.build(prompt);</text>
         <text x="24" y="50" fill="#10B981" fontSize="8" fontFamily="monospace">&gt; Ready on https://app.vercel.app [200 OK]</text>
-        <text x="24" y="62" fill="#FFFFFF" fontSize="7.5" fontFamily="monospace">&gt; Lighthouse Performance: 100/100</text>
+        <text x="24" y="62" fill="#E5E7EB" fontSize="7.5" fontFamily="monospace">&gt; Lighthouse Performance: 100/100</text>
       </svg>
     </div>
   );
@@ -98,13 +276,13 @@ function GraphicVibeCoder({ accentColor }) {
 
 function GraphicBrandBuzz({ accentColor }) {
   return (
-    <div style={{ width: '100%', height: '110px', background: '#FFF5F5', border: '1px solid #FEE2E2', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div className="opp-graphic-container">
       <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
-        <circle cx="35" cy="40" r="18" stroke="#E31B23" strokeWidth="1.2" strokeDasharray="2 2" />
-        <circle cx="35" cy="40" r="6" fill="#E31B23" />
-        <path d="M 75 58 Q 110 50 145 28 T 215 15" stroke="#E31B23" strokeWidth="2.5" strokeLinecap="round" />
+        <circle cx="35" cy="40" r="18" stroke="#EA580C" strokeWidth="1.2" strokeDasharray="2 2" />
+        <circle cx="35" cy="40" r="6" fill="#EA580C" />
+        <path d="M 75 58 Q 110 50 145 28 T 215 15" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" />
         <circle cx="215" cy="15" r="4" fill="#059669" />
-        <text x="75" y="72" fill="#111111" fontSize="8.5" fontFamily="monospace" fontWeight="bold">CONVERSION MATRIX: +340% HOOK CTR</text>
+        <text x="75" y="72" fill="#E5E7EB" fontSize="8.5" fontFamily="monospace" fontWeight="bold">CONVERSION MATRIX: +340% HOOK CTR</text>
       </svg>
     </div>
   );
@@ -112,16 +290,16 @@ function GraphicBrandBuzz({ accentColor }) {
 
 function GraphicAgentHandlers({ accentColor }) {
   return (
-    <div style={{ width: '100%', height: '110px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div className="opp-graphic-container">
       <svg viewBox="0 0 240 80" fill="none" style={{ width: '90%', height: '70px' }}>
-        <rect x="15" y="26" width="55" height="28" rx="4" fill="#059669" stroke="#047857" strokeWidth="1" />
+        <rect x="15" y="26" width="55" height="28" rx="4" fill="#0891B2" stroke="#0E7490" strokeWidth="1" />
         <text x="42" y="43" fill="#FFFFFF" fontSize="8" fontFamily="monospace" fontWeight="bold" textAnchor="middle">TRIGGER</text>
-        <line x1="70" y1="40" x2="95" y2="40" stroke="#059669" strokeWidth="1.5" strokeDasharray="3 2" />
-        <rect x="95" y="20" width="58" height="40" rx="4" fill="#111111" stroke="#333333" strokeWidth="1.2" />
+        <line x1="70" y1="40" x2="95" y2="40" stroke="#0891B2" strokeWidth="1.5" strokeDasharray="3 2" />
+        <rect x="95" y="20" width="58" height="40" rx="4" fill="#18181B" stroke="#27272A" strokeWidth="1.2" />
         <text x="124" y="38" fill="#FFFFFF" fontSize="7.5" fontFamily="monospace" fontWeight="bold" textAnchor="middle">AI AGENT</text>
-        <text x="124" y="48" fill="#10B981" fontSize="6.5" fontFamily="monospace" textAnchor="middle">WEBHOOK/CRM</text>
-        <line x1="153" y1="40" x2="178" y2="40" stroke="#059669" strokeWidth="1.5" strokeDasharray="3 2" />
-        <rect x="178" y="26" width="50" height="28" rx="4" fill="#059669" stroke="#047857" strokeWidth="1" />
+        <text x="124" y="48" fill="#06B6D4" fontSize="6.5" fontFamily="monospace" textAnchor="middle">WEBHOOK/CRM</text>
+        <line x1="153" y1="40" x2="178" y2="40" stroke="#0891B2" strokeWidth="1.5" strokeDasharray="3 2" />
+        <rect x="178" y="26" width="50" height="28" rx="4" fill="#0891B2" stroke="#0E7490" strokeWidth="1" />
         <text x="203" y="43" fill="#FFFFFF" fontSize="8" fontFamily="monospace" fontWeight="bold" textAnchor="middle">EXECUTE</text>
       </svg>
     </div>
@@ -138,7 +316,7 @@ const COLLAPSED_GRAPHICS = {
 };
 
 // ==========================================================================
-// UNIFIED UPSHIFT PALETTE: RED + BLACK + WHITE + TECH GREEN
+// OPPORTUNITY MODULE DATA
 // ==========================================================================
 
 const OPPORTUNITY_MODULES = [
@@ -161,25 +339,6 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Provide 3 sample video reels demonstrating pacing and AI B-roll sync.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
-    // White Base + UpShift Red Accent
-    isWhiteBase: true,
-    accentColor: '#E31B23',
-    cardBg: '#FFFFFF',
-    cardBgHover: '#FFFFFF',
-    cardBorder: '#E7E4DF',
-    cardBorderHover: '#E31B23',
-    badgeBg: '#E31B23',
-    badgeText: '#FFFFFF',
-    chipBg: '#FFF1F1',
-    chipBorder: '#FEE2E2',
-    chipText: '#991B1B',
-    boxBg: '#FFF8F8',
-    boxBorder: '#FEE2E2',
-    boxText: '#111111',
-    textPrimary: '#111111',
-    textSecondary: '#4B5563',
-    textMuted: '#6B7280',
-    shadow: '0 12px 32px -4px rgba(227, 27, 35, 0.12)'
   },
   {
     id: 'c-2',
@@ -199,25 +358,6 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Show portfolio of consistent product mockups with lighting control.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
-    // White Base + Black/Red Accent
-    isWhiteBase: true,
-    accentColor: '#111111',
-    cardBg: '#FFFFFF',
-    cardBgHover: '#FFFFFF',
-    cardBorder: '#E7E4DF',
-    cardBorderHover: '#111111',
-    badgeBg: '#111111',
-    badgeText: '#FFFFFF',
-    chipBg: '#F4F1EA',
-    chipBorder: '#E5E0D6',
-    chipText: '#111111',
-    boxBg: '#FAF8F5',
-    boxBorder: '#EAE6DF',
-    boxText: '#111111',
-    textPrimary: '#111111',
-    textSecondary: '#4B5563',
-    textMuted: '#6B7280',
-    shadow: '0 12px 32px -4px rgba(17, 17, 17, 0.12)'
   },
   {
     id: 'c-3',
@@ -237,32 +377,13 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Submit an annotated dataset sample or evaluation breakdown report.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
-    // White Base + Tech Green Accent
-    isWhiteBase: true,
-    accentColor: '#059669',
-    cardBg: '#FFFFFF',
-    cardBgHover: '#FFFFFF',
-    cardBorder: '#E7E4DF',
-    cardBorderHover: '#059669',
-    badgeBg: '#059669',
-    badgeText: '#FFFFFF',
-    chipBg: '#ECFDF5',
-    chipBorder: '#A7F3D0',
-    chipText: '#065F46',
-    boxBg: '#F0FDF4',
-    boxBorder: '#BBF7D0',
-    boxText: '#111111',
-    textPrimary: '#111111',
-    textSecondary: '#4B5563',
-    textMuted: '#6B7280',
-    shadow: '0 12px 32px -4px rgba(5, 150, 105, 0.12)'
   },
 
   // RIGHT COLUMN
   {
     id: 'c-4',
     code: 'M4',
-    name: 'Vibe Coder',
+    name: 'VibeCoder',
     category: 'AI-Assisted Development',
     compactDesc: 'Functional web experiences & interactive landing pages.',
     role: 'AI Web Experience Builder',
@@ -272,30 +393,11 @@ const OPPORTUNITY_MODULES = [
     focusDomain: 'Responsive Web Apps & Tooling',
     payment_amount: '₹40,000–₹80,000 / build',
     originPlatform: 'Upwork / Creator Collective',
-    neededCapabilities: ['Vibe Coder', 'React / Vite', 'API Integrations'],
+    neededCapabilities: ['VibeCoder', 'React / Vite', 'API Integrations'],
     briefSnippet: 'We need a clean, responsive waitlist landing page with an interactive diagnostic quiz that suggests tailored learning tracks based on user answers.',
     proofRequirement: 'Share a live URL of a web tool or landing experience you shipped.',
     statusBadge: 'Active Ecosystem Need',
     column: 'right',
-    // Intentional Black Contrast Card (Dark Mode Contrast Accent)
-    isWhiteBase: false,
-    accentColor: '#E31B23',
-    cardBg: '#111111',
-    cardBgHover: '#181818',
-    cardBorder: '#262626',
-    cardBorderHover: '#E31B23',
-    badgeBg: '#E31B23',
-    badgeText: '#FFFFFF',
-    chipBg: 'rgba(255, 255, 255, 0.08)',
-    chipBorder: 'rgba(255, 255, 255, 0.18)',
-    chipText: '#F3F4F6',
-    boxBg: 'rgba(255, 255, 255, 0.05)',
-    boxBorder: 'rgba(255, 255, 255, 0.15)',
-    boxText: '#F9FAFB',
-    textPrimary: '#FFFFFF',
-    textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
-    shadow: '0 12px 32px -4px rgba(0, 0, 0, 0.4)'
   },
   {
     id: 'c-6',
@@ -315,25 +417,6 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Show a campaign deck or multichannel copy matrix you designed.',
     statusBadge: 'Active Ecosystem Need',
     column: 'right',
-    // White Base + UpShift Red Accent
-    isWhiteBase: true,
-    accentColor: '#E31B23',
-    cardBg: '#FFFFFF',
-    cardBgHover: '#FFFFFF',
-    cardBorder: '#E7E4DF',
-    cardBorderHover: '#E31B23',
-    badgeBg: '#E31B23',
-    badgeText: '#FFFFFF',
-    chipBg: '#FFF1F1',
-    chipBorder: '#FEE2E2',
-    chipText: '#991B1B',
-    boxBg: '#FFF8F8',
-    boxBorder: '#FEE2E2',
-    boxText: '#111111',
-    textPrimary: '#111111',
-    textSecondary: '#4B5563',
-    textMuted: '#6B7280',
-    shadow: '0 12px 32px -4px rgba(227, 27, 35, 0.12)'
   },
   {
     id: 'c-5',
@@ -353,25 +436,6 @@ const OPPORTUNITY_MODULES = [
     proofRequirement: 'Provide an agent architecture flowchart or webhook execution log.',
     statusBadge: 'Active Ecosystem Need',
     column: 'right',
-    // White Base + Tech Green Accent
-    isWhiteBase: true,
-    accentColor: '#059669',
-    cardBg: '#FFFFFF',
-    cardBgHover: '#FFFFFF',
-    cardBorder: '#E7E4DF',
-    cardBorderHover: '#059669',
-    badgeBg: '#059669',
-    badgeText: '#FFFFFF',
-    chipBg: '#ECFDF5',
-    chipBorder: '#A7F3D0',
-    chipText: '#065F46',
-    boxBg: '#F0FDF4',
-    boxBorder: '#BBF7D0',
-    boxText: '#111111',
-    textPrimary: '#111111',
-    textSecondary: '#4B5563',
-    textMuted: '#6B7280',
-    shadow: '0 12px 32px -4px rgba(5, 150, 105, 0.12)'
   }
 ];
 
@@ -493,21 +557,29 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
 
   const renderCard = (card) => {
     const isActive = activeCardId === card.id;
-    const IconComponent = TRACK_ICONS[card.code] || Sparkles;
+    const theme = MODULE_THEMES[card.code] || MODULE_THEMES['M1'];
+    const IconComponent = theme.icon || Sparkles;
     const GraphicComponent = COLLAPSED_GRAPHICS[card.code];
 
     return (
       <div
         key={card.id}
-        className={`opp-wall-card ${isActive ? 'is-active' : ''}`}
+        className={`opp-wall-card opp-theme-${card.code.toLowerCase()} ${isActive ? 'is-active' : ''}`}
         onMouseEnter={() => handleCardMouseEnter(card.id)}
         onClick={() => handleCardClick(card.id)}
         style={{
-          backgroundColor: isActive ? card.cardBgHover : card.cardBg,
-          border: `1px solid ${isActive ? card.cardBorderHover : card.cardBorder}`,
-          boxShadow: isActive ? card.shadow : '0 2px 8px rgba(0, 0, 0, 0.04)',
-          cursor: 'pointer',
-          pointerEvents: 'auto',
+          '--module-accent': theme.accent,
+          '--module-card-border': theme.cardBorder,
+          '--module-card-bg-tint': theme.cardBgTint,
+          '--module-glow': theme.glow,
+          '--module-badge-bg': theme.badgeBg,
+          '--module-badge-text': theme.badgeText,
+          '--module-badge-border': theme.badgeBorder,
+          '--module-icon-bg': theme.iconBg,
+          '--module-icon-border': theme.iconBorder,
+          '--module-arrow-bg': theme.arrowBg,
+          '--module-arrow-border': theme.arrowBorder,
+          '--module-arrow-color': theme.arrowColor,
         }}
         role="button"
         tabIndex={0}
@@ -519,39 +591,31 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
           }
         }}
       >
+        {/* Subtle Module-Specific Graphic Watermark */}
+        <CardWatermark watermark={theme.watermark} accentColor={theme.accent} />
+
         {/* Compact Default Card View */}
         <div className="opp-wall-card-compact">
           <div className="opp-wall-compact-left">
-            <span 
-              className="opp-wall-badge-num"
-              style={{
-                backgroundColor: card.badgeBg,
-                color: card.badgeText
-              }}
-            >
+            <span className="opp-wall-badge-num">
               {card.code}
             </span>
             <div className="opp-wall-compact-title-wrap">
               <div className="opp-wall-compact-name-row">
-                <IconComponent size={16} color={card.accentColor} />
-                <h4 className="opp-wall-compact-name" style={{ color: card.textPrimary }}>
+                <div className="opp-wall-icon-box">
+                  <IconComponent size={15} />
+                </div>
+                <h4 className="opp-wall-compact-name">
                   {card.name}
                 </h4>
               </div>
-              <p className="opp-wall-compact-desc" style={{ color: card.textMuted }}>
+              <p className="opp-wall-compact-desc">
                 {card.compactDesc}
               </p>
             </div>
           </div>
 
-          <div 
-            className="opp-wall-arrow-btn"
-            style={{
-              backgroundColor: isActive ? card.accentColor : (card.isWhiteBase ? '#FAF8F5' : 'rgba(255, 255, 255, 0.08)'),
-              border: `1px solid ${isActive ? card.accentColor : (card.isWhiteBase ? '#E7E4DF' : 'rgba(255, 255, 255, 0.15)')}`,
-              color: isActive ? '#FFFFFF' : card.textMuted
-            }}
-          >
+          <div className="opp-wall-arrow-btn" aria-label={`Expand ${card.name} opportunity details`}>
             <ArrowRight size={16} />
           </div>
         </div>
@@ -563,28 +627,28 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
 
               {/* Graphic System Illustration */}
               {GraphicComponent && (
-                <div style={{ marginTop: '12px', marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-                  <GraphicComponent accentColor={card.accentColor} />
+                <div style={{ marginTop: '14px', marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                  <GraphicComponent accentColor={theme.accent} />
                 </div>
               )}
 
               {/* Meta Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                <span style={{ fontFamily: 'monospace', fontSize: '11px', fontWeight: 800, color: card.accentColor, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: '11px', fontWeight: 800, color: theme.accent, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   {card.code} · {card.name.toUpperCase()}
                 </span>
-                <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(5, 150, 105, 0.12)', color: '#059669', border: '1px solid rgba(5, 150, 105, 0.25)', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 700, padding: '2.5px 8px', borderRadius: '4px', backgroundColor: 'rgba(5, 150, 105, 0.15)', color: '#34D399', border: '1px solid rgba(5, 150, 105, 0.3)', whiteSpace: 'nowrap' }}>
                   ● {card.statusBadge.toUpperCase()}
                 </span>
               </div>
 
               {/* Role Title */}
-              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '19px', fontWeight: 800, color: card.textPrimary, letterSpacing: '-0.02em', margin: '0 0 10px 0', lineHeight: 1.25, wordBreak: 'break-word' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', margin: '0 0 10px 0', lineHeight: 1.28, wordBreak: 'break-word' }}>
                 {card.role}
               </h3>
 
               {/* Brief Snippet */}
-              <p style={{ fontSize: '13px', fontStyle: 'italic', color: card.textSecondary, lineHeight: 1.5, margin: '0 0 14px 0', paddingLeft: '12px', borderLeft: `2.5px solid ${card.accentColor}`, wordBreak: 'break-word' }}>
+              <p style={{ fontSize: '13px', fontStyle: 'italic', color: 'rgba(255, 255, 255, 0.78)', lineHeight: 1.55, margin: '0 0 14px 0', paddingLeft: '12px', borderLeft: `2.5px solid ${theme.accent}`, wordBreak: 'break-word' }}>
                 "{card.briefSnippet}"
               </p>
 
@@ -594,12 +658,12 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                   <span
                     key={i}
                     style={{
-                      fontSize: '10px',
+                      fontSize: '10.5px',
                       fontFamily: 'monospace',
                       fontWeight: 600,
-                      backgroundColor: card.chipBg,
-                      border: `1px solid ${card.chipBorder}`,
-                      color: card.chipText,
+                      backgroundColor: 'rgba(255, 255, 255, 0.07)',
+                      border: '1px solid rgba(255, 255, 255, 0.14)',
+                      color: '#E5E7EB',
                       padding: '3px 8px',
                       borderRadius: '5px',
                     }}
@@ -612,8 +676,8 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
               {/* Snapshot Details Box */}
               <div 
                 style={{
-                  backgroundColor: card.boxBg,
-                  border: `1px solid ${card.boxBorder}`,
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.09)',
                   borderRadius: '10px',
                   padding: '10px 14px',
                   marginBottom: '14px',
@@ -628,21 +692,24 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                 }}
               >
                 <div style={{ minWidth: '120px', flex: '1 1 auto' }}>
-                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>COMPENSATION</span>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: card.accentColor, wordBreak: 'break-word' }}>{card.payment_amount}</span>
+                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>COMPENSATION</span>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: theme.accent, wordBreak: 'break-word' }}>{card.payment_amount}</span>
                 </div>
                 <div style={{ flex: '0 0 auto' }}>
-                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: card.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>VERIFICATION</span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', whiteSpace: 'nowrap' }}>✓ Verified by UpShift</span>
+                  <span style={{ display: 'block', fontSize: '9px', fontFamily: 'monospace', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>VERIFICATION</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#10B981', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <CheckCircle2 size={12} style={{ color: '#10B981' }} />
+                    <span>Verified by UpShift</span>
+                  </span>
                 </div>
               </div>
 
               {/* Required Proof Spec Box */}
               <div 
                 style={{
-                  backgroundColor: card.boxBg,
-                  border: `1px solid ${card.boxBorder}`,
-                  borderLeft: `3px solid ${card.accentColor}`,
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.09)',
+                  borderLeft: `3px solid ${theme.accent}`,
                   borderRadius: '10px',
                   padding: '10px 14px',
                   marginBottom: '16px',
@@ -651,28 +718,28 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                   maxWidth: '100%'
                 }}
               >
-                <span style={{ fontSize: '9.5px', fontFamily: 'monospace', fontWeight: 800, textTransform: 'uppercase', color: card.accentColor, display: 'block', marginBottom: '3px', letterSpacing: '0.08em' }}>
+                <span style={{ fontSize: '9.5px', fontFamily: 'monospace', fontWeight: 800, textTransform: 'uppercase', color: theme.accent, display: 'block', marginBottom: '3px', letterSpacing: '0.08em' }}>
                   ★ REQUIRED PROOF SPEC
                 </span>
-                <p style={{ fontSize: '12px', color: card.boxText, margin: 0, lineHeight: 1.4, wordBreak: 'break-word' }}>
+                <p style={{ fontSize: '12px', color: '#E5E7EB', margin: 0, lineHeight: 1.45, wordBreak: 'break-word' }}>
                   {card.proofRequirement}
                 </p>
               </div>
 
               {/* Action Footer */}
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '10px', paddingTop: '4px', width: '100%', boxSizing: 'border-box' }}>
-                <span style={{ fontFamily: 'monospace', fontSize: '11px', color: card.textMuted, flex: '1 1 auto', minWidth: '100px' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: '11px', color: '#9CA3AF', flex: '1 1 auto', minWidth: '100px' }}>
                   {card.category}
                 </span>
                 <button
                   type="button"
                   onClick={(e) => handleApplyClick(card, e)}
                   style={{
-                    backgroundColor: card.accentColor,
-                    borderColor: card.accentColor,
+                    backgroundColor: '#E31B23',
+                    borderColor: '#E31B23',
                     color: '#FFFFFF',
                     borderRadius: '9999px',
-                    padding: '8px 16px',
+                    padding: '8px 18px',
                     fontSize: '12px',
                     fontWeight: 700,
                     border: '1px solid transparent',
@@ -680,13 +747,14 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '6px',
-                    transition: 'all 0.2s ease',
-                    boxShadow: `0 4px 14px ${card.accentColor}35`,
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: '0 4px 14px rgba(227, 27, 35, 0.4)',
                     whiteSpace: 'nowrap',
                     flex: '0 0 auto',
                     maxWidth: '100%',
                     boxSizing: 'border-box'
                   }}
+                  className="opp-cta-button"
                 >
                   <span>APPLY FOR THIS GIG</span>
                   <ArrowRight size={14} />
@@ -741,3 +809,4 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
     </section>
   );
 }
+

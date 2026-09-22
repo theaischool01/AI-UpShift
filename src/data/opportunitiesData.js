@@ -112,7 +112,7 @@ export const CONCEPTUAL_CLASSIFIEDS = [
     organization: "Creator Education Collective",
     location: "Remote",
     engagement: "Freelance Contract",
-    neededCapabilities: ["Vibe Coder", "React / Vite", "API Integrations"],
+    neededCapabilities: ["VibeCoder", "React / Vite", "API Integrations"],
     briefSnippet: "We need a clean, responsive waitlist landing page with an interactive diagnostic quiz that suggests tailored learning tracks based on user answers.",
     statusBadge: "Active Ecosystem Need",
     proofRequirement: "Share a live URL of a web tool or landing experience you shipped."

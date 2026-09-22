@@ -35,13 +35,13 @@ export default function UpShiftWordmark({
     >
       <span
         className="upshift-wordmark__up"
-        style={{ color: resolvedUpColor, transition: 'color 200ms ease' }}
+        style={{ color: resolvedUpColor, fontWeight: 'inherit', transition: 'color 200ms ease' }}
       >
         Up
       </span>
       <span
         className="upshift-wordmark__shift"
-        style={{ color: shiftColor }}
+        style={{ color: shiftColor, fontWeight: 'inherit' }}
       >
         Shift
       </span>

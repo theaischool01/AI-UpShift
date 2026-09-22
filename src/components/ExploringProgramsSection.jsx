@@ -22,9 +22,9 @@ const SLIDES = [
   },
   {
     code: '04',
-    name: 'Vibe Coder',
+    name: 'VibeCoder',
     src: '/Page-2/VibeCoder.png',
-    alt: 'Vibe Coder',
+    alt: 'VibeCoder',
   },
   {
     code: '05',
@@ -198,19 +198,13 @@ export default function ExploringProgramsSection() {
         aria-hidden="true"
       />
 
-      {/* Centered Framing System: Left Red Line (desktop only) + Image Frame + Right Red Line (desktop only) */}
-      <div className="relative z-20 flex flex-col items-center justify-center gap-5 max-w-full">
-        <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-7 max-w-full">
-          {/* Left Decorative Vertical Editorial Red Line - Hidden completely on mobile */}
+      {/* Centered Framing System: Framing Wrapper (Image + Left/Right Red Lines) + Dots */}
+      <div className="relative z-20 flex flex-col items-center justify-center gap-4 sm:gap-5 max-w-full">
+        {/* Relative Framing Wrapper for Image + Side Red Lines */}
+        <div className="exploring-programs-framing-wrapper">
+          {/* Left Decorative Vertical Editorial Red Line - Desktop / Tablet-large only */}
           <div
-            className="hidden md:block shrink-0 pointer-events-none select-none"
-            style={{
-              width: '2.5px',
-              height: 'clamp(220px, 58vh, 520px)',
-              backgroundColor: '#E31B23',
-              borderRadius: '9999px',
-              boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
-            }}
+            className="exploring-programs-side-line exploring-programs-side-line--left"
             aria-hidden="true"
           />
 
@@ -220,7 +214,7 @@ export default function ExploringProgramsSection() {
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             style={{
-              width: 'min(1360px, calc(100vw - 32px), calc((100svh - 90px) * (1672 / 941)))',
+              width: 'min(1360px, calc(100vw - clamp(32px, 8vw, 120px)), calc((100svh - 90px) * (1672 / 941)))',
               aspectRatio: '1672 / 941',
               maxHeight: 'calc(100svh - 90px)',
               boxShadow: '0 14px 40px -12px rgba(227, 27, 35, 0.08), 0 4px 18px -4px rgba(0, 0, 0, 0.03)',
@@ -274,23 +268,16 @@ export default function ExploringProgramsSection() {
             )}
           </div>
 
-          {/* Right Decorative Vertical Editorial Red Line - Hidden completely on mobile */}
+          {/* Right Decorative Vertical Editorial Red Line - Desktop / Tablet-large only */}
           <div
-            className="hidden md:block shrink-0 pointer-events-none select-none"
-            style={{
-              width: '2.5px',
-              height: 'clamp(220px, 58vh, 520px)',
-              backgroundColor: '#E31B23',
-              borderRadius: '9999px',
-              boxShadow: '0 0 10px rgba(227, 27, 35, 0.45)',
-            }}
+            className="exploring-programs-side-line exploring-programs-side-line--right"
             aria-hidden="true"
           />
         </div>
 
         {/* Reusable 6-Dot Pagination Navigation matching the Testimonial Style */}
         <div 
-          className="flex items-center justify-center gap-2 pt-2 z-20"
+          className="flex items-center justify-center gap-2 pt-1 sm:pt-2 z-20"
           role="tablist"
           aria-label="Exploring Programs Slideshow Navigation"
         >

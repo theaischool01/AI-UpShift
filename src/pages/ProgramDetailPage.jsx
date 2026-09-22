@@ -430,7 +430,7 @@ export default function ProgramDetailPage() {
                 READY TO BUILD WITH AI?
               </span>
               <h2 className="program-final-cta-title">
-                Enroll in <span>{program.name}</span>
+                Enroll in Up<span>Shift Program</span>
               </h2>
               <p className="program-final-cta-desc">
                 Master applied AI capabilities in 4 weeks. Build verifiable deliverables and start accessing digital gigs.

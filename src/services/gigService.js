@@ -85,6 +85,7 @@ export async function fetchGigs({
       currency,
       priority,
       is_featured,
+      is_local_business,
       posted_at,
       is_active,
       created_at,
@@ -116,8 +117,14 @@ export async function fetchGigs({
       );
     }
 
-    // Apply sorting strategy
-    if (sortBy === 'newest') {
+    // Apply sorting and discovery strategy
+    if (sortBy === 'local_business') {
+      query = query
+        .eq('is_local_business', true)
+        .order('is_featured', { ascending: false })
+        .order('priority', { ascending: false })
+        .order('created_at', { ascending: false });
+    } else if (sortBy === 'newest') {
       query = query
         .order('posted_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false });
@@ -159,9 +166,9 @@ export async function fetchGigs({
     const { data, count, error } = await query.range(from, to);
 
     if (error) {
-      // Graceful fallback for environments before migration 013
-      if (error.message && (error.message.includes('priority') || error.message.includes('max_amount') || error.message.includes('posted_at'))) {
-        console.warn('[gigService:fetchGigs] Optional sorting columns not detected in remote DB, falling back to base query.');
+      // Graceful fallback for environments before migration 013/015
+      if (error.message && (error.message.includes('priority') || error.message.includes('max_amount') || error.message.includes('posted_at') || error.message.includes('is_local_business'))) {
+        console.warn('[gigService:fetchGigs] Optional sorting/classification columns not detected in remote DB, falling back to base query.');
         let fallbackQuery = supabase.from('gigs').select(`
           id,
           external_gig_id,
@@ -175,6 +182,7 @@ export async function fetchGigs({
           proof_spec,
           origin_url,
           payment_amount,
+          is_local_business,
           is_active,
           created_at,
           track:tracks (
@@ -190,6 +198,7 @@ export async function fetchGigs({
         if (isActive !== null) fallbackQuery = fallbackQuery.eq('is_active', Boolean(isActive));
         if (trackId && trackId !== 'ALL') fallbackQuery = fallbackQuery.eq('track_id', trackId);
         if (trimmedSearch) fallbackQuery = fallbackQuery.or(`title.ilike.%${trimmedSearch}%,short_description.ilike.%${trimmedSearch}%`);
+        if (sortBy === 'local_business') fallbackQuery = fallbackQuery.eq('is_local_business', true);
 
         fallbackQuery = fallbackQuery.order('created_at', { ascending: false });
         const fallbackRes = await fallbackQuery.range(from, to);
@@ -251,6 +260,7 @@ export async function fetchGigById(gigId) {
         currency,
         priority,
         is_featured,
+        is_local_business,
         posted_at,
         is_active,
         created_at,
@@ -269,7 +279,7 @@ export async function fetchGigById(gigId) {
 
     if (error) {
       // Fallback query if optional columns are pending
-      if (error.message && (error.message.includes('priority') || error.message.includes('compensation_type'))) {
+      if (error.message && (error.message.includes('priority') || error.message.includes('compensation_type') || error.message.includes('is_local_business'))) {
         const { data: fbData, error: fbErr } = await supabase
           .from('gigs')
           .select(`
@@ -285,6 +295,7 @@ export async function fetchGigById(gigId) {
             proof_spec,
             origin_url,
             payment_amount,
+            is_local_business,
             is_active,
             created_at,
             track:tracks (
@@ -334,6 +345,16 @@ export function normalizeGigPayload(raw = {}) {
   const maxAmt = raw.max_amount !== undefined && raw.max_amount !== null && raw.max_amount !== '' && !isNaN(raw.max_amount) ? parseFloat(raw.max_amount) : (minAmt || null);
   const prio = raw.priority !== undefined && raw.priority !== null && raw.priority !== '' && !isNaN(raw.priority) ? Math.max(0, parseInt(raw.priority, 10)) : 0;
   const isFeat = typeof raw.is_featured === 'boolean' ? raw.is_featured : (String(raw.is_featured).toLowerCase() === 'true' || raw.is_featured === '1');
+  
+  let isLocalBiz = false;
+  if (typeof raw.is_local_business === 'boolean') {
+    isLocalBiz = raw.is_local_business;
+  } else if (typeof raw.is_local_business === 'string') {
+    const val = raw.is_local_business.trim().toLowerCase();
+    isLocalBiz = val === 'yes' || val === 'true' || val === '1';
+  } else if (typeof raw.is_local_business === 'number') {
+    isLocalBiz = raw.is_local_business === 1;
+  }
 
   return {
     external_gig_id: raw.external_gig_id ? String(raw.external_gig_id).trim() : null,
@@ -346,6 +367,7 @@ export function normalizeGigPayload(raw = {}) {
     currency: raw.currency ? String(raw.currency).trim().toUpperCase() : 'INR',
     priority: prio,
     is_featured: isFeat,
+    is_local_business: Boolean(isLocalBiz),
     posted_at: raw.posted_at ? String(raw.posted_at).trim() : null,
     short_description: raw.short_description ? String(raw.short_description).trim() : null,
     overview: raw.overview ? String(raw.overview).trim() : null,
@@ -369,6 +391,7 @@ function stripPendingMarketplaceColumns(payload) {
     currency,
     priority,
     is_featured,
+    is_local_business,
     posted_at,
     updated_at,
     ...baseline
@@ -385,6 +408,7 @@ function isSchemaCacheColumnError(error) {
     msg.includes('compensation_type') ||
     msg.includes('priority') ||
     msg.includes('is_featured') ||
+    msg.includes('is_local_business') ||
     msg.includes('min_amount') ||
     msg.includes('max_amount')
   );
