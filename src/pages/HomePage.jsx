@@ -174,6 +174,41 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                   <ArrowDown size={15} />
                 </button>
               </div>
+
+              {/* Statistics Strip: 3 Metrics with White Circular Badges & Subtle Separators */}
+              <div className="hero-stats-strip" aria-label="UpShift Key Statistics">
+                {/* Stat 1: 5K+ UpShifters */}
+                <div className="hero-stat-item">
+                  <div className="hero-stat-circle">
+                    <span className="hero-stat-value">5K+</span>
+                  </div>
+                  <span className="hero-stat-label">UpShifters</span>
+                </div>
+
+                {/* Separator 1 */}
+                <div className="hero-stat-divider" aria-hidden="true" />
+
+                {/* Stat 2: 1.5K+ Earners */}
+                <div className="hero-stat-item">
+                  <div className="hero-stat-circle">
+                    <span className="hero-stat-value">1.5K+</span>
+                  </div>
+                  <span className="hero-stat-label">Earners</span>
+                </div>
+
+                {/* Separator 2 */}
+                <div className="hero-stat-divider" aria-hidden="true" />
+
+                {/* Stat 3: ₹2.67Cr+ Total UpShifters Earned */}
+                <div className="hero-stat-item">
+                  <div className="hero-stat-circle">
+                    <span className="hero-stat-value hero-stat-value-sm">₹2.67Cr+</span>
+                  </div>
+                  <span className="hero-stat-label">
+                    Total UpShifters<br className="hidden sm:inline" /> Earned
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Right Mascot Column (Dominant on Right, Anchored to bottom) */}

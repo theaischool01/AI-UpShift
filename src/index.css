@@ -950,6 +950,127 @@ h1, h2, h3, h4, .font-heading {
   z-index: 2;
 }
 
+/* ==========================================================================
+   HERO STATS STRIP
+   3 Metrics: White Circles, Brand Red Numbers, White Labels, Subtle Dividers
+   ========================================================================== */
+.hero-stats-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 2px;
+  width: 100%;
+}
+
+.hero-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.hero-stat-circle {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 9999px;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22), 0 0 10px rgba(227, 27, 35, 0.1);
+  flex-shrink: 0;
+  text-align: center;
+  padding: 2px 4px;
+}
+
+.hero-stat-value {
+  color: #E31B23;
+  font-family: var(--font-display, var(--font-heading, -apple-system, BlinkMacSystemFont, sans-serif));
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hero-stat-value-sm {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.hero-stat-label {
+  color: #FFFFFF;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  white-space: normal;
+}
+
+.hero-stat-divider {
+  width: 1px;
+  height: 22px;
+  background-color: rgba(255, 255, 255, 0.28);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+@media (max-width: 1023px) and (min-width: 641px) {
+  .hero-stats-strip {
+    gap: 14px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-stat-circle {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+  }
+  .hero-stat-value {
+    font-size: 14px;
+  }
+  .hero-stat-value-sm {
+    font-size: 9.5px;
+  }
+  .hero-stat-label {
+    font-size: 12.5px;
+  }
+  .hero-stat-divider {
+    height: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-stats-strip {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .hero-stat-divider {
+    display: none;
+  }
+  .hero-stat-circle {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+  }
+  .hero-stat-value {
+    font-size: 13.5px;
+  }
+  .hero-stat-value-sm {
+    font-size: 9px;
+  }
+  .hero-stat-label {
+    font-size: 13px;
+  }
+}
+
 .hero-headline-emphasis {
   display: inline;
   color: #E31B23;
