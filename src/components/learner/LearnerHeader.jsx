@@ -30,13 +30,13 @@ export default function LearnerHeader() {
         >
           {/* UpShift Fox Mascot Avatar */}
           <div 
-            className="rounded-full overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 shadow-xs flex-shrink-0 select-none p-[1.5px]"
+            className="rounded-[9px] overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 shadow-xs flex-shrink-0 select-none p-[1.5px]"
             style={{ width: '36px', height: '36px', minWidth: '36px', minHeight: '36px' }}
           >
             <img 
               src="/assets/mascot/mascot_avatar.jpg" 
               alt="UpShift Mascot" 
-              className="w-full h-full object-cover rounded-full select-none"
+              className="w-full h-full object-cover rounded-[8px] select-none"
             />
           </div>
           <div className="flex flex-col justify-center min-w-0">

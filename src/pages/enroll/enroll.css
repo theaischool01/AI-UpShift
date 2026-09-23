@@ -75,7 +75,7 @@
 .enroll-brand-avatar {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid #E5E7EB;
   background-color: #FFFFFF;

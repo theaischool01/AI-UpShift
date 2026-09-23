@@ -59,7 +59,7 @@ export default function Navbar({ onOpenRegistration }) {
   const navItems = [
     { id: 'programs', label: 'Programs' },
     { id: 'how-it-works', label: 'How It Works' },
-    { id: 'outcomes', label: 'Outcomes' },
+    { id: 'outcomes', label: 'Our Stories' },
     { id: 'opportunities', label: 'Opportunities' },
     { id: 'partners', label: 'Partners' },
   ];
@@ -110,21 +110,21 @@ export default function Navbar({ onOpenRegistration }) {
             style={{
               width: '26px',
               height: '26px',
-              borderRadius: '50%',
+              borderRadius: '7px',
               overflow: 'hidden',
               border: isHero ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,0,0,0.15)',
               backgroundColor: '#111111',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '1.5px',
+              padding: '1px',
               flexShrink: 0
             }}
           >
             <img 
               src="/assets/mascot/mascot_avatar.jpg" 
               alt="Upshift Mascot" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px' }}
             />
           </div>
           <div className="flex items-center gap-1 sm:gap-1.5 leading-none whitespace-nowrap">

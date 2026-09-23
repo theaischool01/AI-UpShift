@@ -270,7 +270,7 @@ export default function EnrollmentPage() {
         <div className="enroll-header-inner">
           <Link to="/" className="enroll-brand-link">
             <div className="enroll-brand-avatar">
-              <img src="/assets/mascot/mascot_avatar.jpg" alt="UpShift Mascot" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              <img src="/assets/mascot/mascot_avatar.jpg" alt="UpShift Mascot" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '7px' }} />
             </div>
             <div className="enroll-brand-text">
               <span className="enroll-brand-school">THE AI SCHOOL</span>

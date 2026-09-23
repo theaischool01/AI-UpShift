@@ -316,7 +316,7 @@ const COLLAPSED_GRAPHICS = {
 };
 
 // ==========================================================================
-// OPPORTUNITY MODULE DATA
+// OPPORTUNITY MODULE DATA (6 Distinct Showcase Tracks)
 // ==========================================================================
 
 const OPPORTUNITY_MODULES = [
@@ -327,16 +327,16 @@ const OPPORTUNITY_MODULES = [
     name: 'ReelRush AI',
     category: 'AI Video / Short-Form Content',
     compactDesc: 'Short-form video creation for real brands.',
-    role: 'AI Short-Form Video Creator',
-    organization: 'Seed-Stage FinTech Startup',
-    location: 'Remote (Global)',
-    engagement: 'Project Retainer (15 hrs/wk)',
+    role: 'AI Short-Form Video Content Producer',
+    organization: 'Modern Consumer Brand / Startup',
+    location: 'Remote',
+    engagement: 'Freelance Contract',
     focusDomain: 'Visual Editing & Audio Directing',
     payment_amount: '₹25,000–₹45,000 / month',
     originPlatform: 'Upwork / Startup Network',
-    neededCapabilities: ['ReelRush AI', 'Hook Engineering', 'AI B-Roll Directing'],
-    briefSnippet: 'Need a sharp creator to turn our bi-weekly founder audio discussions into 8 polished vertical reels per week. We have the thoughts; we need someone who can direct visuals and ship proof.',
-    proofRequirement: 'Provide 3 sample video reels demonstrating pacing and AI B-roll sync.',
+    neededCapabilities: ['ReelRush AI', 'AI Video Editing', 'Short-Form Content'],
+    briefSnippet: 'Create branded short-form AI videos for social media campaigns, including hooks, pacing, AI B-roll and final edits.',
+    proofRequirement: 'Provide sample short-form videos demonstrating pacing, storytelling and AI B-roll integration.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
   },
@@ -346,16 +346,16 @@ const OPPORTUNITY_MODULES = [
     name: 'VisualForge AI',
     category: 'AI Design / Visual Creation',
     compactDesc: 'Brand identities, 3D mockups & visual systems.',
-    role: 'Visual Identity & Social Asset Designer',
-    organization: 'Boutique D2C Coffee Roaster',
-    location: 'Remote (India / US East)',
-    engagement: 'Project Sprint (2-Week Milestone)',
-    focusDomain: 'Brand Identity & Product Renders',
-    payment_amount: '₹30,000–₹60,000 / sprint',
+    role: 'Generative Brand Asset Designer',
+    organization: 'Creative / D2C Brand',
+    location: 'Remote',
+    engagement: 'Freelance Contract',
+    focusDomain: 'Generative Design & Brand Assets',
+    payment_amount: '₹30,000–₹55,000 / sprint',
     originPlatform: 'D2C Brand Ecosystem',
-    neededCapabilities: ['VisualForge AI', '3D Mockup Generation', 'Brand Styling'],
-    briefSnippet: 'Launching a cold brew line. Looking for a visual builder to generate 12 photorealistic product environment renders and 24 social launch graphics.',
-    proofRequirement: 'Show portfolio of consistent product mockups with lighting control.',
+    neededCapabilities: ['VisualForge AI', 'Generative Design', 'Brand Assets'],
+    briefSnippet: 'Create AI-generated visual assets for a commercial brand campaign, including social creatives, product visuals and campaign variations.',
+    proofRequirement: 'Provide a small collection of AI-generated commercial visual assets with documented design direction.',
     statusBadge: 'Active Ecosystem Need',
     column: 'left',
   },
@@ -484,7 +484,7 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
       return {
         ...mod,
         id: primaryGig.id,
-        role: primaryGig.title,
+        role: primaryGig.title || mod.role,
         organization: primaryGig.organization || primaryGig.origin_site || mod.organization,
         location: primaryGig.location || mod.location,
         engagement: primaryGig.engagement_type || mod.engagement,
@@ -495,23 +495,11 @@ export default function OpportunityDispatchSection({ onExploreClick }) {
         isRealGig: true,
         rawGig: primaryGig
       };
-    } else if (realGigs.length > 0) {
-      return {
-        ...mod,
-        role: 'NO ACTIVE OPPORTUNITY FOR THIS TRACK YET',
-        organization: 'UpShift Partner Network',
-        location: 'Remote',
-        engagement: 'Awaiting Upload',
-        payment_amount: 'Payment Specified on Match',
-        originPlatform: 'UpShift Dispatch',
-        briefSnippet: `Uploads from partner startups and growth agencies are dispatched regularly. Enroll in ${mod.name} to build proof and unlock upcoming gigs.`,
-        statusBadge: 'Awaiting Dispatch',
-        isRealGig: false,
-        rawGig: null
-      };
     } else {
+      // Always fallback to the rich, distinct opportunity data for this track
       return {
         ...mod,
+        statusBadge: 'Active Ecosystem Need',
         isRealGig: false,
         rawGig: null
       };
