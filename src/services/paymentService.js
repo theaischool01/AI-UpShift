@@ -85,7 +85,10 @@ export async function verifyRazorpayPayment({
         mobile: learnerData.mobile,
         city: learnerData.city,
         state: learnerData.state,
-        current_status: learnerData.currentStatus,
+        current_status: learnerData.otherStatus
+          ? `${learnerData.currentStatus} (${learnerData.otherStatus})`
+          : learnerData.currentStatus,
+        other_status: learnerData.otherStatus || null,
         college: learnerData.college,
         course_degree: learnerData.courseDegree,
         branch: learnerData.branch,

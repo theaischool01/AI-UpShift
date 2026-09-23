@@ -79,6 +79,7 @@ export default function EnrollmentPage() {
     city: '',
     state: '',
     currentStatus: '',
+    otherStatus: '',
     college: '',
     courseDegree: '',
     branch: '',
@@ -146,7 +147,12 @@ export default function EnrollmentPage() {
     if (!formData.city.trim()) errs.city = 'City is required.';
     if (!formData.state.trim()) errs.state = 'State is required.';
 
-    if (!formData.currentStatus) errs.currentStatus = 'Please select your current status.';
+    if (!formData.currentStatus) {
+      errs.currentStatus = 'Please select your current status.';
+    } else if (formData.currentStatus === 'Others' && !formData.otherStatus.trim()) {
+      errs.otherStatus = 'Please enter your current status.';
+    }
+
     if (!formData.college.trim()) errs.college = 'College / University name is required.';
     if (!formData.courseDegree.trim()) errs.courseDegree = 'Course / Degree is required.';
     if (!formData.branch.trim()) errs.branch = 'Branch / Specialization is required.';
@@ -165,11 +171,20 @@ export default function EnrollmentPage() {
   };
 
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [field]: value };
+      if (field === 'currentStatus' && value !== 'Others') {
+        updated.otherStatus = '';
+      }
+      return updated;
+    });
     if (errors[field]) {
       setErrors((prev) => {
         const next = { ...prev };
         delete next[field];
+        if (field === 'currentStatus') {
+          delete next.otherStatus;
+        }
         return next;
       });
     }
@@ -207,7 +222,10 @@ export default function EnrollmentPage() {
           gender: formData.gender || 'Not specified',
           city: formData.city.trim(),
           state: formData.state.trim(),
-          current_status: formData.currentStatus,
+          current_status: formData.currentStatus === 'Others' && formData.otherStatus.trim()
+            ? `Others: ${formData.otherStatus.trim()}`
+            : formData.currentStatus,
+          other_status: formData.currentStatus === 'Others' ? formData.otherStatus.trim() : '',
           college: formData.college.trim(),
           course_degree: formData.courseDegree.trim(),
           branch: formData.branch.trim(),
@@ -241,6 +259,7 @@ export default function EnrollmentPage() {
         city: formData.city.trim(),
         state: formData.state.trim(),
         currentStatus: formData.currentStatus,
+        otherStatus: formData.currentStatus === 'Others' ? formData.otherStatus.trim() : '',
         college: formData.college.trim(),
         courseDegree: formData.courseDegree.trim(),
         branch: formData.branch.trim(),
@@ -482,6 +501,25 @@ export default function EnrollmentPage() {
                   </select>
                   {errors.currentStatus && <p className="enroll-error-msg">{errors.currentStatus}</p>}
                 </div>
+
+                {/* Other Status (conditionally shown when Others is selected) */}
+                {formData.currentStatus === 'Others' && (
+                  <div className="enroll-field enroll-field-span-2">
+                    <label htmlFor="otherStatus" className="enroll-label">
+                      Other Status <span className="enroll-req">*</span>
+                    </label>
+                    <input
+                      id="otherStatus"
+                      type="text"
+                      value={formData.otherStatus}
+                      onChange={(e) => handleInputChange('otherStatus', e.target.value)}
+                      placeholder="Enter your current status"
+                      className={`enroll-input ${errors.otherStatus ? 'enroll-input-error' : ''}`}
+                      autoFocus
+                    />
+                    {errors.otherStatus && <p className="enroll-error-msg">{errors.otherStatus}</p>}
+                  </div>
+                )}
 
                 {/* College / Institution */}
                 <div className="enroll-field enroll-field-span-2">
