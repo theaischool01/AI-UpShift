@@ -659,13 +659,13 @@ h1, h2, h3, h4, .font-heading {
   z-index: 1001;
   pointer-events: auto;
   width: 100%;
-  max-width: 980px;
-  background: rgba(255, 255, 255, 0.85);
+  max-width: 1040px;
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--radius-pill);
-  padding: 6px 8px 6px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: var(--radius-pill, 9999px);
+  padding: 6px 10px 6px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -675,9 +675,9 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .nav-scrolled {
-  max-width: 920px;
-  padding: 5px 8px 5px 14px;
-  background: rgba(255, 255, 255, 0.95);
+  max-width: 1040px;
+  padding: 6px 10px 6px 16px;
+  background: rgba(255, 255, 255, 0.96);
   border-color: rgba(0, 0, 0, 0.12);
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12);
 }
@@ -694,6 +694,8 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .nav-floating.navbar--hero.nav-scrolled {
+  max-width: 1040px;
+  padding: 6px 10px 6px 16px;
   background: rgba(10, 10, 12, 0.88);
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow:
@@ -705,12 +707,12 @@ h1, h2, h3, h4, .font-heading {
 .nav-links-desktop {
   display: flex !important;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 /* Desktop Navigation Links */
 .nav-item-link {
-  padding: 6px 14px;
+  padding: 6px 12px;
   font-size: 13px;
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
   font-weight: 500;
@@ -762,7 +764,7 @@ h1, h2, h3, h4, .font-heading {
 .nav-ctas-desktop {
   display: flex !important;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -786,6 +788,19 @@ h1, h2, h3, h4, .font-heading {
   border-radius: 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
   box-sizing: border-box;
+}
+
+@media (max-width: 1020px) and (min-width: 861px) {
+  .nav-floating {
+    padding: 6px 8px 6px 14px;
+  }
+  .nav-item-link {
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+  .nav-ctas-desktop {
+    gap: 6px;
+  }
 }
 
 @media (max-width: 860px) {
@@ -1388,34 +1403,13 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .exploring-programs-header {
-  text-align: center;
-  max-width: 680px;
-  margin: 0 auto clamp(16px, 2vw, 24px) auto;
+  text-align: left;
+  width: min(1360px, calc(100vw - clamp(32px, 8vw, 120px)), calc((100svh - 90px) * (1672 / 941)));
+  max-width: 100%;
+  margin: 0 auto clamp(10px, 1.5vw, 16px) auto;
   position: relative;
   z-index: 20;
-}
-
-.exploring-programs-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.exploring-programs-eyebrow-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background-color: #E31B23;
-}
-
-.exploring-programs-eyebrow-text {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #E31B23;
-  text-transform: uppercase;
+  box-sizing: border-box;
 }
 
 .exploring-programs-title {
@@ -1425,7 +1419,21 @@ h1, h2, h3, h4, .font-heading {
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: #111111;
-  margin: 0 0 6px 0;
+  margin: 0;
+  text-align: left;
+}
+
+.exploring-programs-title .upshift-brand-inline {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.exploring-programs-title .brand-up {
+  color: #111111;
+}
+
+.exploring-programs-title .brand-shift {
+  color: #E31B23;
 }
 
 .exploring-programs-subtitle {

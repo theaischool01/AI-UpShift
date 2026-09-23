@@ -19,6 +19,7 @@ import './enroll.css';
 const STATUS_OPTIONS = [
   'Currently Studying',
   'Graduated',
+  'Working Professional',
   'Freelance',
   'Others',
 ];
@@ -74,7 +75,6 @@ export default function EnrollmentPage() {
     fullName: '',
     email: '',
     mobile: '',
-    dobAge: '',
     gender: '',
     city: '',
     state: '',
@@ -143,7 +143,6 @@ export default function EnrollmentPage() {
       errs.mobile = 'Please enter a valid mobile number.';
     }
 
-    if (!formData.dobAge.trim()) errs.dobAge = 'Date of birth / age is required.';
     if (!formData.city.trim()) errs.city = 'City is required.';
     if (!formData.state.trim()) errs.state = 'State is required.';
 
@@ -205,7 +204,6 @@ export default function EnrollmentPage() {
           full_name: formData.fullName.trim(),
           email: formData.email.trim().toLowerCase(),
           mobile: formData.mobile.trim(),
-          dob_age: formData.dobAge.trim(),
           gender: formData.gender || 'Not specified',
           city: formData.city.trim(),
           state: formData.state.trim(),
@@ -238,7 +236,7 @@ export default function EnrollmentPage() {
         fullName: formData.fullName.trim(),
         email: formData.email.trim().toLowerCase(),
         mobile: formData.mobile.trim(),
-        dobAge: formData.dobAge.trim(),
+        dobAge: '',
         gender: formData.gender || null,
         city: formData.city.trim(),
         state: formData.state.trim(),
@@ -301,7 +299,11 @@ export default function EnrollmentPage() {
         <div style={{ marginBottom: '20px' }}>
           <div className="enroll-eyebrow">
             <span className="enroll-eyebrow-dot" />
-            <span className="enroll-eyebrow-text">UpShift · REGISTRATION</span>
+            <span className="enroll-eyebrow-text">
+              <span className="brand-up">Up</span>
+              <span className="brand-shift">Shift</span>
+              <span className="eyebrow-suffix"> · REGISTRATION</span>
+            </span>
           </div>
           <h1 className="enroll-title">
             START YOUR UpShift JOURNEY
@@ -397,20 +399,20 @@ export default function EnrollmentPage() {
                   {errors.mobile && <p className="enroll-error-msg">{errors.mobile}</p>}
                 </div>
 
-                {/* Date of Birth / Age */}
+                {/* City */}
                 <div className="enroll-field">
-                  <label htmlFor="dobAge" className="enroll-label">
-                    Date of Birth / Age <span className="enroll-req">*</span>
+                  <label htmlFor="city" className="enroll-label">
+                    City <span className="enroll-req">*</span>
                   </label>
                   <input
-                    id="dobAge"
+                    id="city"
                     type="text"
-                    value={formData.dobAge}
-                    onChange={(e) => handleInputChange('dobAge', e.target.value)}
-                    placeholder="e.g. 21 or 15/08/2003"
-                    className={`enroll-input ${errors.dobAge ? 'enroll-input-error' : ''}`}
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    placeholder="e.g. Bengaluru"
+                    className={`enroll-input ${errors.city ? 'enroll-input-error' : ''}`}
                   />
-                  {errors.dobAge && <p className="enroll-error-msg">{errors.dobAge}</p>}
+                  {errors.city && <p className="enroll-error-msg">{errors.city}</p>}
                 </div>
 
                 {/* Gender */}
@@ -431,24 +433,8 @@ export default function EnrollmentPage() {
                   </select>
                 </div>
 
-                {/* City */}
-                <div className="enroll-field">
-                  <label htmlFor="city" className="enroll-label">
-                    City <span className="enroll-req">*</span>
-                  </label>
-                  <input
-                    id="city"
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    placeholder="e.g. Bengaluru"
-                    className={`enroll-input ${errors.city ? 'enroll-input-error' : ''}`}
-                  />
-                  {errors.city && <p className="enroll-error-msg">{errors.city}</p>}
-                </div>
-
                 {/* State */}
-                <div className="enroll-field enroll-field-span-2">
+                <div className="enroll-field">
                   <label htmlFor="state" className="enroll-label">
                     State <span className="enroll-req">*</span>
                   </label>
@@ -552,7 +538,7 @@ export default function EnrollmentPage() {
               <div className="enroll-section-header">
                 <Lock size={15} style={{ color: '#E31B23' }} />
                 <h3 className="enroll-section-header-title">
-                  03  UPSHIFT PASSWORD
+                  03  UpShift Password
                 </h3>
               </div>
 
@@ -590,7 +576,7 @@ export default function EnrollmentPage() {
                 {/* Confirm Password */}
                 <div className="enroll-field">
                   <label htmlFor="confirmPassword" className="enroll-label">
-                    Confirm Password <span className="enroll-req">*</span>
+                    Confirm UpShift Password <span className="enroll-req">*</span>
                   </label>
                   <div className="enroll-pw-wrapper">
                     <input
@@ -633,7 +619,7 @@ export default function EnrollmentPage() {
                   </>
                 ) : (
                   <>
-                    <span>CONTINUE TO PAYMENT →</span>
+                    <span>CONTINUE TO UPSHIFT REGISTRATION →</span>
                   </>
                 )}
               </button>

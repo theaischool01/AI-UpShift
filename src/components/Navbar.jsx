@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import UpShiftWordmark from './common/UpShiftWordmark';
 
 export default function Navbar({ onOpenRegistration }) {
   const { user, role } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -31,7 +32,7 @@ export default function Navbar({ onOpenRegistration }) {
       return;
     }
 
-    const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'outcomes', 'opportunities', 'partners', 'upshifter'];
+    const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'outcomes', 'opportunities', 'upshifter'];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -63,14 +64,32 @@ export default function Navbar({ onOpenRegistration }) {
     { id: 'partners', label: 'Partners' },
   ];
 
-  const handleNavigate = (sectionId) => {
+  const handleNavigate = (itemId) => {
     setMobileMenuOpen(false);
-    const el = document.getElementById(sectionId);
+    if (itemId === 'partners') {
+      navigate('/ourpartners');
+      return;
+    }
+
+    if (location.pathname !== '/') {
+      navigate(`/#${itemId}`);
+      return;
+    }
+
+    const el = document.getElementById(itemId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     } else {
-      window.location.href = `/#${sectionId}`;
+      navigate(`/#${itemId}`);
     }
+  };
+
+  const isItemActive = (itemId) => {
+    if (itemId === 'partners') {
+      return location.pathname === '/ourpartners' || location.pathname === '/partners';
+    }
+    if (location.pathname !== '/') return false;
+    return activeSection === itemId || (itemId === 'programs' && activeSection === 'courses');
   };
 
   const isHero = location.pathname === '/' && activeSection === 'hero';
@@ -120,7 +139,7 @@ export default function Navbar({ onOpenRegistration }) {
           </div>
         </div>
 
-        {/* CENTER: Desktop Nav Items (Programs, How It Works, Outcomes, Opportunities) */}
+        {/* CENTER: Desktop Nav Items (Programs, How It Works, Outcomes, Opportunities, Partners) */}
         <div 
           className="nav-links-desktop"
           style={{
@@ -131,7 +150,7 @@ export default function Navbar({ onOpenRegistration }) {
           }}
         >
           {navItems.map((item) => {
-            const isActive = activeSection === item.id || (item.id === 'programs' && activeSection === 'courses');
+            const isActive = isItemActive(item.id);
             return (
               <button
                 key={item.id}
@@ -258,7 +277,7 @@ export default function Navbar({ onOpenRegistration }) {
         >
           <div className="flex flex-col gap-1.5">
             {navItems.map((item) => {
-              const isActive = activeSection === item.id || (item.id === 'programs' && activeSection === 'courses');
+              const isActive = isItemActive(item.id);
               return (
                 <button
                   key={item.id}

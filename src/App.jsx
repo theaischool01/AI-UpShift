@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 
 // Dynamic code splitting for routes
 const ProgramDetailPage = lazy(() => import('./pages/ProgramDetailPage'));
+const PartnersPage = lazy(() => import('./pages/PartnersPage'));
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
 const EnrollmentPage = lazy(() => import('./pages/enroll/EnrollmentPage'));
 const PaymentPage = lazy(() => import('./pages/enroll/PaymentPage'));
@@ -184,6 +185,10 @@ export default function App() {
             <Routes>
               {/* Public Marketing Landing Page */}
               <Route path="/" element={<PublicHomePage />} />
+
+              {/* Dedicated Partners Page */}
+              <Route path="/ourpartners" element={<PartnersPage />} />
+              <Route path="/partners" element={<Navigate to="/ourpartners" replace />} />
 
               {/* Dedicated Standalone Program Details Page */}
               <Route path="/programs/:trackId" element={<ProgramDetailPage />} />

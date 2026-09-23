@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowUpRight, 
-  ArrowRight, 
-  ArrowDown, 
-  Play, 
-  Palette, 
-  Database, 
-  Code, 
-  Megaphone, 
-  Bot, 
-  Sparkles, 
-  CheckCircle2, 
+import {
+  ArrowUpRight,
+  ArrowRight,
+  ArrowDown,
+  Play,
+  Palette,
+  Database,
+  Code,
+  Megaphone,
+  Bot,
+  Sparkles,
+  CheckCircle2,
   ExternalLink,
   MapPin,
   Clock,
@@ -24,7 +24,6 @@ import ExploringProgramsSection from '../components/ExploringProgramsSection';
 import ProgramOrbitCarousel from '../components/ProgramOrbitCarousel';
 import UserJourneySection from '../components/UserJourneySection';
 import OpportunityDispatchSection from '../components/OpportunityDispatchSection';
-import PartnersSection from '../components/PartnersSection';
 
 import { PROGRAMS_DATA } from '../data/programsData';
 import { CONCEPTUAL_CLASSIFIEDS } from '../data/opportunitiesData';
@@ -203,7 +202,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                 {/* Stat 3: ₹2.67Cr+ Total UpShifters Earned */}
                 <div className="hero-stat-item">
                   <div className="hero-stat-circle">
-                    <span className="hero-stat-value hero-stat-value-sm">₹2.67Cr+</span>
+                    <span className="hero-stat-value hero-stat-value-sm">₹2.11Cr+</span>
                   </div>
                   <span className="hero-stat-label">
                     Total UpShifters<br className="hidden sm:inline" /> Earned
@@ -278,9 +277,9 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
           </div>
 
           {/* Circular Orbit Carousel with Central Mascot */}
-          <ProgramOrbitCarousel 
-            programs={PROGRAMS_DATA} 
-            onSelectProgram={onSelectProgram} 
+          <ProgramOrbitCarousel
+            programs={PROGRAMS_DATA}
+            onSelectProgram={onSelectProgram}
           />
         </div>
       </section>
@@ -296,14 +295,9 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       <OpportunityDispatchSection onExploreClick={() => scrollToSection('courses')} />
 
       {/* ============================================================ */}
-      {/* 6. PROGRAM PARTNERS & OUR ECOSYSTEM PARTNERS                 */}
+      {/* 6. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
       {/* ============================================================ */}
-      <PartnersSection />
-
-      {/* ============================================================ */}
-      {/* 7. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
-      {/* ============================================================ */}
-      <section id="join-upshift" className="section bg-[#FAF8F5] text-[#111111] relative pt-6 pb-10 md:pt-7 md:pb-12 border-t border-[#E5E7EB]">
+      <section id="join-upshift" className="section bg-[#FAF8F5] text-[#111111] relative pt-10 pb-14 md:pt-14 md:pb-16 border-t border-[#E5E7EB]">
         <div className="container relative z-10" style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
           <span className="eyebrow mb-4 inline-flex items-center gap-2">
             <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />

@@ -70,7 +70,7 @@ const MENTORS_DATA = [
   {
     id: 'mentor-3',
     label: 'MENTOR 03',
-    name: 'YERRANAGU',
+    name: 'KIRAN BABU',
     role: 'VISION & DATA',
     image: '/OurTeam/mentor3.webp',
     fallbackImage: '/OurTeam/mentor3.png',
@@ -80,7 +80,7 @@ const MENTORS_DATA = [
   {
     id: 'mentor-4',
     label: 'MENTOR 04',
-    name: 'TM PRANEETH NAIDU',
+    name: 'RAJA MAMIDI',
     role: 'FULL-STACK AI',
     image: '/OurTeam/mentor4.webp',
     fallbackImage: '/OurTeam/mentor4.png',
@@ -152,7 +152,7 @@ export default function OurPeopleSection() {
 
           <h2 className="our-people-title">
             MEET THE PEOPLE<br />
-            WHO BUILD <span className="our-people-title-accent">UPSHIFT.</span>
+            WHO BUILD Up<span className="our-people-title-accent">Shift.</span>
           </h2>
 
           <p className="our-people-subtitle">
