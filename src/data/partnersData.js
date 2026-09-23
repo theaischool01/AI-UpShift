@@ -30,6 +30,7 @@ export const PROGRAM_PARTNERS = [
   },
 ];
 
+// Ecosystem Partners (21 distinct partners, excluding the 3 Program Partners)
 export const ECOSYSTEM_PARTNERS = [
   {
     id: 'agent-analytics',
@@ -86,12 +87,6 @@ export const ECOSYSTEM_PARTNERS = [
     alt: 'Department of Telecommunications (DoT), Government of India',
   },
   {
-    id: 'dst-eco',
-    name: 'Department of Science & Technology',
-    logo: '/partners/dst.png',
-    alt: 'Department of Science and Technology (DST)',
-  },
-  {
     id: 'hyperleap',
     name: 'Hyperleap AI',
     logo: '/partners/hyperleap.png',
@@ -122,12 +117,6 @@ export const ECOSYSTEM_PARTNERS = [
     alt: 'Mapúa University',
   },
   {
-    id: 'math-eco',
-    name: 'MATH',
-    logo: '/partners/math.png',
-    alt: 'MATH AI Hub',
-  },
-  {
     id: 'rava',
     name: 'Rava.ai',
     logo: '/partners/rava.png',
@@ -150,12 +139,6 @@ export const ECOSYSTEM_PARTNERS = [
     name: 'STAR',
     logo: '/partners/star.png',
     alt: 'STAR Telecommunications',
-  },
-  {
-    id: 't-hub-eco',
-    name: 'T-Hub',
-    logo: '/partners/t-hub.png',
-    alt: 'T-Hub Ecosystem Partner',
   },
   {
     id: 'task',

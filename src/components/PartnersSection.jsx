@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PROGRAM_PARTNERS, ECOSYSTEM_PARTNERS } from '../data/partnersData';
 import './PartnersSection.css';
 
 export default function PartnersSection() {
-  // Distribute 24 ecosystem partners across 4 staggered columns for desktop/tablet layout
-  const numColumns = 4;
-  const columns = Array.from({ length: numColumns }, () => []);
-  ECOSYSTEM_PARTNERS.forEach((partner, index) => {
-    columns[index % numColumns].push(partner);
-  });
+  // Distribute 21 ecosystem partners evenly across 3 columns (7 per column)
+  const desktopColumns = useMemo(() => {
+    const cols = [[], [], []];
+    ECOSYSTEM_PARTNERS.forEach((partner, index) => {
+      cols[index % 3].push(partner);
+    });
+    return cols;
+  }, []);
+
+  // Distribute across 2 columns for mobile
+  const mobileColumns = useMemo(() => {
+    const cols = [[], []];
+    ECOSYSTEM_PARTNERS.forEach((partner, index) => {
+      cols[index % 2].push(partner);
+    });
+    return cols;
+  }, []);
 
   return (
     <section id="partners" className="partners-section scroll-mt-20">
@@ -54,7 +65,7 @@ export default function PartnersSection() {
         </div>
 
         {/* ============================================================ */}
-        {/* 2. OUR ECOSYSTEM PARTNERS (Main Installation Block)          */}
+        {/* 2. OUR ECOSYSTEM PARTNERS (Vertical Moving 3-Column System)  */}
         {/* ============================================================ */}
         <div className="ecosystem-partners-panel">
           {/* Atmospheric Soft Red Ambient Background Glow */}
@@ -86,49 +97,67 @@ export default function PartnersSection() {
               </div>
             </div>
 
-            {/* Right Zone: Multi-Column Staggered Logo Field */}
+            {/* Right Zone: 3-Column Vertical Moving Logo Window (Clipped 3-Row Viewport) */}
             <div className="ecosystem-field-col">
-              {/* Desktop / Tablet: 4 Staggered Columns */}
-              <div className="ecosystem-staggered-columns">
-                {columns.map((colPartners, colIndex) => (
-                  <div
-                    key={`col-${colIndex}`}
-                    className={`ecosystem-col ecosystem-col--${colIndex + 1}`}
-                  >
-                    {colPartners.map((partner) => (
-                      <div
-                        key={partner.id}
-                        className="ecosystem-logo-tile"
-                        title={partner.name}
-                      >
-                        <img
-                          src={partner.logo}
-                          alt={partner.alt}
-                          className="ecosystem-logo-img"
-                          loading="lazy"
-                        />
+              {/* Desktop & Tablet: 3 Vertical Moving Columns */}
+              <div className="ecosystem-logo-window ecosystem-desktop-window">
+                {desktopColumns.map((colPartners, colIndex) => {
+                  // Duplicate the items once to create a seamless infinite CSS loop
+                  const trackItems = [...colPartners, ...colPartners];
+                  return (
+                    <div
+                      key={`col-${colIndex}`}
+                      className={`ecosystem-column-lane ecosystem-lane--${colIndex + 1}`}
+                    >
+                      <div className={`ecosystem-column-track ecosystem-track--${colIndex + 1}`}>
+                        {trackItems.map((partner, idx) => (
+                          <div
+                            key={`${partner.id}-${idx}`}
+                            className="ecosystem-logo-tile"
+                            title={partner.name}
+                          >
+                            <img
+                              src={partner.logo}
+                              alt={partner.alt}
+                              className="ecosystem-logo-img"
+                              loading="lazy"
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Mobile Fallback: 2-Column Responsive Flow */}
-              <div className="ecosystem-mobile-grid">
-                {ECOSYSTEM_PARTNERS.map((partner) => (
-                  <div
-                    key={`mob-${partner.id}`}
-                    className="ecosystem-logo-tile"
-                    title={partner.name}
-                  >
-                    <img
-                      src={partner.logo}
-                      alt={partner.alt}
-                      className="ecosystem-logo-img"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
+              {/* Mobile: 2 Vertical Moving Columns */}
+              <div className="ecosystem-logo-window ecosystem-mobile-window">
+                {mobileColumns.map((colPartners, colIndex) => {
+                  const trackItems = [...colPartners, ...colPartners];
+                  return (
+                    <div
+                      key={`mob-col-${colIndex}`}
+                      className={`ecosystem-column-lane ecosystem-mobile-lane--${colIndex + 1}`}
+                    >
+                      <div className={`ecosystem-column-track ecosystem-mobile-track--${colIndex + 1}`}>
+                        {trackItems.map((partner, idx) => (
+                          <div
+                            key={`mob-${partner.id}-${idx}`}
+                            className="ecosystem-logo-tile"
+                            title={partner.name}
+                          >
+                            <img
+                              src={partner.logo}
+                              alt={partner.alt}
+                              className="ecosystem-logo-img"
+                              loading="lazy"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
