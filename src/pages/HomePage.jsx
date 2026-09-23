@@ -199,10 +199,10 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                 {/* Separator 2 */}
                 <div className="hero-stat-divider" aria-hidden="true" />
 
-                {/* Stat 3: ₹2.67Cr+ Total UpShifters Earned */}
+                {/* Stat 3: ₹2.1Cr+ Total UpShifters Earned */}
                 <div className="hero-stat-item">
                   <div className="hero-stat-circle">
-                    <span className="hero-stat-value hero-stat-value-sm">₹2.11Cr+</span>
+                    <span className="hero-stat-value hero-stat-value-sm">₹2.1Cr+</span>
                   </div>
                   <span className="hero-stat-label">
                     Total UpShifters<br className="hidden sm:inline" /> Earned

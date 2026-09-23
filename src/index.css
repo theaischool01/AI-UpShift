@@ -1015,9 +1015,9 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .hero-stat-value-sm {
-  font-size: 10px;
+  font-size: 13.5px;
   font-weight: 800;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   white-space: nowrap;
   line-height: 1;
   display: inline-block;
@@ -1057,8 +1057,8 @@ h1, h2, h3, h4, .font-heading {
     font-size: 14px;
   }
   .hero-stat-value-sm {
-    font-size: 9.5px;
-    letter-spacing: -0.035em;
+    font-size: 13px;
+    letter-spacing: -0.025em;
   }
   .hero-stat-label {
     font-size: 12.5px;
@@ -1088,8 +1088,8 @@ h1, h2, h3, h4, .font-heading {
     font-size: 13.5px;
   }
   .hero-stat-value-sm {
-    font-size: 9.2px;
-    letter-spacing: -0.035em;
+    font-size: 12.5px;
+    letter-spacing: -0.025em;
   }
   .hero-stat-label {
     font-size: 13px;
