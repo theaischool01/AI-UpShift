@@ -87,14 +87,6 @@ export default function PartnersSection() {
               <p className="ecosystem-desc">
                 A collaborative network of premier academic institutions, government bodies, technology enterprises, and venture accelerators powering real-world AI deployment.
               </p>
-
-              {/* Trust Metric Badge */}
-              <div className="ecosystem-trust-badge">
-                <span className="ecosystem-badge-num">24+</span>
-                <span className="ecosystem-badge-label">
-                  Institutional & Industry<br />Partners Connected
-                </span>
-              </div>
             </div>
 
             {/* Right Zone: 3-Column Vertical Moving Logo Window (Clipped 3-Row Viewport) */}
