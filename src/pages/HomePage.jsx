@@ -24,6 +24,7 @@ import ExploringProgramsSection from '../components/ExploringProgramsSection';
 import ProgramOrbitCarousel from '../components/ProgramOrbitCarousel';
 import UserJourneySection from '../components/UserJourneySection';
 import OpportunityDispatchSection from '../components/OpportunityDispatchSection';
+import PartnersSection from '../components/PartnersSection';
 
 import { PROGRAMS_DATA } from '../data/programsData';
 import { CONCEPTUAL_CLASSIFIEDS } from '../data/opportunitiesData';
@@ -295,7 +296,12 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       <OpportunityDispatchSection onExploreClick={() => scrollToSection('courses')} />
 
       {/* ============================================================ */}
-      {/* 6. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
+      {/* 6. PROGRAM PARTNERS & OUR ECOSYSTEM PARTNERS                 */}
+      {/* ============================================================ */}
+      <PartnersSection />
+
+      {/* ============================================================ */}
+      {/* 7. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
       {/* ============================================================ */}
       <section id="join-upshift" className="section bg-[#FAF8F5] text-[#111111] relative pt-6 pb-10 md:pt-7 md:pb-12 border-t border-[#E5E7EB]">
         <div className="container relative z-10" style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>

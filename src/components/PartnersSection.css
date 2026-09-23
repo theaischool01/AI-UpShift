@@ -1,0 +1,388 @@
+/* ==========================================================================
+   PROGRAM PARTNERS & OUR ECOSYSTEM PARTNERS SECTION
+   UpShift Editorial White/Light Visual Language
+   ========================================================================== */
+
+.partners-section {
+  position: relative;
+  background-color: #FAF8F5;
+  color: #111111;
+  padding: clamp(48px, 6vw, 76px) 0 clamp(44px, 5.5vw, 68px) 0;
+  border-top: 1px solid #E5E7EB;
+  box-sizing: border-box;
+}
+
+.partners-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .partners-container {
+    padding: 0 16px;
+  }
+}
+
+/* Common Eyebrow */
+.partners-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.partners-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #E31B23;
+  flex-shrink: 0;
+}
+
+.partners-eyebrow-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #E31B23;
+  text-transform: uppercase;
+}
+
+.partners-accent-text {
+  color: #E31B23;
+}
+
+/* ==========================================================================
+   1. PROGRAM PARTNERS BLOCK
+   ========================================================================== */
+
+.program-partners-block {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: clamp(28px, 3.5vw, 44px);
+  margin-bottom: clamp(48px, 6vw, 72px);
+}
+
+@media (min-width: 960px) {
+  .program-partners-block {
+    grid-template-columns: 360px 1fr;
+    gap: 48px;
+  }
+}
+
+@media (min-width: 1120px) {
+  .program-partners-block {
+    grid-template-columns: 390px 1fr;
+    gap: 56px;
+  }
+}
+
+.program-partners-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.program-partners-heading {
+  font-family: var(--font-heading, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: clamp(30px, 3.8vw, 46px);
+  font-weight: 900;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: #111111;
+  margin: 0 0 14px 0;
+}
+
+.program-partners-desc {
+  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #4B5563;
+  margin: 0;
+  max-width: 360px;
+}
+
+/* Program Partners 3-Card Row */
+.program-partners-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (min-width: 520px) {
+  .program-partners-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .program-partners-grid {
+    gap: 20px;
+  }
+}
+
+.program-partner-card {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE7E1;
+  border-radius: 20px;
+  padding: 24px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.025);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+  position: relative;
+}
+
+.program-partner-card:hover {
+  transform: translateY(-3px);
+  border-color: #FECDD3;
+  box-shadow: 0 10px 28px -4px rgba(227, 27, 35, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.program-partner-logo-frame {
+  height: 60px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.program-partner-logo-img {
+  max-height: 52px;
+  max-width: 140px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.program-partner-card:hover .program-partner-logo-img {
+  transform: scale(1.05);
+}
+
+.program-partner-category {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #E31B23;
+  text-transform: uppercase;
+  background-color: #FFF1F2;
+  border: 1px solid #FECDD3;
+  padding: 3px 9px;
+  border-radius: 9999px;
+}
+
+/* ==========================================================================
+   2. OUR ECOSYSTEM PARTNERS PANEL
+   ========================================================================== */
+
+.ecosystem-partners-panel {
+  position: relative;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 28px;
+  padding: clamp(36px, 4.5vw, 56px) clamp(20px, 3.5vw, 44px);
+  box-shadow: 0 6px 30px -4px rgba(0, 0, 0, 0.035);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .ecosystem-partners-panel {
+    border-radius: 20px;
+    padding: 28px 16px;
+  }
+}
+
+/* Subtle Atmospheric Red Ambient Background Glow */
+.ecosystem-ambient-glow {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 60%;
+  height: 120%;
+  background: radial-gradient(ellipse at center, rgba(227, 27, 35, 0.045) 0%, rgba(227, 27, 35, 0.015) 50%, transparent 75%);
+  pointer-events: none;
+  filter: blur(40px);
+  z-index: 0;
+}
+
+.ecosystem-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(32px, 4vw, 52px);
+  align-items: flex-start;
+}
+
+@media (min-width: 960px) {
+  .ecosystem-layout {
+    grid-template-columns: 340px 1fr;
+    gap: 40px;
+  }
+}
+
+@media (min-width: 1120px) {
+  .ecosystem-layout {
+    grid-template-columns: 360px 1fr;
+    gap: 48px;
+  }
+}
+
+/* Left Info Column */
+.ecosystem-info-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ecosystem-heading {
+  font-family: var(--font-heading, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: clamp(28px, 3.4vw, 44px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #111111;
+  margin: 0 0 14px 0;
+}
+
+.ecosystem-desc {
+  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #4B5563;
+  margin: 0 0 28px 0;
+}
+
+.ecosystem-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background-color: #FAF8F5;
+  border: 1px solid #EAE7E1;
+  border-radius: 14px;
+}
+
+.ecosystem-badge-num {
+  font-family: var(--font-heading, -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: 24px;
+  font-weight: 900;
+  color: #E31B23;
+  line-height: 1;
+}
+
+.ecosystem-badge-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Right Field: Staggered Multi-Column Grid */
+.ecosystem-field-col {
+  width: 100%;
+}
+
+/* Staggered 4-Column Layout on Desktop & Tablet */
+.ecosystem-staggered-columns {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .ecosystem-staggered-columns {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    align-items: flex-start;
+  }
+}
+
+.ecosystem-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Stagger Offsets */
+.ecosystem-col--1 {
+  margin-top: 0;
+}
+
+.ecosystem-col--2 {
+  margin-top: 24px;
+}
+
+.ecosystem-col--3 {
+  margin-top: 12px;
+}
+
+.ecosystem-col--4 {
+  margin-top: 36px;
+}
+
+/* Mobile 2-Column Grid (Hidden on Desktop) */
+.ecosystem-mobile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .ecosystem-mobile-grid {
+    display: none;
+  }
+}
+
+/* Individual Logo Tile */
+.ecosystem-logo-tile {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE7E1;
+  border-radius: 14px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.ecosystem-logo-tile:hover {
+  transform: translateY(-2px);
+  border-color: #FECDD3;
+  box-shadow: 0 6px 16px -2px rgba(227, 27, 35, 0.09), 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.ecosystem-logo-img {
+  max-height: 40px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.22s ease;
+}
+
+.ecosystem-logo-tile:hover .ecosystem-logo-img {
+  transform: scale(1.05);
+}
