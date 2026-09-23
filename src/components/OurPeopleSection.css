@@ -412,13 +412,6 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
-
-  .our-people-mentor-card:nth-child(5) {
-    grid-column: span 2;
-    max-width: 320px;
-    margin: 0 auto;
-    width: 100%;
-  }
 }
 
 @media (min-width: 860px) {

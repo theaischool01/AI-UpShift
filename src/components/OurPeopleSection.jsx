@@ -45,7 +45,7 @@ const LEADERSHIP_DATA = [
   },
 ];
 
-// Mentors team data (Exactly 5 mentors, no Mentor 06)
+// Mentors team data (6 mentors)
 const MENTORS_DATA = [
   {
     id: 'mentor-1',
@@ -97,10 +97,21 @@ const MENTORS_DATA = [
     initials: 'RR',
     linkedin: 'https://www.linkedin.com/in/ranjan-relan/',
   },
+  {
+    id: 'mentor-6',
+    label: 'MENTOR 06',
+    name: 'VIJAY KUMAR JAKKULA',
+    role: 'FOUNDER & CEO · VITA TECHNOLOGIES',
+    image: '/OurTeam/vijay.png',
+    fallbackImage: '/OurTeam/vijay.png',
+    initials: 'VK',
+    objectPosition: '35% 35%',
+    linkedin: '',
+  },
 ];
 
 // Safe Image Component with multi-stage fallback (Primary -> Secondary -> Placeholder)
-function SafeImageAvatar({ src, fallbackSrc, alt, initials, tag, isMentor = false }) {
+function SafeImageAvatar({ src, fallbackSrc, alt, initials, tag, isMentor = false, objectPosition }) {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
 
@@ -135,6 +146,7 @@ function SafeImageAvatar({ src, fallbackSrc, alt, initials, tag, isMentor = fals
       onError={handleError}
       loading="lazy"
       className={isMentor ? 'our-people-mentor-avatar-img' : 'our-people-portrait-img'}
+      style={objectPosition ? { objectPosition } : undefined}
     />
   );
 }
@@ -243,6 +255,7 @@ export default function OurPeopleSection() {
                     alt={mentor.name}
                     initials={mentor.initials}
                     isMentor={true}
+                    objectPosition={mentor.objectPosition}
                   />
                 </div>
                 <span className="our-people-mentor-code">{mentor.label}</span>
