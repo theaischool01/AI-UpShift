@@ -703,3 +703,16 @@ img[src*="sairam-sec-logo.png"] {
     padding: 10px 12px;
   }
 }
+
+/* ==========================================================================
+   Category Section Divider
+   ========================================================================== */
+
+.partner-section-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #E5E7EB;
+  margin: clamp(40px, 5vw, 64px) 0;
+  border: none;
+}
+

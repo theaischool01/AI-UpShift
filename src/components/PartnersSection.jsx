@@ -291,13 +291,19 @@ export default function PartnersSection() {
           <GovernmentSection partners={GOVERNMENT_PARTNERS} />
         </div>
 
+        {/* Section Divider */}
+        <div className="partner-section-divider" aria-hidden="true" />
+
         {/* 2. CORPORATE PARTNERS (Editorial Sidebar + 4x3 Standing Portrait Cards) */}
-        <div className="partner-category-section partner-category-section--corporate">
+        <div className="partner-category-section partner-category-section--corporate" style={{ marginTop: '0' }}>
           <CorporateSection partners={CORPORATE_PARTNERS} />
         </div>
 
+        {/* Section Divider */}
+        <div className="partner-section-divider" aria-hidden="true" />
+
         {/* 3. UNIVERSITY PARTNERS (5 Logos in Same Line) */}
-        <div className="partner-category-section">
+        <div className="partner-category-section" style={{ marginTop: '0' }}>
           <div className="partner-section-header">
             <h2 className="partner-section-title">
               UNIVERSITY <span className="partners-accent-text">PARTNERS</span>
@@ -310,17 +316,20 @@ export default function PartnersSection() {
           <UniversityPartnersGrid partners={UNIVERSITY_PARTNERS} />
         </div>
 
-        {/* 4. NAIVA PARTNERS */}
-        <div className="partner-category-section">
+        {/* Section Divider */}
+        <div className="partner-section-divider" aria-hidden="true" />
+
+        {/* 4. ACADEMIC PARTNERS */}
+        <div className="partner-category-section" style={{ marginTop: '0' }}>
           <div className="partner-section-header">
             <h2 className="partner-section-title">
-              NAIVA <span className="partners-accent-text">PARTNERS</span>
+              ACADEMIC <span className="partners-accent-text">PARTNERS</span>
             </h2>
             <p className="partner-section-desc">
               A vibrant nationwide consortium of AI startups, digital product agencies, and growth ventures actively building with AI.
             </p>
           </div>
-          <AnimatedPartnerWall partners={NAIVA_PARTNERS} categoryId="NAIVA" />
+          <AnimatedPartnerWall partners={NAIVA_PARTNERS} categoryId="ACADEMIC" />
         </div>
 
       </div>

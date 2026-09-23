@@ -36,6 +36,7 @@
   --c-agenthandlers-bg: #F0FDFA;
 
   --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-editorial: 'Newsreader', serif;
 
@@ -1413,11 +1414,11 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .exploring-programs-title {
-  font-family: var(--font-heading, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-family: var(--font-heading, var(--font-display, 'Space Grotesk', sans-serif));
   font-size: clamp(22px, 2.8vw, 32px);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
   color: #111111;
   margin: 0;
   text-align: left;
@@ -1426,14 +1427,21 @@ h1, h2, h3, h4, .font-heading {
 .exploring-programs-title .upshift-brand-inline {
   display: inline-flex;
   align-items: baseline;
+  font-family: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
 }
 
 .exploring-programs-title .brand-up {
   color: #111111;
+  font-family: inherit;
+  font-weight: inherit;
 }
 
 .exploring-programs-title .brand-shift {
   color: #E31B23;
+  font-family: inherit;
+  font-weight: inherit;
 }
 
 .exploring-programs-subtitle {

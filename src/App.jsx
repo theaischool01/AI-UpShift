@@ -27,6 +27,10 @@ const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
 const LearnerLayout = lazy(() => import('./components/learner/LearnerLayout'));
 const LearnerDashboardPage = lazy(() => import('./pages/learner/LearnerDashboardPage'));
 const LearnerGigDetailPage = lazy(() => import('./pages/learner/LearnerGigDetailPage'));
+const LocalBusinessesPage = lazy(() => import('./pages/learner/LocalBusinessesPage'));
+const LocalBusinessDetailPage = lazy(() => import('./pages/learner/LocalBusinessDetailPage'));
+const StartupBusinessesPage = lazy(() => import('./pages/learner/StartupBusinessesPage'));
+const StartupBusinessDetailPage = lazy(() => import('./pages/learner/StartupBusinessDetailPage'));
 
 // Route Suspense Fallback
 function RouteLoadingFallback() {
@@ -236,6 +240,35 @@ export default function App() {
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<LearnerDashboardPage />} />
                 <Route path="gigs/:gigId" element={<LearnerGigDetailPage />} />
+                <Route path="local-businesses" element={<LocalBusinessesPage />} />
+                <Route path="local-businesses/:businessId" element={<LocalBusinessDetailPage />} />
+                <Route path="startup-businesses" element={<StartupBusinessesPage />} />
+                <Route path="startup-businesses/:startupId" element={<StartupBusinessDetailPage />} />
+              </Route>
+
+              {/* Direct Top-Level Opportunity Routes (Clean URLs inside Learner Shell) */}
+              <Route 
+                path="/local-businesses" 
+                element={
+                  <ProtectedRoute requiredRole="learner">
+                    <LearnerLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<LocalBusinessesPage />} />
+                <Route path=":businessId" element={<LocalBusinessDetailPage />} />
+              </Route>
+
+              <Route 
+                path="/startup-businesses" 
+                element={
+                  <ProtectedRoute requiredRole="learner">
+                    <LearnerLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<StartupBusinessesPage />} />
+                <Route path=":startupId" element={<StartupBusinessDetailPage />} />
               </Route>
 
               {/* Fallback to Home */}

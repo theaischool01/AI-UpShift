@@ -1,9 +1,11 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LogOut, 
   Globe, 
-  Sparkles
+  Briefcase,
+  Store,
+  Rocket
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import UpShiftWordmark from '../common/UpShiftWordmark';
@@ -11,6 +13,7 @@ import UpShiftWordmark from '../common/UpShiftWordmark';
 export default function LearnerHeader() {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     await signOut();
@@ -20,85 +23,114 @@ export default function LearnerHeader() {
   const learnerName = profile?.full_name || user?.user_metadata?.full_name || 'Learner';
   const college = profile?.college || user?.user_metadata?.college || '';
 
+  const pathname = location.pathname;
+  const isGigsActive = pathname === '/learner/dashboard' || pathname.startsWith('/learner/gigs') || pathname === '/learner';
+  const isLocalActive = pathname.startsWith('/local-businesses') || pathname.startsWith('/learner/local-businesses');
+  const isStartupActive = pathname.startsWith('/startup-businesses') || pathname.startsWith('/learner/startup-businesses');
+
+  const navItems = [
+    {
+      id: 'gigs',
+      label: 'Gigs',
+      to: '/learner/dashboard',
+      icon: Briefcase,
+      isActive: isGigsActive
+    },
+    {
+      id: 'local',
+      label: 'Local Businesses',
+      to: '/local-businesses',
+      icon: Store,
+      isActive: isLocalActive
+    },
+    {
+      id: 'startup',
+      label: 'Startup Businesses',
+      to: '/startup-businesses',
+      icon: Rocket,
+      isActive: isStartupActive
+    }
+  ];
+
   return (
-    <header className="learner-header" aria-label="Learner Marketplace Header">
-      {/* Left: Branding & Role */}
-      <div className="flex items-center gap-4">
+    <header className="learner-header" aria-label="Learner Opportunity Workspace Header">
+      {/* 1. LEFT: UpShift Brand & Space Identifier */}
+      <div className="learner-header-left">
         <Link 
           to="/learner/dashboard" 
-          className="flex items-center gap-2.5 sm:gap-3 no-underline group select-none text-inherit hover:no-underline min-w-0"
+          className="flex items-center gap-2.5 sm:gap-3 no-underline select-none text-inherit hover:no-underline min-w-0"
         >
-          {/* UpShift Fox Mascot Avatar */}
+          {/* UpShift Mascot Avatar */}
           <div 
-            className="rounded-[9px] overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 shadow-xs flex-shrink-0 select-none p-[1.5px]"
-            style={{ width: '36px', height: '36px', minWidth: '36px', minHeight: '36px' }}
+            className="rounded-[9px] overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 shadow-2xs flex-shrink-0 select-none p-[1.5px]"
+            style={{ width: '34px', height: '34px', minWidth: '34px', minHeight: '34px' }}
           >
             <img 
               src="/assets/mascot/mascot_avatar.jpg" 
               alt="UpShift Mascot" 
-              className="w-full h-full object-cover rounded-[8px] select-none"
+              className="w-full h-full object-cover rounded-[7px] select-none"
             />
           </div>
           <div className="flex flex-col justify-center min-w-0">
             <span 
-              className="text-[18px] sm:text-[19px] font-black tracking-[-0.03em] leading-none text-[#111111]"
-              style={{ 
-                fontFamily: 'var(--font-heading, var(--font-display, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif))',
-                fontWeight: 900 
-              }}
+              className="text-[17px] sm:text-[18px] font-black tracking-[-0.03em] leading-none text-[#111111]"
+              style={{ fontWeight: 900 }}
             >
               <UpShiftWordmark theme="light" style={{ fontWeight: 900 }} />
             </span>
-            <span className="text-[9.5px] sm:text-[10px] font-mono font-semibold tracking-[0.14em] text-[#6B7280] uppercase mt-1 leading-none">
+            <span className="text-[9px] sm:text-[9.5px] font-mono font-bold tracking-[0.12em] text-[#6B7280] uppercase mt-0.5 leading-none">
               OPPORTUNITIES
             </span>
           </div>
         </Link>
-
-        {/* UpShift Program Badge */}
-        <div className="hidden md:flex items-center gap-2 pl-4 border-l border-[#E5E7EB]">
-          <span
-            className="learner-badge-track"
-            style={{
-              backgroundColor: 'rgba(227, 27, 35, 0.08)',
-              color: '#E31B23',
-              border: '1px solid rgba(227, 27, 35, 0.2)',
-            }}
-            title="Enrolled in UpShift Program"
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>UpShift Program</span>
-          </span>
-        </div>
       </div>
 
-      {/* Right: Learner Identity & Actions */}
-      <div className="flex items-center gap-3">
+      {/* 2. CENTER: Segmented Opportunity Navigation Pill */}
+      <div className="learner-header-center">
+        <nav className="learner-header-nav" aria-label="Opportunity Workspace Navigation">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.id}
+                to={item.to}
+                className={`learner-header-tab ${item.isActive ? 'is-active' : ''}`}
+              >
+                <Icon className="learner-header-tab-icon" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* 3. RIGHT: Learner Profile, Home & Sign Out */}
+      <div className="learner-header-right">
         {/* Learner Identity pill */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F3F4F6] border border-[#E5E7EB] text-xs">
-          <div className="w-6 h-6 rounded-full bg-[#E5E7EB] text-[#374151] flex items-center justify-center text-xs font-bold">
+        <div className="learner-user-pill hidden sm:flex">
+          <div className="learner-user-avatar">
             {learnerName.charAt(0).toUpperCase()}
           </div>
-          <div className="text-left">
-            <div className="font-semibold text-[#111827] leading-tight truncate max-w-[130px]">
+          <div className="learner-user-info">
+            <span className="learner-user-name">
               {learnerName}
-            </div>
+            </span>
             {college && (
-              <div className="text-[10px] text-[#6B7280] truncate max-w-[130px]" title={college}>
+              <span className="text-[9.5px] text-[#6B7280] truncate max-w-[110px]" title={college}>
                 {college}
-              </div>
+              </span>
             )}
           </div>
         </div>
 
-        {/* Public Marketing Site Link */}
+        {/* Home Button */}
         <Link
           to="/"
-          className="learner-btn-secondary hidden lg:inline-flex"
-          title="Visit public website"
+          className="learner-btn-secondary"
+          title="Visit UpShift Public Home"
         >
           <Globe className="w-3.5 h-3.5" />
-          <span>Home</span>
+          <span className="hidden md:inline">Home</span>
         </Link>
 
         {/* Sign Out Button */}
@@ -108,7 +140,7 @@ export default function LearnerHeader() {
           title="Sign out of UpShift"
         >
           <LogOut className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Sign Out</span>
+          <span className="hidden md:inline">Sign Out</span>
         </button>
       </div>
     </header>

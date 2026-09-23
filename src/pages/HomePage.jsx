@@ -271,7 +271,7 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
                 CREATE YOUR PATH TO <span className="hero-headline-emphasis hero-emphasis-earning">EARNING</span>
               </span>
             </h2>
-            <p className="text-xs sm:text-sm text-white/75 font-display leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/75 font-body leading-relaxed">
               One Journey that helps anyone turn AI capabilities into real projects, credible proof of work and new earning pathways.
             </p>
           </div>
@@ -297,7 +297,11 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
       {/* ============================================================ */}
       {/* 6. FINAL REGISTRATION CALL-TO-ACTION AREA                    */}
       {/* ============================================================ */}
-      <section id="join-upshift" className="section bg-[#FAF8F5] text-[#111111] relative pt-10 pb-14 md:pt-14 md:pb-16 border-t border-[#E5E7EB]">
+      <section 
+        id="join-upshift" 
+        className="section bg-[#FAF8F5] text-[#111111] relative pt-10 pb-14 md:pt-14 md:pb-16"
+        style={{ borderTop: '1px solid #EAE6DF' }}
+      >
         <div className="container relative z-10" style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
           <span className="eyebrow mb-4 inline-flex items-center gap-2">
             <span className="eyebrow-dot" style={{ backgroundColor: '#E31B23' }} />
@@ -341,7 +345,10 @@ export default function HomePage({ onSelectProgram, onOpenRegistration }) {
           </div>
 
           {/* Supporting Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-[#6B7280] uppercase tracking-wider pt-6 border-t border-[#E5E7EB]">
+          <div 
+            className="flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-[#6B7280] uppercase tracking-wider pt-6"
+            style={{ borderTop: '1px solid #EAE6DF' }}
+          >
             <span className="inline-flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
               Verified Capstone Deliverables

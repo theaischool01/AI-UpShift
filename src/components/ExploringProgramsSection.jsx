@@ -203,7 +203,7 @@ export default function ExploringProgramsSection() {
         {/* Editorial Section Intro (Left-aligned to framing container) */}
         <div className="exploring-programs-header">
           <h2 className="exploring-programs-title">
-            OUR <span className="upshift-brand-inline"><span className="brand-up">Up</span><span className="brand-shift">Shift</span></span> PROGRAMS
+            <span className="upshift-brand-inline"><span className="brand-up">Up</span><span className="brand-shift">Shift</span></span> <span style={{ color: '#E31B23' }}>PROGRAMS</span>
           </h2>
         </div>
 
