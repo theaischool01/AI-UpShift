@@ -31,7 +31,7 @@ export default function Navbar({ onOpenRegistration }) {
       return;
     }
 
-    const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'opportunities', 'upshifter'];
+    const sectionIds = ['hero', 'programs', 'courses', 'how-it-works', 'outcomes', 'opportunities', 'partners', 'upshifter'];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -60,6 +60,7 @@ export default function Navbar({ onOpenRegistration }) {
     { id: 'how-it-works', label: 'How It Works' },
     { id: 'outcomes', label: 'Outcomes' },
     { id: 'opportunities', label: 'Opportunities' },
+    { id: 'partners', label: 'Partners' },
   ];
 
   const handleNavigate = (sectionId) => {

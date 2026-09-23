@@ -983,7 +983,9 @@ h1, h2, h3, h4, .font-heading {
   box-shadow: 0 4px 14px rgba(227, 27, 35, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
   flex-shrink: 0;
   text-align: center;
-  padding: 2px 4px;
+  padding: 0 2px;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 .hero-stat-value {
@@ -999,7 +1001,10 @@ h1, h2, h3, h4, .font-heading {
 .hero-stat-value-sm {
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  line-height: 1;
+  display: inline-block;
 }
 
 .hero-stat-label {
@@ -1027,15 +1032,17 @@ h1, h2, h3, h4, .font-heading {
     flex-wrap: wrap;
   }
   .hero-stat-circle {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    padding: 0 2px;
   }
   .hero-stat-value {
     font-size: 14px;
   }
   .hero-stat-value-sm {
     font-size: 9.5px;
+    letter-spacing: -0.035em;
   }
   .hero-stat-label {
     font-size: 12.5px;
@@ -1056,15 +1063,17 @@ h1, h2, h3, h4, .font-heading {
     display: none;
   }
   .hero-stat-circle {
-    width: 46px;
-    height: 46px;
-    min-width: 46px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    padding: 0 2px;
   }
   .hero-stat-value {
     font-size: 13.5px;
   }
   .hero-stat-value-sm {
-    font-size: 9px;
+    font-size: 9.2px;
+    letter-spacing: -0.035em;
   }
   .hero-stat-label {
     font-size: 13px;
