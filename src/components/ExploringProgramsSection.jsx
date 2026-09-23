@@ -198,8 +198,22 @@ export default function ExploringProgramsSection() {
         aria-hidden="true"
       />
 
-      {/* Centered Framing System: Framing Wrapper (Image + Left/Right Red Lines) + Dots */}
-      <div className="relative z-20 flex flex-col items-center justify-center gap-4 sm:gap-5 max-w-full">
+      {/* Centered Framing System: Header + Framing Wrapper (Image + Left/Right Red Lines) + Dots */}
+      <div className="relative z-20 flex flex-col items-center justify-center gap-3 sm:gap-4 max-w-full">
+        {/* Editorial Section Intro (Compact & Intentional Header) */}
+        <div className="exploring-programs-header">
+          <div className="exploring-programs-eyebrow">
+            <span className="exploring-programs-eyebrow-dot" />
+            <span className="exploring-programs-eyebrow-text">FLAGSHIP CURRICULUM</span>
+          </div>
+          <h2 className="exploring-programs-title">
+            SIX SPECIALIZED PATHS TO MASTERY.
+          </h2>
+          <p className="exploring-programs-subtitle">
+            Direct, outcome-driven tracks designed to turn applied AI capabilities into real proof of work.
+          </p>
+        </div>
+
         {/* Relative Framing Wrapper for Image + Side Red Lines */}
         <div className="exploring-programs-framing-wrapper">
           {/* Left Decorative Vertical Editorial Red Line - Desktop / Tablet-large only */}

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import './OurPeopleSection.css';
 
 function LinkedInIcon({ size = 15, className = '' }) {
@@ -25,8 +24,8 @@ const LEADERSHIP_DATA = [
     name: 'GANTA SRINATH REDDY',
     role: 'FOUNDER / CEO',
     bio: 'Building the systems, curriculum, and industry direction behind The AI School and UpShift.',
-    image: '/OurTeam/founder.png',
-    fallbackImage: '/OurTeam/founder.jpg',
+    image: '/OurTeam/founder.jpg',
+    fallbackImage: '/OurTeam/founder.png',
     initials: 'GSR',
     tag: 'FOUNDER',
     linkedin: 'https://www.linkedin.com/in/srinathreddy-g/',
@@ -37,8 +36,8 @@ const LEADERSHIP_DATA = [
     name: 'K. SPANDANA',
     role: 'CO-FOUNDER',
     bio: 'Driving learner experience, mentorship, and the operational foundation behind the UpShift journey.',
-    image: '/OurTeam/cofounder.png',
-    fallbackImage: '/OurTeam/cofounder.webp',
+    image: '/OurTeam/cofounder.webp',
+    fallbackImage: '/OurTeam/cofounder.png',
     initials: 'KS',
     tag: 'CO-FOUNDER',
     linkedin: 'https://www.linkedin.com/in/spandana-k-2b6a2713b/',
@@ -51,46 +50,51 @@ const MENTORS_DATA = [
   {
     id: 'mentor-1',
     label: 'MENTOR 01',
+    name: 'ARUN CHINNACHAMY',
     role: 'AI & CREATIVE',
-    image: '/OurTeam/mentor1.png',
-    fallbackImage: '/OurTeam/mentor1.webp',
-    initials: 'M1',
+    image: '/OurTeam/mentor1.webp',
+    fallbackImage: '/OurTeam/mentor1.png',
+    initials: 'AC',
     linkedin: 'https://www.linkedin.com/in/arun-chinnachamy/',
   },
   {
     id: 'mentor-2',
     label: 'MENTOR 02',
+    name: 'GOPI KRISHNA',
     role: 'AGENTIC SYSTEMS',
-    image: '/OurTeam/mentor2.png',
-    fallbackImage: '/OurTeam/mentor2.webp',
-    initials: 'M2',
+    image: '/OurTeam/mentor2.webp',
+    fallbackImage: '/OurTeam/mentor2.png',
+    initials: 'GK',
     linkedin: 'https://www.linkedin.com/in/gopil/',
   },
   {
     id: 'mentor-3',
     label: 'MENTOR 03',
+    name: 'YERRANAGU',
     role: 'VISION & DATA',
-    image: '/OurTeam/mentor3.png',
-    fallbackImage: '/OurTeam/mentor3.webp',
-    initials: 'M3',
+    image: '/OurTeam/mentor3.webp',
+    fallbackImage: '/OurTeam/mentor3.png',
+    initials: 'YN',
     linkedin: 'https://www.linkedin.com/in/yerranagu/',
   },
   {
     id: 'mentor-4',
     label: 'MENTOR 04',
+    name: 'TM PRANEETH NAIDU',
     role: 'FULL-STACK AI',
-    image: '/OurTeam/mentor4.png',
-    fallbackImage: '/OurTeam/mentor4.webp',
-    initials: 'M4',
+    image: '/OurTeam/mentor4.webp',
+    fallbackImage: '/OurTeam/mentor4.png',
+    initials: 'TP',
     linkedin: 'https://www.linkedin.com/in/tmpraneethnaidu/',
   },
   {
     id: 'mentor-5',
     label: 'MENTOR 05',
+    name: 'RANJAN RELAN',
     role: 'GROWTH & AUTOMATION',
-    image: '/OurTeam/mentor5.png',
-    fallbackImage: '/OurTeam/mentor5.webp',
-    initials: 'M5',
+    image: '/OurTeam/mentor5.webp',
+    fallbackImage: '/OurTeam/mentor5.png',
+    initials: 'RR',
     linkedin: 'https://www.linkedin.com/in/ranjan-relan/',
   },
 ];
@@ -175,23 +179,23 @@ export default function OurPeopleSection() {
 
             const cardElement = (
               <div key="card" className="our-people-card">
-                <span className="our-people-card-role">{person.role}</span>
+                <div className="our-people-card-top-row">
+                  <span className="our-people-card-role">{person.role}</span>
+                  {person.linkedin && (
+                    <a
+                      href={person.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="our-people-linkedin-icon-btn"
+                      aria-label={`Connect with ${person.name} on LinkedIn`}
+                      title={`Connect with ${person.name} on LinkedIn`}
+                    >
+                      <LinkedInIcon size={15} />
+                    </a>
+                  )}
+                </div>
                 <h3 className="our-people-card-name">{person.name}</h3>
                 <p className="our-people-card-bio">{person.bio}</p>
-
-                {person.linkedin && (
-                  <a
-                    href={person.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="our-people-linkedin-btn"
-                    aria-label={`Connect with ${person.name} on LinkedIn`}
-                  >
-                    <LinkedInIcon size={15} />
-                    <span>CONNECT ON LINKEDIN</span>
-                    <ArrowUpRight size={14} />
-                  </a>
-                )}
               </div>
             );
 
@@ -236,12 +240,13 @@ export default function OurPeopleSection() {
                   <SafeImageAvatar
                     src={mentor.image}
                     fallbackSrc={mentor.fallbackImage}
-                    alt={mentor.label}
+                    alt={mentor.name}
                     initials={mentor.initials}
                     isMentor={true}
                   />
                 </div>
-                <h4 className="our-people-mentor-name">{mentor.label}</h4>
+                <span className="our-people-mentor-code">{mentor.label}</span>
+                <h4 className="our-people-mentor-name">{mentor.name}</h4>
                 <p className="our-people-mentor-role">{mentor.role}</p>
 
                 {mentor.linkedin && (
@@ -250,11 +255,10 @@ export default function OurPeopleSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="our-people-mentor-linkedin-btn"
-                    aria-label={`Connect with ${mentor.label} on LinkedIn`}
+                    aria-label={`Connect with ${mentor.name} on LinkedIn`}
+                    title={`Connect with ${mentor.name} on LinkedIn`}
                   >
                     <LinkedInIcon size={14} />
-                    <span>CONNECT</span>
-                    <ArrowUpRight size={13} />
                   </a>
                 )}
               </div>
