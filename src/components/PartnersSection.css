@@ -1,20 +1,19 @@
 /* ==========================================================================
-   PROGRAM PARTNERS & OUR ECOSYSTEM PARTNERS SECTION
-   UpShift Editorial White/Light Visual Language
+   UPSHIFT PARTNERS SHOWCASE
+   Government (Red Header Banner + 5-Col Logo Matrix) + Corporate (Split Sidebar + Portrait Grid) + Others
    ========================================================================== */
 
 .partners-section {
   position: relative;
   background-color: #FAF8F5;
   color: #111111;
-  padding: clamp(48px, 6vw, 76px) 0 clamp(44px, 5.5vw, 68px) 0;
-  border-top: 1px solid #E5E7EB;
+  padding: clamp(36px, 5vw, 64px) 0 clamp(48px, 6vw, 80px) 0;
   box-sizing: border-box;
 }
 
 .partners-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
   box-sizing: border-box;
@@ -26,12 +25,25 @@
   }
 }
 
-/* Common Eyebrow */
+/* ==========================================================================
+   Hero Intro Header
+   ========================================================================== */
+
+.partners-page-hero {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto clamp(40px, 5vw, 60px) auto;
+}
+
 .partners-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
+  background-color: #FFF1F1;
+  border: 1px solid #FEE2E2;
+  padding: 4px 12px;
+  border-radius: 9999px;
 }
 
 .partners-eyebrow-dot {
@@ -43,380 +55,702 @@
 }
 
 .partners-eyebrow-text {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
   color: #E31B23;
   text-transform: uppercase;
+}
+
+.partners-page-title {
+  font-family: var(--font-heading), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(34px, 4.5vw, 54px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #111111;
+  margin: 0 0 14px 0;
 }
 
 .partners-accent-text {
   color: #E31B23;
 }
 
+.partners-page-subtitle {
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(14.5px, 1.8vw, 17px);
+  line-height: 1.55;
+  color: #4B5563;
+  margin: 0 auto;
+  max-width: 580px;
+}
+
 /* ==========================================================================
-   1. PROGRAM PARTNERS BLOCK (Top Featured Group)
+   01 GOVERNMENT PARTNERS (Red Intro Banner + 5-Column White Logo Matrix)
    ========================================================================== */
 
-.program-partners-block {
-  display: grid;
-  grid-template-columns: 1fr;
+.govt-showcase {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #EAE7E1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  background-color: #FFFFFF;
+  box-sizing: border-box;
+}
+
+/* Top Red Banner */
+.govt-banner {
+  position: relative;
+  background-color: #E31B23;
+  color: #FFFFFF;
+  padding: clamp(36px, 4.5vw, 48px) clamp(24px, 4vw, 44px);
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: clamp(28px, 3.5vw, 44px);
-  margin-bottom: clamp(48px, 6vw, 72px);
+  min-height: 190px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-@media (min-width: 960px) {
-  .program-partners-block {
-    grid-template-columns: 360px 1fr;
-    gap: 48px;
+.govt-banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 660px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.govt-banner-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #FFFFFF;
+  text-transform: uppercase;
+}
+
+.govt-banner-eyebrow-bar {
+  width: 2px;
+  height: 13px;
+  background-color: #FFFFFF;
+  display: inline-block;
+  opacity: 0.9;
+}
+
+.govt-banner-eyebrow-text {
+  color: #FFFFFF;
+}
+
+.govt-banner-eyebrow-plus {
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.govt-banner-title {
+  font-family: var(--font-heading), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(28px, 3.8vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: #FFFFFF;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.govt-banner-desc {
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(14px, 1.6vw, 15.5px);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+  max-width: 580px;
+}
+
+/* Subtle Geometric Line Art */
+.govt-banner-graphic {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: clamp(200px, 36vw, 400px);
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 1;
+}
+
+.govt-banner-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.15);
+  transform-origin: right center;
+}
+
+/* Clean 5-Column Logo Matrix */
+.govt-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background-color: #EAE7E1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.govt-matrix-cell {
+  background-color: #FFFFFF;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
+
+.govt-matrix-cell:hover {
+  background-color: #FAF9F6;
+}
+
+.govt-matrix-cell--placeholder,
+.govt-matrix-cell--empty {
+  background-color: #FFFFFF;
+}
+
+.govt-matrix-logo-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.govt-matrix-logo-img {
+  max-width: 90%;
+  max-height: 76%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .govt-matrix-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .govt-matrix-cell {
+    height: 110px;
+    padding: 10px 12px;
   }
 }
 
-@media (min-width: 1120px) {
-  .program-partners-block {
-    grid-template-columns: 390px 1fr;
-    gap: 56px;
+@media (max-width: 640px) {
+  .govt-banner {
+    padding: 28px 20px;
+    min-height: auto;
+  }
+  .govt-banner-graphic {
+    opacity: 0.3;
+    width: 160px;
+  }
+  .govt-matrix-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .govt-matrix-cell {
+    height: 98px;
+    padding: 8px 10px;
   }
 }
 
-.program-partners-info {
+/* ==========================================================================
+   02 CORPORATE PARTNERS (Editorial Sidebar + 4x3 Standing Portrait Cards)
+   ========================================================================== */
+
+.corp-showcase-split {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.corp-showcase-sidebar {
+  width: 32%;
+  max-width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.corp-showcase-title {
+  font-family: var(--font-heading), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: #111111;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.corp-showcase-desc {
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #4B5563;
+  margin: 0;
+}
+
+.corp-showcase-matrix {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* Horizontal Landscape Card (approx 2.15:1 width-to-height) */
+.corp-portrait-card {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE7E1;
+  border-radius: 16px;
+  aspect-ratio: 2.15 / 1;
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.corp-portrait-card:hover {
+  transform: translateY(-2px);
+  border-color: #DFDBD3;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.corp-portrait-logo-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.corp-portrait-logo-img {
+  max-width: 88%;
+  max-height: 72%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Fix Centific white SVG visibility on white card */
+.corp-logo--invert,
+img[src*="centific"] {
+  filter: brightness(0);
+}
+
+/* Area51 asset has wide whitespace margins, scale up to make it clearly readable */
+.corp-logo--scale-area51,
+img[src*="area51"] {
+  transform: scale(1.65);
+}
+
+@media (max-width: 1024px) {
+  .corp-showcase-split {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .corp-showcase-sidebar {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .corp-showcase-matrix {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .corp-showcase-matrix {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .corp-showcase-split {
+    gap: 24px;
+  }
+
+  .corp-showcase-matrix {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .corp-portrait-card {
+    border-radius: 14px;
+    padding: 8px 12px;
+    aspect-ratio: 2.0 / 1;
+    min-height: 74px;
+  }
+
+  .corp-portrait-logo-img {
+    max-width: 86%;
+    max-height: 68%;
+  }
+}
+
+/* ==========================================================================
+   PARTNER CATEGORY SECTIONS (University, Naiva)
+   ========================================================================== */
+
+.partner-category-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: clamp(56px, 6.5vw, 80px);
+}
+
+.partner-category-section:first-of-type {
+  margin-top: 0;
+}
+
+.partner-category-section--corporate {
+  margin-top: clamp(72px, 8.5vw, 100px);
+}
+
+.partner-section-header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  max-width: 680px;
+  gap: 8px;
 }
 
-.program-partners-heading {
-  font-family: var(--font-heading, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  font-size: clamp(30px, 3.8vw, 46px);
+.partner-section-title {
+  font-family: var(--font-heading), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(24px, 2.8vw, 32px);
   font-weight: 900;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   color: #111111;
-  margin: 0 0 14px 0;
+  margin: 0;
+  line-height: 1.15;
 }
 
-.program-partners-desc {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+.partner-section-desc {
+  font-family: var(--font-display), -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14.5px;
   line-height: 1.6;
   color: #4B5563;
   margin: 0;
-  max-width: 360px;
+  max-width: 640px;
 }
 
-/* Program Partners 3-Card Row */
-.program-partners-grid {
+/* ==========================================================================
+   STATIC PARTNER GRID (University - 5 Columns Single Line on Desktop)
+   ========================================================================== */
+
+.univ-static-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   width: 100%;
+  box-sizing: border-box;
 }
 
-@media (min-width: 520px) {
-  .program-partners-grid {
+@media (max-width: 1024px) {
+  .univ-static-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .univ-static-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+.partner-static-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .partner-static-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
 }
 
-@media (min-width: 1024px) {
-  .program-partners-grid {
-    gap: 20px;
-  }
-}
-
-.program-partner-card {
-  background-color: #FFFFFF;
-  border: 1px solid #EAE7E1;
-  border-radius: 20px;
-  padding: 24px 20px 20px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 140px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.025);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: center;
-  position: relative;
-}
-
-.program-partner-card:hover {
-  transform: translateY(-3px);
-  border-color: #FECDD3;
-  box-shadow: 0 10px 28px -4px rgba(227, 27, 35, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.program-partner-logo-frame {
-  height: 60px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.program-partner-logo-img {
-  max-height: 52px;
-  max-width: 140px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  transition: transform 0.25s ease;
-}
-
-.program-partner-card:hover .program-partner-logo-img {
-  transform: scale(1.05);
-}
-
-.program-partner-category {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #E31B23;
-  text-transform: uppercase;
-  background-color: #FFF1F2;
-  border: 1px solid #FECDD3;
-  padding: 3px 9px;
-  border-radius: 9999px;
-}
-
-/* ==========================================================================
-   2. OUR ECOSYSTEM PARTNERS PANEL (3 Vertical Moving Columns)
-   ========================================================================== */
-
-.ecosystem-partners-panel {
-  position: relative;
-  background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 28px;
-  padding: clamp(36px, 4.5vw, 52px) clamp(20px, 3.5vw, 44px);
-  box-shadow: 0 6px 30px -4px rgba(0, 0, 0, 0.035);
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
 @media (max-width: 640px) {
-  .ecosystem-partners-panel {
-    border-radius: 20px;
-    padding: 28px 16px;
-  }
-}
-
-/* Subtle Atmospheric Red Ambient Background Glow */
-.ecosystem-ambient-glow {
-  position: absolute;
-  top: -10%;
-  right: -5%;
-  width: 60%;
-  height: 120%;
-  background: radial-gradient(ellipse at center, rgba(227, 27, 35, 0.045) 0%, rgba(227, 27, 35, 0.015) 50%, transparent 75%);
-  pointer-events: none;
-  filter: blur(40px);
-  z-index: 0;
-}
-
-.ecosystem-layout {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(32px, 4vw, 48px);
-  align-items: center;
-}
-
-@media (min-width: 960px) {
-  .ecosystem-layout {
-    grid-template-columns: 340px 1fr;
-    gap: 40px;
-  }
-}
-
-@media (min-width: 1120px) {
-  .ecosystem-layout {
-    grid-template-columns: 360px 1fr;
-    gap: 48px;
-  }
-}
-
-/* Left Info Column */
-.ecosystem-info-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.ecosystem-heading {
-  font-family: var(--font-heading, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  font-size: clamp(28px, 3.4vw, 44px);
-  font-weight: 900;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  color: #111111;
-  margin: 0 0 14px 0;
-}
-
-.ecosystem-desc {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: #4B5563;
-  margin: 0;
-}
-
-/* Right Field: 3-Column Vertical Motion Window */
-.ecosystem-field-col {
-  width: 100%;
-}
-
-/* ==========================================================================
-   VERTICAL MOVING VIEWPORT (Exactly 3 Rows Visible)
-   Height = 3 cards (80px * 3) + 2 gaps (14px * 2) = 268px
-   ========================================================================== */
-.ecosystem-logo-window {
-  position: relative;
-  height: 268px;
-  overflow: hidden;
-  width: 100%;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
-  box-sizing: border-box;
-}
-
-/* Desktop & Tablet: Exactly 3 Columns */
-.ecosystem-desktop-window {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .ecosystem-desktop-window {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    height: 268px;
-  }
-}
-
-/* Mobile: Exactly 2 Columns */
-.ecosystem-mobile-window {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  height: 268px;
-}
-
-@media (min-width: 640px) {
-  .ecosystem-mobile-window {
-    display: none;
-  }
-}
-
-/* Individual Column Lane */
-.ecosystem-column-lane {
-  position: relative;
-  overflow: hidden;
-  height: 100%;
-}
-
-/* Moving Track */
-.ecosystem-column-track {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  will-change: transform;
-}
-
-@media (max-width: 639px) {
-  .ecosystem-column-track {
+  .partner-static-grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 }
 
-/* Desktop 3-Column Alternating Animations (Continuous Non-stop Scroll) */
-.ecosystem-track--1 {
-  animation: ecosystemScrollDown 22s linear infinite;
-}
-
-.ecosystem-track--2 {
-  animation: ecosystemScrollUp 26s linear infinite;
-}
-
-.ecosystem-track--3 {
-  animation: ecosystemScrollDown 24s linear infinite;
-}
-
-/* Mobile 2-Column Alternating Animations */
-.ecosystem-mobile-track--1 {
-  animation: ecosystemScrollDown 22s linear infinite;
-}
-
-.ecosystem-mobile-track--2 {
-  animation: ecosystemScrollUp 25s linear infinite;
-}
-
-/* Keyframes for Seamless Infinite Vertical Motion */
-@keyframes ecosystemScrollUp {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-50%);
-  }
-}
-
-@keyframes ecosystemScrollDown {
-  0% {
-    transform: translateY(-50%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-/* Prefers Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  .ecosystem-column-track {
-    animation: none !important;
-    transform: none !important;
-  }
-}
-
-/* Individual Partner Logo Tile */
-.ecosystem-logo-tile {
+/* Unified Clean Landscape Card */
+.partner-card-clean {
   background-color: #FFFFFF;
   border: 1px solid #EAE7E1;
-  border-radius: 14px;
-  height: 80px;
-  min-height: 80px;
+  border-radius: 18px;
+  height: 108px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+  padding: 10px 14px;
   box-sizing: border-box;
-  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
 }
 
-.ecosystem-logo-tile:hover {
-  border-color: #FECDD3;
-  box-shadow: 0 6px 18px -2px rgba(227, 27, 35, 0.09), 0 2px 6px rgba(0, 0, 0, 0.03);
+.partner-card-clean:hover {
+  transform: translateY(-1px);
+  border-color: #DFDBD3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
-.ecosystem-logo-img {
-  max-height: 42px;
-  max-width: 100%;
+.partner-card-logo-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.partner-card-logo-img {
+  max-width: 90%;
+  max-height: 76%;
   width: auto;
   height: auto;
   object-fit: contain;
   display: block;
-  transition: transform 0.22s ease;
 }
 
-.ecosystem-logo-tile:hover .ecosystem-logo-img {
-  transform: scale(1.05);
+/* Specific scaling for logos with wide transparent borders */
+img[src*="anu.png"] {
+  transform: scale(1.6);
+}
+
+img[src*="mapua.png"] {
+  transform: scale(1.3);
+}
+
+img[src*="jaipuria.png"] {
+  transform: scale(1.3);
+}
+
+img[src*="sairam-sec-logo.png"] {
+  transform: scale(1.15);
+}
+
+@media (max-width: 640px) {
+  .partner-card-clean {
+    height: 96px;
+    border-radius: 14px;
+    padding: 8px 10px;
+  }
+
+  .partner-card-logo-img {
+    max-width: 88%;
+    max-height: 70%;
+  }
+}
+
+.partner-card-clean--placeholder {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE7E1;
+}
+
+.partner-placeholder-content {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   NAIVA PARTNERS (Animated Dynamic Wall)
+   ========================================================================== */
+
+.partner-wall-viewport {
+  position: relative;
+  width: 100%;
+  height: 410px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.45);
+  border: 1px solid #EAE7E1;
+  border-radius: 20px;
+  padding: 12px;
+  box-sizing: border-box;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.partner-wall-grid {
+  display: flex;
+  gap: 12px;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.partner-wall-column {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.partner-wall-track {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  will-change: transform;
+}
+
+.partner-track--up {
+  animation: moveVerticalUp var(--animation-duration, 80s) linear infinite;
+}
+
+.partner-track--down {
+  animation: moveVerticalDown var(--animation-duration, 80s) linear infinite;
+}
+
+@keyframes moveVerticalUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes moveVerticalDown {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.partner-logo-card {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE7E1;
+  border-radius: 14px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  overflow: hidden;
+}
+
+.partner-logo-card:hover {
+  transform: translateY(-1px);
+  border-color: #DFDBD3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.partner-logo-img {
+  max-width: 90%;
+  max-height: 78%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.partner-logo-card--placeholder {
+  background-color: #FFFFFF;
+  border: 1px solid #EAE7E1;
+}
+
+.partner-wall-grid--desktop {
+  display: flex;
+}
+.partner-wall-grid--tablet {
+  display: none;
+}
+.partner-wall-grid--mobile {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .partner-wall-viewport {
+    height: 380px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .partner-wall-grid--desktop {
+    display: none;
+  }
+  .partner-wall-grid--tablet {
+    display: flex;
+  }
+  .partner-wall-grid--mobile {
+    display: none;
+  }
+  .partner-logo-card {
+    height: 84px;
+  }
+}
+
+@media (max-width: 640px) {
+  .partner-wall-viewport {
+    height: 340px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+  .partner-wall-grid--desktop {
+    display: none;
+  }
+  .partner-wall-grid--tablet {
+    display: none;
+  }
+  .partner-wall-grid--mobile {
+    display: flex;
+  }
+  .partner-logo-card {
+    height: 76px;
+    padding: 10px 12px;
+  }
 }

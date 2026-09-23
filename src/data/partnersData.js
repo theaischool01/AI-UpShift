@@ -1,161 +1,293 @@
 // ==========================================================================
 // UPSHIFT PARTNERS & ECOSYSTEM DATA
-// Real partner assets from /public/partners/
+// Categorized according to the official UpShift hierarchy:
+// 01 - GOVERNMENT PARTNERS
+// 02 - CORPORATE PARTNERS
+// 03 - UNIVERSITY PARTNERS
+// 04 - NAIVA PARTNERS
 // ==========================================================================
 
-export const PROGRAM_PARTNERS = [
+export const GOVERNMENT_PARTNERS = [
   {
-    id: 't-hub',
-    name: 'T-Hub',
-    fullName: 'T-Hub Innovation Hub',
-    logo: '/partners/t-hub.png',
-    alt: 'T-Hub Innovation Hub',
-    category: 'Innovation Partner',
+    id: 'task',
+    name: 'TASK',
+    fullName: 'Telangana Academy for Skill and Knowledge',
+    logo: '/partners/Govt/task.png',
+    alt: 'Telangana Academy for Skill and Knowledge',
+  },
+  {
+    id: 'dot',
+    name: 'DOT',
+    fullName: 'Department of Telecommunications',
+    logo: '/partners/Govt/dot.png',
+    alt: 'Department of Telecommunications (DoT), Government of India',
+  },
+  {
+    id: 'dst',
+    name: 'DST',
+    fullName: 'Department of Science & Technology',
+    logo: '/partners/Govt/dst.png',
+    alt: 'Department of Science and Technology, Government of India',
+  },
+  {
+    id: 'tamil-nadu',
+    name: 'TAMIL NADU',
+    fullName: 'Government of Tamil Nadu',
+    logo: '/partners/Govt/Tamil_Nadu_emb.png',
+    alt: 'Government of Tamil Nadu',
   },
   {
     id: 'math',
     name: 'MATH',
     fullName: 'Centre of Excellence in AI (MATH)',
-    logo: '/partners/math.png',
+    logo: '/partners/Govt/math.png',
     alt: 'MATH Centre of Excellence in AI',
-    category: 'AI CoE Partner',
   },
   {
-    id: 'dst',
-    name: 'DST',
-    fullName: 'Department of Science and Technology',
-    logo: '/partners/dst.png',
-    alt: 'Department of Science and Technology, Government of India',
-    category: 'Government Initiative',
+    id: 't-hub',
+    name: 'THUB',
+    fullName: 'T-Hub Innovation Hub',
+    logo: '/partners/Govt/t-hub.png',
+    alt: 'T-Hub Innovation Hub',
   },
-];
-
-// Ecosystem Partners (21 distinct partners, excluding the 3 Program Partners)
-export const ECOSYSTEM_PARTNERS = [
   {
-    id: 'agent-analytics',
-    name: 'AgentAnalytics AI',
-    logo: '/partners/agent_analytics.png',
-    alt: 'AgentAnalytics AI',
+    id: 'nimsme',
+    name: 'NIMSME',
+    fullName: 'National Institute for MSME',
+    logo: '/partners/Govt/nimsme-logo.jpg',
+    alt: 'National Institute for Micro, Small and Medium Enterprises',
+  },
+  {
+    id: 'bsnl',
+    name: 'BSNL',
+    fullName: 'BSNL Telecom Training Academy',
+    logo: '/partners/Govt/bsnl.png',
+    alt: 'BSNL Telecom Training Academy',
+  },
+  {
+    id: 'moscow',
+    name: 'MOSCOW',
+    fullName: 'Moscow Partner Initiative',
+    logo: '/partners/Govt/moscow.png',
+    alt: 'Moscow partner logo placeholder',
+    isPlaceholder: true,
+  },
+  {
+    id: 'itu',
+    name: 'ITU',
+    fullName: 'International Telecommunication Union',
+    logo: '/partners/Govt/itu.png',
+    alt: 'ITU World Telecommunication Standardization Assembly',
+  },
+  {
+    id: 'tcoe',
+    name: 'TCOE',
+    fullName: 'Telecom Centres of Excellence',
+    logo: '/partners/Govt/tcoe.png',
+    alt: 'Telecom Centres of Excellence (TCOE)',
+  },
+  {
+    id: 'bdl',
+    name: 'BDI',
+    fullName: 'Bharat Dynamics Limited',
+    logo: '/partners/Govt/bdl.png',
+    alt: 'Bharat Dynamics Limited (BDL)',
+  },
+  {
+    id: 'ict',
+    name: 'IET',
+    fullName: 'ICT Academy',
+    logo: '/partners/Govt/ict.png',
+    alt: 'ICT Academy',
   },
   {
     id: 'ai-alliance',
-    name: 'AI Alliance Network',
-    logo: '/partners/ai_alliance.png',
+    name: 'AI ALLIANCE',
+    fullName: 'AI Alliance Network',
+    logo: '/partners/Govt/ai_alliance.png',
     alt: 'AI Alliance Network',
   },
+];
+
+export const CORPORATE_PARTNERS = [
   {
-    id: 'anu',
-    name: 'Acharya Nagarjuna University',
-    logo: '/partners/anu.png',
-    alt: 'Acharya Nagarjuna University',
+    id: 'uber',
+    name: 'Uber',
+    fullName: 'Uber Technologies',
+    logo: '/partners/corporate/uber.png',
+    alt: 'Uber',
+  },
+  {
+    id: 'fiverr',
+    name: 'Fiverr',
+    fullName: 'Fiverr International',
+    logo: '/partners/corporate/fiverr.png',
+    alt: 'Fiverr',
+  },
+  {
+    id: 'centific',
+    name: 'Centific',
+    fullName: 'Centific Global AI Solutions',
+    logo: '/partners/corporate/centific.svg',
+    alt: 'Centific',
+  },
+  {
+    id: 'rfgen',
+    name: 'RFgen',
+    fullName: 'RFgen Software',
+    logo: '/partners/corporate/rfgen.png',
+    alt: 'RFgen Software',
+  },
+  {
+    id: 'star',
+    name: 'Star',
+    fullName: 'STAR Telecommunications',
+    logo: '/partners/corporate/star.png',
+    alt: 'STAR Telecommunications',
+  },
+  {
+    id: 'jaipuria',
+    name: 'Jaipuria',
+    fullName: 'Jaipuria Institute of Management',
+    logo: '/partners/corporate/jaipuria.png',
+    alt: 'Jaipuria Institute of Management',
   },
   {
     id: 'area51',
-    name: 'AREA51',
-    logo: '/partners/area51.png',
+    name: 'Area51',
+    fullName: 'AREA51 Innovation Center',
+    logo: '/partners/corporate/area51.png',
     alt: 'AREA51 Innovation Center',
   },
   {
     id: 'avpl',
-    name: 'AVPL International',
-    logo: '/partners/avpl.png',
+    name: 'AUPL',
+    fullName: 'AVPL International',
+    logo: '/partners/corporate/avpl.png',
     alt: 'AVPL International',
   },
   {
-    id: 'bdl',
-    name: 'Bharat Dynamics Limited',
-    logo: '/partners/bdl.png',
-    alt: 'Bharat Dynamics Limited (BDL)',
-  },
-  {
-    id: 'bsnl',
-    name: 'BSNL Academy',
-    logo: '/partners/bsnl.png',
-    alt: 'BSNL Telecom Training Academy',
-  },
-  {
     id: 'csi',
-    name: 'Computer Society of India',
-    logo: '/partners/csi.png',
+    name: 'CSI',
+    fullName: 'Computer Society of India (CSI)',
+    logo: '/partners/corporate/csi.png',
     alt: 'Computer Society of India (CSI)',
   },
   {
-    id: 'dot',
-    name: 'Department of Telecommunications',
-    logo: '/partners/dot.png',
-    alt: 'Department of Telecommunications (DoT), Government of India',
-  },
-  {
-    id: 'hyperleap',
-    name: 'Hyperleap AI',
-    logo: '/partners/hyperleap.png',
-    alt: 'Hyperleap AI',
-  },
-  {
-    id: 'ict',
-    name: 'ICT Academy',
-    logo: '/partners/ict.png',
-    alt: 'ICT Academy',
-  },
-  {
-    id: 'itu',
-    name: 'ITU WTSA',
-    logo: '/partners/itu.png',
-    alt: 'ITU World Telecommunication Standardization Assembly',
-  },
-  {
-    id: 'jaipuria',
-    name: 'Jaipuria Institute of Management',
-    logo: '/partners/jaipuria.png',
-    alt: 'Jaipuria Institute of Management',
-  },
-  {
-    id: 'mapua',
-    name: 'Mapúa University',
-    logo: '/partners/mapua.png',
-    alt: 'Mapúa University',
+    id: 'agent-analytics',
+    name: 'Agent Analytics',
+    fullName: 'AgentAnalytics AI',
+    logo: '/partners/corporate/agent_analytics.png',
+    alt: 'AgentAnalytics AI',
   },
   {
     id: 'rava',
-    name: 'Rava.ai',
-    logo: '/partners/rava.png',
+    name: 'Rava AI',
+    fullName: 'Rava.ai Enterprise AI',
+    logo: '/partners/corporate/rava.png',
     alt: 'Rava.ai Enterprise AI',
   },
   {
-    id: 'rfgen',
-    name: 'RFgen Software',
-    logo: '/partners/rfgen.png',
-    alt: 'RFgen Software',
+    id: 'hyperleap',
+    name: 'Hyperleap',
+    fullName: 'Hyperleap AI',
+    logo: '/partners/corporate/hyperleap.png',
+    alt: 'Hyperleap AI',
+  },
+];
+
+export const UNIVERSITY_PARTNERS = [
+  {
+    id: 'mapua',
+    name: 'Mapúa University',
+    fullName: 'Mapúa University',
+    logo: '/partners/University/mapua.png',
+    alt: 'Mapúa University',
+  },
+  {
+    id: 'anu',
+    name: 'ANU',
+    fullName: 'Acharya Nagarjuna University (ANU)',
+    logo: '/partners/University/anu.png',
+    alt: 'Acharya Nagarjuna University',
   },
   {
     id: 'srm',
-    name: 'SRM University',
-    logo: '/partners/srm.png',
-    alt: 'SRM Institute of Science and Technology',
+    name: 'SRM University AP',
+    fullName: 'SRM University AP',
+    logo: '/partners/University/srm.png',
+    alt: 'SRM University AP',
   },
   {
-    id: 'star',
-    name: 'STAR',
-    logo: '/partners/star.png',
-    alt: 'STAR Telecommunications',
+    id: 'sairam',
+    name: 'Sairam Engineering College',
+    fullName: 'Sri Sairam Engineering College',
+    logo: '/partners/University/sairam-sec-logo.png',
+    alt: 'Sri Sairam Engineering College',
   },
   {
-    id: 'task',
-    name: 'TASK',
-    logo: '/partners/task.png',
-    alt: 'Telangana Academy for Skill and Knowledge (TASK)',
+    id: 'jaipuria-univ',
+    name: 'Jaipuria',
+    fullName: 'Jaipuria Institute of Management',
+    logo: '/partners/corporate/jaipuria.png',
+    alt: 'Jaipuria Institute of Management',
+  },
+];
+
+const NAIVA_FILENAMES = [
+  '1-1.webp', '2-2.webp', '3-1.webp', '4.webp', '5-1.webp', '6-1.webp', '7-1.webp', '8-1.webp', '9-1.webp', '10-1.webp',
+  '11-1.webp', '12-1.webp', '13-1.webp', '14-1.webp', '15-1.webp', '16-1.webp', '17-1.webp', '18-1.webp', '19.webp', '20.webp',
+  '21-1.webp', '22-2.webp', '23-1.webp', '24-1.webp', '25-1.webp', '26.webp', '27.webp', '28.webp', '29.webp', '30.webp',
+  '31.webp', '32.webp', '33.webp', '34.webp', '35.webp', '36.webp', '37.webp', '38.webp', '39.webp', '40.webp',
+  '41.webp', '42.webp', '43.webp', '44.webp', '45.webp', '46.webp', '47.webp', '48.webp', '49.webp', '50.webp',
+  '51.webp', '52.webp', '53.webp', '54.webp', '55.webp', '56.webp', '57.webp', '58.webp', '59.webp', '60.webp',
+  '61.webp', '62.webp', '63.webp', '64.webp', '65.webp', '66.webp', '67.webp', '68.webp', '69.webp', '70.webp',
+  '71.webp', '72.webp', '73.webp', '74.webp', '75.webp', '76.webp', '77.webp', '78.webp', '79.webp', '80.webp'
+];
+
+export const NAIVA_PARTNERS = NAIVA_FILENAMES.map((file, idx) => ({
+  id: `naiva-${idx + 1}`,
+  name: `Naiva Partner ${idx + 1}`,
+  fullName: `Naiva Ecosystem Enterprise ${idx + 1}`,
+  logo: `/partners/Naiva/${file}`,
+  alt: `Naiva Partner ${idx + 1}`,
+}));
+
+export const PARTNER_CATEGORIES = [
+  {
+    num: '01',
+    code: 'GOVERNMENT',
+    title: 'GOVERNMENT PARTNERS',
+    desc: 'Government initiatives, technology departments, and national innovation hubs accelerating AI capability across India.',
+    partners: GOVERNMENT_PARTNERS,
   },
   {
-    id: 'tcoe',
-    name: 'TCOE India',
-    logo: '/partners/tcoe.png',
-    alt: 'Telecom Centres of Excellence (TCOE)',
+    num: '02',
+    code: 'CORPORATE',
+    title: 'CORPORATE PARTNERS',
+    desc: 'Forward-looking enterprises, scale-ups, and technology platforms deploying AI solutions and sourcing trained UpShift talent.',
+    partners: CORPORATE_PARTNERS,
   },
   {
-    id: 'uber',
-    name: 'Uber',
-    logo: '/partners/uber.png',
-    alt: 'Uber',
+    num: '03',
+    code: 'UNIVERSITY',
+    title: 'UNIVERSITY PARTNERS',
+    desc: 'Leading universities and academic institutions integrating hands-on applied AI programs into their technical student pathways.',
+    partners: UNIVERSITY_PARTNERS,
   },
+  {
+    num: '04',
+    code: 'NAIVA',
+    title: 'NAIVA PARTNERS',
+    desc: 'A vibrant nationwide consortium of AI startups, digital product agencies, and growth ventures actively building with AI.',
+    partners: NAIVA_PARTNERS,
+  },
+];
+
+// Backwards compatibility exports
+export const PROGRAM_PARTNERS = GOVERNMENT_PARTNERS.slice(0, 3);
+export const ECOSYSTEM_PARTNERS = [
+  ...GOVERNMENT_PARTNERS.slice(3).filter(p => !p.isPlaceholder),
+  ...CORPORATE_PARTNERS,
+  ...UNIVERSITY_PARTNERS,
 ];
