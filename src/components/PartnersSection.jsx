@@ -3,7 +3,7 @@ import { GOVERNMENT_PARTNERS, CORPORATE_PARTNERS, UNIVERSITY_PARTNERS, NAIVA_PAR
 import './PartnersSection.css';
 
 function GovernmentSection({ partners }) {
-  // Pad grid to 15 slots (3 rows x 5 columns) on desktop for a complete grid matrix
+  // Pad grid to 15 slots (3 rows x 5 columns) on desktop for 5 items per row
   const totalSlots = Math.ceil(partners.length / 5) * 5;
   const paddedSlots = [...partners];
   while (paddedSlots.length < totalSlots) {
@@ -11,81 +11,23 @@ function GovernmentSection({ partners }) {
   }
 
   return (
-    <div className="govt-showcase">
-      {/* Top Colored Intro Banner */}
-      <div className="govt-banner">
-        <div className="govt-banner-content">
-          <div className="govt-banner-eyebrow">
-            <span className="govt-banner-eyebrow-bar" />
-            <span className="govt-banner-eyebrow-text">PARTNERS</span>
-            <span className="govt-banner-eyebrow-plus">+</span>
-          </div>
-          <h2 className="govt-banner-title">
-            GOVERNMENT PARTNERS
-          </h2>
-          <p className="govt-banner-desc">
-            Government initiatives, technology departments and national innovation hubs accelerating AI capability across India.
-          </p>
-        </div>
-
-        {/* Decorative Geometric Line Artwork */}
-        <div className="govt-banner-graphic" aria-hidden="true">
-          <svg
-            viewBox="0 0 240 160"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="govt-banner-svg"
-          >
-            <polygon
-              points="120,10 230,80 120,150 10,80"
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth="1.5"
-            />
-            <line
-              x1="120"
-              y1="10"
-              x2="120"
-              y2="150"
-              stroke="rgba(255,255,255,0.45)"
-              strokeWidth="1.5"
-            />
-            <line
-              x1="10"
-              y1="80"
-              x2="230"
-              y2="80"
-              stroke="rgba(255,255,255,0.45)"
-              strokeWidth="1.5"
-            />
-            <polyline
-              points="175,45 120,80 175,115"
-              stroke="rgba(255,255,255,0.3)"
-              strokeWidth="1.5"
-            />
-            <polyline
-              points="65,45 120,80 65,115"
-              stroke="rgba(255,255,255,0.3)"
-              strokeWidth="1.5"
-            />
-          </svg>
-        </div>
+    <div className="govt-section-stacked">
+      {/* Centered Editorial Header */}
+      <div className="govt-section-header">
+        <h2 className="govt-showcase-title">
+          GOVERNMENT <span className="partners-accent-text">PARTNERS</span>
+        </h2>
+        <p className="govt-showcase-desc">
+          Government initiatives, technology departments, and national innovation hubs accelerating AI capability across India.
+        </p>
       </div>
 
-      {/* Clean White Logo Matrix (5 Columns Desktop, 1px Dividers, Natural Colors) */}
+      {/* Clean 5-Column Divider Grid Matrix */}
       <div className="govt-matrix-grid">
         {paddedSlots.map((partner) => {
           if (partner.isEmpty) {
             return (
               <div key={partner.id} className="govt-matrix-cell govt-matrix-cell--empty" />
-            );
-          }
-          if (partner.isPlaceholder) {
-            return (
-              <div
-                key={partner.id}
-                className="govt-matrix-cell govt-matrix-cell--placeholder"
-                title="Moscow (Reserved Slot)"
-              />
             );
           }
           return (

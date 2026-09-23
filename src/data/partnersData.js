@@ -9,13 +9,6 @@
 
 export const GOVERNMENT_PARTNERS = [
   {
-    id: 'task',
-    name: 'TASK',
-    fullName: 'Telangana Academy for Skill and Knowledge',
-    logo: '/partners/Govt/task.png',
-    alt: 'Telangana Academy for Skill and Knowledge',
-  },
-  {
     id: 'dot',
     name: 'DOT',
     fullName: 'Department of Telecommunications',
@@ -31,7 +24,7 @@ export const GOVERNMENT_PARTNERS = [
   },
   {
     id: 'tamil-nadu',
-    name: 'TAMIL NADU',
+    name: 'Tamil Nadu',
     fullName: 'Government of Tamil Nadu',
     logo: '/partners/Govt/Tamil_Nadu_emb.png',
     alt: 'Government of Tamil Nadu',
@@ -45,17 +38,10 @@ export const GOVERNMENT_PARTNERS = [
   },
   {
     id: 't-hub',
-    name: 'THUB',
+    name: 'T-Hub',
     fullName: 'T-Hub Innovation Hub',
     logo: '/partners/Govt/t-hub.png',
     alt: 'T-Hub Innovation Hub',
-  },
-  {
-    id: 'nimsme',
-    name: 'NIMSME',
-    fullName: 'National Institute for MSME',
-    logo: '/partners/Govt/nimsme-logo.jpg',
-    alt: 'National Institute for Micro, Small and Medium Enterprises',
   },
   {
     id: 'bsnl',
@@ -65,19 +51,11 @@ export const GOVERNMENT_PARTNERS = [
     alt: 'BSNL Telecom Training Academy',
   },
   {
-    id: 'moscow',
-    name: 'MOSCOW',
-    fullName: 'Moscow Partner Initiative',
-    logo: '/partners/Govt/moscow.png',
-    alt: 'Moscow partner logo placeholder',
-    isPlaceholder: true,
-  },
-  {
-    id: 'itu',
-    name: 'ITU',
-    fullName: 'International Telecommunication Union',
-    logo: '/partners/Govt/itu.png',
-    alt: 'ITU World Telecommunication Standardization Assembly',
+    id: 'ict',
+    name: 'ICT Academy',
+    fullName: 'ICT Academy',
+    logo: '/partners/Govt/ict.png',
+    alt: 'ICT Academy',
   },
   {
     id: 'tcoe',
@@ -87,25 +65,53 @@ export const GOVERNMENT_PARTNERS = [
     alt: 'Telecom Centres of Excellence (TCOE)',
   },
   {
+    id: 'itu',
+    name: 'ITUWTSA',
+    fullName: 'International Telecommunication Union (ITU WTSA)',
+    logo: '/partners/Govt/itu.png',
+    alt: 'ITU World Telecommunication Standardization Assembly',
+  },
+  {
+    id: 'task',
+    name: 'TASK',
+    fullName: 'Telangana Academy for Skill and Knowledge',
+    logo: '/partners/Govt/task.png',
+    alt: 'Telangana Academy for Skill and Knowledge',
+  },
+  {
     id: 'bdl',
-    name: 'BDI',
-    fullName: 'Bharat Dynamics Limited',
+    name: 'BDL',
+    fullName: 'Bharat Dynamics Limited (BDL)',
     logo: '/partners/Govt/bdl.png',
     alt: 'Bharat Dynamics Limited (BDL)',
   },
   {
-    id: 'ict',
-    name: 'IET',
-    fullName: 'ICT Academy',
-    logo: '/partners/Govt/ict.png',
-    alt: 'ICT Academy',
+    id: 'nimsme',
+    name: 'NIMSME',
+    fullName: 'National Institute for MSME',
+    logo: '/partners/Govt/nimsme-logo.jpg',
+    alt: 'National Institute for Micro, Small and Medium Enterprises',
   },
   {
     id: 'ai-alliance',
-    name: 'AI ALLIANCE',
+    name: 'AI Alliance',
     fullName: 'AI Alliance Network',
     logo: '/partners/Govt/ai_alliance.png',
     alt: 'AI Alliance Network',
+  },
+  {
+    id: 'moscow',
+    name: 'Moscow',
+    fullName: 'Moscow Partner Initiative',
+    logo: '/partners/Govt/moscow.png',
+    alt: 'Moscow',
+  },
+  {
+    id: 'tnaim',
+    name: 'TNAIM',
+    fullName: 'Tamil Nadu Artificial Intelligence Mission',
+    logo: '/partners/Govt/tnaim.png',
+    alt: 'Tamil Nadu Artificial Intelligence Mission (TNAIM)',
   },
 ];
 
@@ -224,13 +230,6 @@ export const UNIVERSITY_PARTNERS = [
     fullName: 'Sri Sairam Engineering College',
     logo: '/partners/University/sairam-sec-logo.png',
     alt: 'Sri Sairam Engineering College',
-  },
-  {
-    id: 'jaipuria-univ',
-    name: 'Jaipuria',
-    fullName: 'Jaipuria Institute of Management',
-    logo: '/partners/corporate/jaipuria.png',
-    alt: 'Jaipuria Institute of Management',
   },
 ];
 
