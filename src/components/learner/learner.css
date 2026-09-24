@@ -734,6 +734,167 @@
 /* ==========================================================================
    G. OPPORTUNITY CARDS
    ========================================================================== */
+/* Digital Gig Card Dedicated System */
+.gig-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .gig-card {
+    padding: 20px;
+  }
+}
+
+.gig-card:hover {
+  border-color: #D1D5DB;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+}
+
+.gig-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.gig-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.gig-card__module {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.gig-card__featured {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #D97706;
+  background-color: #FFFBEB;
+  border: 1px solid #FDE68A;
+  padding: 3px 8px;
+  border-radius: 6px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.gig-card__featured svg {
+  width: 13px;
+  height: 13px;
+  color: #F59E0B;
+}
+
+.gig-card__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  line-height: 1.28;
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.15s ease;
+}
+
+.gig-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.gig-card__title a:hover {
+  color: #E31B23;
+}
+
+.gig-card__description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #4B5563;
+  line-height: 1.55;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.gig-card__footer {
+  margin-top: auto;
+  border-top: 1px solid #EEEEEE;
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.gig-card__pay {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.gig-card__pay--empty {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9CA3AF;
+}
+
+.gig-card__read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.gig-card__read-more:hover {
+  color: #E31B23;
+}
+
+.gig-card__read-more svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.15s ease;
+}
+
+.gig-card:hover .gig-card__read-more svg {
+  transform: translateX(3px);
+}
+
 .learner-card {
   background-color: #FFFFFF;
   border: 1px solid #E5E7EB;
