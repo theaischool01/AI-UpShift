@@ -123,15 +123,15 @@ export default function LearnerHeader() {
             </div>
           </div>
 
-          {/* Globe Button */}
-          <button
-            type="button"
+          {/* Public Website / Home Link */}
+          <Link
+            to="/"
             className="learner-header-action-btn"
-            title="Language / Region"
-            aria-label="Language / Region"
+            title="Open Public UpShift Homepage"
+            aria-label="Public UpShift Homepage"
           >
             <Globe className="w-4 h-4 text-[#374151]" />
-          </button>
+          </Link>
 
           {/* Logout Button */}
           <button
