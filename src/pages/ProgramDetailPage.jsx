@@ -6,7 +6,6 @@ import {
   CheckCircle2, 
   Sparkles, 
   Layers, 
-  Award, 
   Briefcase, 
   Users, 
   Target, 
@@ -139,10 +138,28 @@ export default function ProgramDetailPage() {
                   );
                 })()}
 
-                {/* Short Course Overview */}
+                {/* Short Compact Program Description */}
                 <p className="program-hero-desc">
-                  {program.overview || program.oneSentence}
+                  {program.shortDescription || program.overview || program.oneSentence}
                 </p>
+
+                {/* Compact Opportunity Metric Line */}
+                {program.opportunityLine && (
+                  <p className="program-hero-opportunity">
+                    {(() => {
+                      const match = program.opportunityLine.match(/^(\$[\w\d+]+)(\s+.*)$/);
+                      if (match) {
+                        return (
+                          <>
+                            <span className="text-[#E31B23] font-extrabold">{match[1]}</span>
+                            <span>{match[2]}</span>
+                          </>
+                        );
+                      }
+                      return program.opportunityLine;
+                    })()}
+                  </p>
+                )}
 
                 {/* Action CTAs: GET STARTED (Primary Red) + View Proofs */}
                 <div className="program-hero-actions">
@@ -177,19 +194,6 @@ export default function ProgramDetailPage() {
                     <span>FLAGSHIP CURRICULUM</span>
                   </div>
                 </div>
-
-                {/* Verified Proof Capstone Badge under Image */}
-                {program.sampleArtifact && (
-                  <div className="program-capstone-banner">
-                    <div className="program-capstone-label">
-                      <Award size={14} style={{ color: '#E31B23', flexShrink: 0 }} />
-                      <span>Signature Capstone:</span>
-                    </div>
-                    <span className="program-capstone-value">
-                      {program.sampleArtifact.title}
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
           </div>

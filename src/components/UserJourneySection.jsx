@@ -11,73 +11,70 @@ const STORIES_DATA = [
     name: 'P Likhitha',
     shortCode: 'L',
     avatar: dianaAvatar,
-    quote: 'I didn’t expect much when I first started. I just wanted to make some extra money in my free time. Slowly, I got interested in the work and started learning new things. Now I feel much more confident than when I started.'
+    quote: 'I started just to explore AI and earn something on the side. Along the way, I learned new skills, built real projects, and gained the confidence to take on bigger opportunities.'
   },
   {
     id: 2,
     name: 'Shaik Irshad',
     shortCode: 'SI',
     avatar: '/assets/testimonial-01.webp',
-    quote: 'I was looking for something flexible that I could do in my free time. I liked that I could work whenever I was available. The work helped me learn new skills, and the extra income has been useful for my daily expenses.'
+    quote: 'I always wanted to learn AI but didn’t know how to apply it. UpShift helped me turn concepts into practical projects and gave me the confidence to showcase what I can create.'
   },
   {
     id: 3,
     name: 'P Prathyusha',
     shortCode: 'PP',
     avatar: '/assets/testimonial-02.webp',
-    quote: 'I started working with The AISCHOOL as a freelancer because I wanted to earn something in my free time. At first, I was a little unsure, but once I started working, I got comfortable with it. I learned new things and also earned some money for my personal expenses.'
+    quote: 'I started with basic AI knowledge and a lot of questions. Today, I can build solutions, solve real problems, and see opportunities I never noticed before.'
   },
   {
     id: 4,
     name: 'G Ruthwik',
     shortCode: 'GR',
     avatar: '/assets/testimonial-04.png',
-    quote: 'I joined because I wanted to learn something new and earn at the same time. Working on different tasks helped me understand things better. I also started earning from my work, which felt really good because I could use some of it for myself.'
+    quote: 'I joined UpShift to improve my skills, but the biggest change was my confidence. I learned how to build, present, and deliver work professionally.'
   },
   {
     id: 5,
     name: 'K Anvitha',
     shortCode: 'KA',
     avatar: '/assets/testimonial-03.webp',
-    quote: 'I wanted something I could do along with my regular studies, and this worked well for me. I could manage my own time and work when I was free. The money I earned helped me pay for a few things I wanted without always asking my parents.'
+    quote: 'I never imagined AI could create opportunities for me. What started as learning became a journey of building skills, earning independently, and believing in myself.'
   },
   {
     id: 6,
     name: 'M Sufian',
     shortCode: 'MS',
     avatar: '/assets/testimonial-06.webp',
-    quote: 'AISCHOOL has been a good experience for me. I don’t have to follow a fixed schedule, so I can work whenever I have time. I have learned a lot through the tasks, and the extra money has helped me with some of my monthly expenses.'
+    quote: 'I never thought my AI skills could become an opportunity. Building real projects helped me prove my ability and take my first step towards earning.'
   },
   {
     id: 7,
     name: 'M Nandini',
     shortCode: 'MN',
     avatar: '/assets/testimonial-07.png',
-    quote: 'I started because I wanted to use my free time in a better way. I learned new things while working on real tasks, and slowly started earning as well. I have used some of my earnings for shopping, travel, and other things I wanted.'
+    quote: 'Started with curiosity. Learned AI skills. Built real projects. Gained confidence to create new opportunities.'
   },
   {
     id: 8,
     name: 'O Srinath',
     shortCode: 'OS',
     avatar: '/assets/testimonial-05.webp',
-    quote: 'When I first heard about the opportunity, I wasn’t sure if I could do the work. I decided to try it anyway. After completing a few tasks, I became more comfortable. Now I enjoy learning through the work and earning a little extra in my free time.'
+    quote: 'I joined to learn something new, but I discovered much more — the ability to create, earn, and grow with AI.'
   },
-
-
   {
     id: 9,
     name: 'K Preethi',
     shortCode: 'KP',
     avatar: '/assets/testimonial-08.png',
-    quote: 'For me, it is not only about earning. I have learned how to manage my time, complete work properly, and be responsible for what I do. At the same time, having my own small income feels really nice because I can spend it on things I need or want.'
+    quote: 'I began with curiosity and no clear direction. Today, I have practical AI skills, real project experience, and the confidence to create my own opportunities.'
   },
-
   {
     id: 10,
     name: 'P Harish',
     shortCode: 'PH',
     avatar: '/assets/testimonial-10.png',
-    quote: 'I started by helping with a few small projects. As I completed more work, I began receiving paid gigs regularly. I saved those earnings and bought my own laptop. That was the moment I felt I could genuinely build something for myself.'
+    quote: 'My first project changed the way I looked at AI. I moved from just learning tools to actually using them to create meaningful outcomes.'
   }
 ];
 

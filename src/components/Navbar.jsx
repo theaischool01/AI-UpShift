@@ -118,10 +118,10 @@ export default function Navbar({ onOpenRegistration }) {
             />
           </div>
 
-          {/* Unified Branding: THE AI SCHOOL | UpShift */}
+          {/* Unified Branding: The AI SCHOOL | UpShift */}
           <div className="nav-brand-text">
             <span className="nav-brand-school">
-              <span style={{ color: '#111111' }}>THE </span>
+              <span style={{ color: '#111111' }}>The </span>
               <span style={{ color: '#FFFFFF' }}>AI SCHOOL</span>
             </span>
             <span className="nav-brand-separator">|</span>

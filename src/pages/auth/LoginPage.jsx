@@ -138,8 +138,8 @@ export default function LoginPage() {
         </div>
 
         {/* Micro Eyebrow */}
-        <div style={{ textAlign: 'center', fontSize: '11px', fontFamily: 'monospace', fontWeight: '700', letterSpacing: '0.08em', color: '#6B7280', textTransform: 'uppercase', marginBottom: '16px' }}>
-          THE AI SCHOOL / WORKSPACE
+        <div style={{ textAlign: 'center', fontSize: '11px', fontFamily: 'monospace', fontWeight: '700', letterSpacing: '0.08em', color: '#6B7280', marginBottom: '16px' }}>
+          The AI SCHOOL / WORKSPACE
         </div>
 
         {/* Heading */}
@@ -389,7 +389,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer style={{ marginTop: '32px', textAlign: 'center', fontSize: '11px', fontFamily: 'monospace', color: '#9CA3AF' }}>
-        UPSHIFT · THE AI SCHOOL © 2026 · ALL RIGHTS RESERVED
+        UPSHIFT · The AI SCHOOL © 2026 · ALL RIGHTS RESERVED
       </footer>
     </div>
   );

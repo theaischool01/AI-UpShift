@@ -293,7 +293,7 @@ export default function EnrollmentPage() {
               <img src="/assets/mascot/mascot_avatar.jpg" alt="UpShift Mascot" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '7px' }} />
             </div>
             <div className="enroll-brand-text">
-              <span className="enroll-brand-school">THE AI SCHOOL</span>
+              <span className="enroll-brand-school">The AI SCHOOL</span>
               <span className="enroll-brand-divider">/</span>
               <UpShiftWordmark theme="light" className="enroll-brand-name" />
             </div>

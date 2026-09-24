@@ -138,10 +138,10 @@ export default function AboutPage({ setActivePage }) {
               The Parent Organization
             </span>
             <h3 className="font-heading text-3xl sm:text-4xl text-[#111111] mb-3">
-              THE AI SCHOOL GLOBAL ECOSYSTEM
+              The AI SCHOOL GLOBAL ECOSYSTEM
             </h3>
             <p className="text-sm text-[#5A5751] leading-relaxed">
-              Upshift is the flagship proof-of-work platform created by <strong>The AI School</strong>. Headquartered across key digital talent hubs with teams and learners active in:
+              Upshift is the flagship proof-of-work platform created by <strong>The AI SCHOOL</strong>. Headquartered across key digital talent hubs with teams and learners active in:
             </p>
           </div>
 

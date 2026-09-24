@@ -855,7 +855,6 @@ h1, h2, h3, h4, .font-heading {
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .nav-brand-separator {
@@ -4206,18 +4205,37 @@ h1, h2, h3, h4, .font-heading {
 
 .program-hero-desc {
   font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
-  font-size: 14px;
-  line-height: 1.65;
-  color: #555555;
-  margin-bottom: 24px;
-  max-width: 540px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4B5563;
+  margin-bottom: 14px;
+  max-width: 640px;
   overflow-wrap: break-word;
 }
 
 @media (max-width: 640px) {
   .program-hero-desc {
     font-size: 13.5px;
-    line-height: 1.6;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+}
+
+.program-hero-opportunity {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #111111;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 640px) {
+  .program-hero-opportunity {
+    font-size: 13.5px;
+    line-height: 1.4;
     margin-bottom: 20px;
   }
 }

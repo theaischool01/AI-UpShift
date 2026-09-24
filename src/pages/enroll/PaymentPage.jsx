@@ -100,7 +100,7 @@ export default function PaymentPage() {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency || 'INR',
-        name: 'UpShift | By The AI School',
+        name: 'UpShift | By The AI SCHOOL',
         description: 'UpShift Complete Applied AI Program (All 6 Tracks Included)',
         image: '/assets/mascot/mascot_avatar.jpg',
         order_id: order.id,
@@ -232,7 +232,7 @@ export default function PaymentPage() {
               <img src="/assets/mascot/mascot_avatar.jpg" alt="UpShift Mascot" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '7px' }} />
             </div>
             <div className="enroll-brand-text">
-              <span className="enroll-brand-school">THE AI SCHOOL</span>
+              <span className="enroll-brand-school">The AI SCHOOL</span>
               <span className="enroll-brand-divider">/</span>
               <UpShiftWordmark theme="light" className="enroll-brand-name" />
             </div>
@@ -421,7 +421,7 @@ export default function PaymentPage() {
 
       {/* Minimal Footer */}
       <footer style={{ padding: '24px', borderTop: '1px solid #E5E7EB', textAlign: 'center', fontSize: '12px', color: '#6B7280', fontFamily: 'var(--font-mono), monospace' }}>
-        <p>© {new Date().getFullYear()} THE AI SCHOOL · UPSHIFT APPLIED AI PROGRAM · ALL RIGHTS RESERVED</p>
+        <p>© {new Date().getFullYear()} The AI SCHOOL · UPSHIFT APPLIED AI PROGRAM · ALL RIGHTS RESERVED</p>
       </footer>
     </div>
   );

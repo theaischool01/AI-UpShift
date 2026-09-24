@@ -838,7 +838,7 @@ export default function UpShiftRegistrationModal({
                     <option value="Friend / Referral">Friend / Referral</option>
                     <option value="College / University">College / University</option>
                     <option value="Event / Workshop">Event / Workshop</option>
-                    <option value="The AI School">The AI School</option>
+                    <option value="The AI SCHOOL">The AI SCHOOL</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
