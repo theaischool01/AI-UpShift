@@ -100,41 +100,33 @@ export default function Navbar({ onOpenRegistration }) {
         className={`nav-floating ${isScrolled ? 'nav-scrolled' : ''} ${isHero ? 'navbar--hero' : ''}`}
         aria-label="Main Navigation"
       >
-        {/* LEFT: Brand Lockup (THE AI SCHOOL | UpShift) */}
+        {/* LEFT: Brand Lockup inside Red Highlighted Pill */}
         <div 
           onClick={() => handleNavigate('hero')}
-          className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 select-none group min-w-0"
-          style={{ textDecoration: 'none' }}
+          className="nav-brand-pill"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleNavigate('hero'); }}
+          aria-label="UpShift Home"
         >
-          <div 
-            style={{
-              width: '26px',
-              height: '26px',
-              borderRadius: '7px',
-              overflow: 'hidden',
-              border: isHero ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(0,0,0,0.15)',
-              backgroundColor: '#111111',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1px',
-              flexShrink: 0
-            }}
-          >
+          {/* Mascot avatar inside dedicated circular badge */}
+          <div className="nav-brand-avatar">
             <img 
               src="/assets/mascot/mascot_avatar.jpg" 
-              alt="Upshift Mascot" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px' }}
+              alt="UpShift Mascot" 
+              className="nav-brand-avatar-img"
             />
           </div>
-          <div className="flex items-center gap-1 sm:gap-1.5 leading-none whitespace-nowrap">
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '11px', fontWeight: '800', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
-              <span style={{ color: isHero ? '#FFFFFF' : '#111111' }}>THE </span>
-              <span style={{ color: '#E31B23' }}>AI SCHOOL</span>
+
+          {/* Unified Branding: THE AI SCHOOL | UpShift */}
+          <div className="nav-brand-text">
+            <span className="nav-brand-school">
+              <span style={{ color: '#111111' }}>THE </span>
+              <span style={{ color: '#FFFFFF' }}>AI SCHOOL</span>
             </span>
-            <span style={{ color: isHero ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: '11px', fontWeight: '300' }}>|</span>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '12.5px', fontWeight: '800', letterSpacing: '-0.01em' }}>
-              <UpShiftWordmark theme={isHero ? 'dark' : 'light'} />
+            <span className="nav-brand-separator">|</span>
+            <span className="nav-brand-name">
+              <UpShiftWordmark upColor="#111111" shiftColor="#FFFFFF" />
             </span>
           </div>
         </div>

@@ -1,17 +1,36 @@
-import React, { useState } from 'react';
-import { X, CheckCircle2, Sparkles, Send, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function MockApplicationModal({ isOpen, onClose, opportunity, opportunityType = 'local' }) {
+export default function MockApplicationModal({ 
+  isOpen, 
+  onClose, 
+  opportunity, 
+  opportunityType = 'local',
+  initialPortfolioUrl = '' 
+}) {
   const { user, profile } = useAuth();
 
-  const [fullName, setFullName] = useState(profile?.full_name || user?.user_metadata?.full_name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
   const [introduction, setIntroduction] = useState('');
   const [whyFit, setWhyFit] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync pre-filled user info and initial URLs on modal open
+  useEffect(() => {
+    if (isOpen) {
+      setFullName(profile?.full_name || user?.user_metadata?.full_name || '');
+      setEmail(user?.email || '');
+      if (initialPortfolioUrl) {
+        setPortfolioUrl(initialPortfolioUrl);
+      }
+      setIsSubmitted(false);
+      setIsSubmitting(false);
+    }
+  }, [isOpen, profile, user, initialPortfolioUrl]);
 
   if (!isOpen || !opportunity) return null;
 
@@ -36,51 +55,26 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{
-        backgroundColor: 'rgba(8, 12, 20, 0.55)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-        animation: 'fadeIn 0.18s ease-out'
-      }}
+      className="learner-modal-overlay"
       role="dialog" 
       aria-modal="true"
       onClick={handleClose}
     >
       <div 
-        className="bg-white text-[#111827] overflow-hidden flex flex-col max-h-[92vh] w-full"
-        style={{
-          maxWidth: '580px',
-          borderRadius: '20px',
-          border: '1px solid #E5E7EB',
-          boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.04)',
-        }}
+        className="learner-modal-container"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div 
-          className="p-6 pb-5 flex items-start justify-between gap-4 bg-[#FFFFFF]"
-          style={{ borderBottom: '1px solid #F1F3F5' }}
-        >
+        <div className="learner-modal-header">
           <div className="min-w-0 flex-1">
-            <div 
-              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold tracking-wider uppercase mb-2"
-              style={{
-                backgroundColor: '#FFF1F1',
-                color: '#E31B23',
-                border: '1px solid #FEE2E2'
-              }}
-            >
+            <div className="learner-modal-badge">
               <Sparkles size={11} style={{ color: '#E31B23' }} />
-              <span>{opportunityType === 'startup' ? 'Startup Opportunity' : 'Local Business Opportunity'}</span>
+              <span>{opportunityType === 'startup' ? 'Startup Business Opportunity' : 'Local Business Opportunity'}</span>
             </div>
-            <h3 
-              className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight leading-tight m-0"
-              style={{ fontFamily: 'var(--font-heading, -apple-system, BlinkMacSystemFont, sans-serif)' }}
-            >
+            <h3 className="learner-modal-title">
               Apply to {title}
             </h3>
-            <p className="text-xs sm:text-sm text-[#6B7280] m-0 mt-1 truncate">
+            <p className="learner-modal-subtitle truncate">
               {roleTitle}
             </p>
           </div>
@@ -88,7 +82,7 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
           <button
             type="button"
             onClick={handleClose}
-            className="w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-[#111827] border border-gray-200 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+            className="learner-modal-close-btn"
             aria-label="Close modal"
           >
             <X size={16} />
@@ -96,7 +90,7 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
         </div>
 
         {/* Content Body */}
-        <div className="p-6 overflow-y-auto flex-1 bg-white">
+        <div className="learner-modal-body">
           {isSubmitted ? (
             <div className="text-center py-6 space-y-4">
               <div 
@@ -139,7 +133,7 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
               >
                 <div className="flex justify-between">
                   <span className="text-[#6B7280] font-mono uppercase text-[10.5px]">Applicant</span>
-                  <span className="font-semibold text-[#111827]">{fullName}</span>
+                  <span className="font-semibold text-[#111827]">{fullName || 'Learner'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#6B7280] font-mono uppercase text-[10.5px]">Email</span>
@@ -168,11 +162,11 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit}>
               {/* Full Name */}
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-[#374151] mb-1.5 uppercase tracking-wider">
-                  FULL NAME <span className="text-[#E31B23]">*</span>
+              <div className="learner-form-group">
+                <label className="learner-form-label">
+                  <span>FULL NAME</span> <span className="learner-form-required">*</span>
                 </label>
                 <input
                   type="text"
@@ -180,31 +174,29 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Rahul Sharma"
-                  className="w-full px-4 rounded-xl text-xs sm:text-sm text-[#111827] bg-[#FAFAFA] border border-[#D9DEE6] focus:bg-white focus:outline-none focus:border-[#E31B23] transition-all"
-                  style={{ height: '48px' }}
+                  className="learner-form-input"
                 />
               </div>
 
               {/* Email */}
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-[#374151] mb-1.5 uppercase tracking-wider">
-                  EMAIL ADDRESS <span className="text-[#E31B23]">*</span>
+              <div className="learner-form-group">
+                <label className="learner-form-label">
+                  <span>EMAIL ADDRESS</span> <span className="learner-form-required">*</span>
                 </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. rahul@example.com"
-                  className="w-full px-4 rounded-xl text-xs sm:text-sm text-[#111827] bg-[#FAFAFA] border border-[#D9DEE6] focus:bg-white focus:outline-none focus:border-[#E31B23] transition-all"
-                  style={{ height: '48px' }}
+                  placeholder="you@example.com"
+                  className="learner-form-input"
                 />
               </div>
 
               {/* Portfolio / Work URL */}
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-[#374151] mb-1.5 uppercase tracking-wider">
-                  PORTFOLIO / WORK URL <span className="text-[#E31B23]">*</span>
+              <div className="learner-form-group">
+                <label className="learner-form-label">
+                  <span>PORTFOLIO / WORK URL</span> <span className="learner-form-required">*</span>
                 </label>
                 <input
                   type="url"
@@ -212,57 +204,53 @@ export default function MockApplicationModal({ isOpen, onClose, opportunity, opp
                   value={portfolioUrl}
                   onChange={(e) => setPortfolioUrl(e.target.value)}
                   placeholder="https://github.com/... or https://behance.net/..."
-                  className="w-full px-4 rounded-xl text-xs sm:text-sm text-[#111827] bg-[#FAFAFA] border border-[#D9DEE6] focus:bg-white focus:outline-none focus:border-[#E31B23] transition-all"
-                  style={{ height: '48px' }}
+                  className="learner-form-input"
                 />
               </div>
 
               {/* Short Introduction */}
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-[#374151] mb-1.5 uppercase tracking-wider">
-                  SHORT INTRODUCTION
+              <div className="learner-form-group">
+                <label className="learner-form-label">
+                  <span>SHORT INTRODUCTION</span>
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={introduction}
                   onChange={(e) => setIntroduction(e.target.value)}
-                  placeholder="Briefly introduce yourself and your UpShift track..."
-                  className="w-full p-3.5 rounded-xl text-xs sm:text-sm text-[#111827] bg-[#FAFAFA] border border-[#D9DEE6] focus:bg-white focus:outline-none focus:border-[#E31B23] transition-all resize-none"
+                  placeholder="Briefly introduce yourself and your relevant experience..."
+                  className="learner-form-textarea"
                 />
               </div>
 
               {/* Why are you a good fit? */}
-              <div>
-                <label className="block text-[11px] font-mono font-bold text-[#374151] mb-1.5 uppercase tracking-wider">
-                  WHY ARE YOU A GOOD FIT? <span className="text-[#E31B23]">*</span>
+              <div className="learner-form-group">
+                <label className="learner-form-label">
+                  <span>WHY ARE YOU A GOOD FIT?</span> <span className="learner-form-required">*</span>
                 </label>
                 <textarea
                   rows={3}
                   required
                   value={whyFit}
                   onChange={(e) => setWhyFit(e.target.value)}
-                  placeholder="Highlight relevant tools, projects, or workflow skills matching this scope..."
-                  className="w-full p-3.5 rounded-xl text-xs sm:text-sm text-[#111827] bg-[#FAFAFA] border border-[#D9DEE6] focus:bg-white focus:outline-none focus:border-[#E31B23] transition-all resize-none"
+                  placeholder="Highlight the tools, projects, skills, or experience relevant to this opportunity..."
+                  className="learner-form-textarea"
                 />
               </div>
 
-              {/* Submit CTA */}
-              <div 
-                className="pt-3 flex items-center justify-end gap-3"
-                style={{ borderTop: '1px solid #F1F3F5' }}
-              >
+              {/* Footer CTA */}
+              <div className="learner-modal-footer mt-4">
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-5 py-2.5 rounded-xl border border-[#E5E7EB] text-xs font-semibold text-[#4B5563] bg-white hover:bg-gray-50 transition-colors cursor-pointer"
-                  style={{ height: '44px' }}
+                  className="learner-btn-secondary"
+                  style={{ height: '44px', padding: '0 18px' }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="learner-apply-button text-xs font-bold"
+                  className="learner-apply-button"
                   style={{
                     height: '44px',
                     padding: '0 22px',

@@ -200,7 +200,7 @@ export default function ExploringProgramsSection() {
 
       {/* Centered Framing System: Header + Framing Wrapper (Image + Left/Right Red Lines) + Dots */}
       <div className="relative z-20 flex flex-col items-center justify-center gap-3 sm:gap-4 max-w-full">
-        {/* Editorial Section Intro (Left-aligned to framing container) */}
+        {/* Editorial Section Intro (Centered) */}
         <div className="exploring-programs-header">
           <h2 className="exploring-programs-title">
             <span className="upshift-brand-inline"><span className="brand-up">Up</span><span className="brand-shift">Shift</span></span> <span style={{ color: '#E31B23' }}>PROGRAMS</span>

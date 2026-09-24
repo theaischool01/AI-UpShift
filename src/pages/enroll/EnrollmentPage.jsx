@@ -269,7 +269,8 @@ export default function EnrollmentPage() {
         programName: 'UpShift Complete Applied AI Program',
         price: 4999,
         gigId: selectedGig?.id || null,
-        gigTitle: selectedGig?.title || null
+        gigTitle: selectedGig?.title || null,
+        returnUrl: searchParams.get('redirect') || location.state?.from?.pathname || null
       };
 
       // 3. Persist session and route directly to /enroll/payment
@@ -299,7 +300,7 @@ export default function EnrollmentPage() {
           </Link>
 
           <Link to="/login" className="enroll-signin-link">
-            <span>Already registered?</span> <span className="enroll-signin-accent">SIGN IN →</span>
+            <span className="enroll-signin-prompt">Already registered?</span> <span className="enroll-signin-accent">SIGN IN →</span>
           </Link>
         </div>
       </header>

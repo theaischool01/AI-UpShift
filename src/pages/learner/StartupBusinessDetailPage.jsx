@@ -367,36 +367,39 @@ export default function StartupBusinessDetailPage() {
             <div className="learner-sidebar-divider" />
 
             {/* Showcase Your Work Form Fields */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-1.5">
+            <div className="learner-showcase-section">
+              <div className="learner-showcase-header">
                 <UploadCloud className="w-4 h-4 text-[#E31B23]" />
-                <span className="learner-sidebar-eyebrow mb-0">SHOWCASE YOUR WORK</span>
+                <span className="learner-showcase-title">SHOWCASE YOUR WORK</span>
               </div>
-              <p className="text-[11px] text-[#6B7280] m-0">
-                Share relevant code repos, live demos, or portfolio links with the founders:
+              <p className="learner-showcase-desc">
+                Share relevant project links or proof artifacts with the business.
               </p>
 
-              <div className="space-y-2 text-xs">
-                <input
-                  type="url"
-                  value={githubUrl}
-                  onChange={(e) => setGithubUrl(e.target.value)}
-                  placeholder="GitHub Repository / Code Link"
-                  className="w-full px-3 py-2 rounded-lg border border-[#D1D5DB] text-xs text-[#111827] bg-[#FAFAFA] focus:bg-white focus:outline-hidden focus:border-[#E31B23]"
-                />
+              <div className="learner-showcase-fields">
                 <input
                   type="url"
                   value={portfolioUrl}
                   onChange={(e) => setPortfolioUrl(e.target.value)}
-                  placeholder="Portfolio / Personal Website"
-                  className="w-full px-3 py-2 rounded-lg border border-[#D1D5DB] text-xs text-[#111827] bg-[#FAFAFA] focus:bg-white focus:outline-hidden focus:border-[#E31B23]"
+                  placeholder="Portfolio / GitHub / Behance"
+                  className="learner-showcase-input"
+                  aria-label="Portfolio / GitHub / Behance"
                 />
                 <input
                   type="url"
                   value={driveUrl}
                   onChange={(e) => setDriveUrl(e.target.value)}
-                  placeholder="Google Drive / Project Demo Video"
-                  className="w-full px-3 py-2 rounded-lg border border-[#D1D5DB] text-xs text-[#111827] bg-[#FAFAFA] focus:bg-white focus:outline-hidden focus:border-[#E31B23]"
+                  placeholder="Google Drive / Sample Work"
+                  className="learner-showcase-input"
+                  aria-label="Google Drive / Sample Work"
+                />
+                <input
+                  type="url"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  placeholder="Live Website / Demo Link"
+                  className="learner-showcase-input"
+                  aria-label="Live Website / Demo Link"
                 />
               </div>
             </div>
@@ -404,7 +407,7 @@ export default function StartupBusinessDetailPage() {
             <div className="learner-sidebar-divider" />
 
             {/* Apply CTA Button */}
-            <div className="learner-sidebar-cta-block pt-1">
+            <div className="learner-sidebar-cta-block">
               <button
                 type="button"
                 onClick={() => setIsApplyModalOpen(true)}
@@ -424,6 +427,7 @@ export default function StartupBusinessDetailPage() {
         onClose={() => setIsApplyModalOpen(false)}
         opportunity={startup}
         opportunityType="startup"
+        initialPortfolioUrl={portfolioUrl || driveUrl || websiteUrl}
       />
     </div>
   );

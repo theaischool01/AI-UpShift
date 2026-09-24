@@ -46,7 +46,7 @@
 
 /* Header */
 .enroll-header {
-  padding: 14px 24px;
+  padding: 12px 24px;
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -54,6 +54,7 @@
   position: sticky;
   top: 0;
   z-index: 40;
+  box-sizing: border-box;
 }
 
 .enroll-header-inner {
@@ -62,6 +63,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .enroll-brand-link {
@@ -70,11 +74,15 @@
   gap: 10px;
   text-decoration: none;
   cursor: pointer;
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 .enroll-brand-avatar {
   width: 30px;
   height: 30px;
+  min-width: 30px;
+  min-height: 30px;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #E5E7EB;
@@ -83,6 +91,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
 }
 
 .enroll-brand-text {
@@ -90,13 +99,14 @@
   align-items: center;
   gap: 6px;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .enroll-brand-school {
   font-family: var(--font-mono), monospace;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: #E31B23;
   text-transform: uppercase;
 }
@@ -122,19 +132,111 @@
   font-size: 13px;
   font-weight: 600;
   color: #4B5563;
-  transition: color 0.2s ease;
-  display: flex;
+  transition: all 0.15s ease;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .enroll-signin-link:hover {
   color: #111827;
 }
 
+.enroll-signin-prompt {
+  display: inline;
+}
+
 .enroll-signin-accent {
   color: #E31B23;
   font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Responsive Mobile Refinements for Header */
+@media (max-width: 640px) {
+  .enroll-header {
+    padding: 10px 14px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+  }
+
+  .enroll-header-inner {
+    gap: 8px;
+  }
+
+  .enroll-brand-link {
+    gap: 7px;
+  }
+
+  .enroll-brand-avatar {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 7px;
+  }
+
+  .enroll-brand-text {
+    gap: 4px;
+  }
+
+  .enroll-brand-school {
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+  }
+
+  .enroll-brand-divider {
+    font-size: 10px;
+    color: #E5E7EB;
+  }
+
+  .enroll-brand-name {
+    font-size: 13px;
+  }
+
+  /* Hide the "Already registered?" prompt on mobile so SIGN IN -> fits cleanly and never wraps */
+  .enroll-signin-prompt {
+    display: none !important;
+  }
+
+  .enroll-signin-link {
+    font-size: 12px;
+    padding: 6px 11px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  }
+
+  .enroll-signin-accent {
+    font-size: 11.5px;
+    font-weight: 800;
+  }
+}
+
+@media (max-width: 360px) {
+  .enroll-header {
+    padding: 10px 10px;
+  }
+
+  .enroll-brand-school {
+    font-size: 9px;
+  }
+
+  .enroll-brand-name {
+    font-size: 12.5px;
+  }
+
+  .enroll-signin-link {
+    padding: 5px 8px;
+  }
+
+  .enroll-signin-accent {
+    font-size: 11px;
+  }
 }
 
 /* Main Container - Compact Width */

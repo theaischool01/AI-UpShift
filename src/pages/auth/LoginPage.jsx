@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
@@ -14,6 +14,10 @@ export default function LoginPage() {
 
   const { user, role, loading: authLoading, fetchProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract return destination if passed from protected route or query parameter
+  const fromLocation = location.state?.from?.pathname || (new URLSearchParams(location.search)).get('redirect') || '';
 
   // Ensure body background is light #F9FAFB while on login page, then restore
   useEffect(() => {
@@ -24,16 +28,16 @@ export default function LoginPage() {
     };
   }, []);
 
-  // If already authenticated and role is resolved, immediately redirect to appropriate dashboard
+  // If already authenticated and role is resolved, immediately redirect to appropriate destination or dashboard
   useEffect(() => {
     if (!authLoading && user && role) {
       if (role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
+        navigate(fromLocation || '/admin/dashboard', { replace: true });
       } else if (role === 'learner') {
-        navigate('/learner/dashboard', { replace: true });
+        navigate(fromLocation || '/learner/dashboard', { replace: true });
       }
     }
-  }, [user, role, authLoading, navigate]);
+  }, [user, role, authLoading, navigate, fromLocation]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,9 +89,9 @@ export default function LoginPage() {
       }
 
       if (userProfile.role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
+        navigate(fromLocation || '/admin/dashboard', { replace: true });
       } else if (userProfile.role === 'learner') {
-        navigate('/learner/dashboard', { replace: true });
+        navigate(fromLocation || '/learner/dashboard', { replace: true });
       } else {
         await supabase.auth.signOut();
         setErrorMessage('Your account is not configured correctly. Please contact an administrator.');
@@ -318,11 +322,43 @@ export default function LoginPage() {
           </div>
         </form>
 
-        {/* Security Note Footer */}
-        <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #E5E7EB', textAlign: 'center' }}>
-          <p style={{ margin: 0, fontSize: '12px', color: '#6B7280', lineHeight: 1.5 }}>
-            Accounts are provisioned by program administrators.
-          </p>
+        {/* New to UpShift Self-Registration CTA */}
+        <div style={{ marginTop: '24px', paddingTop: '18px', borderTop: '1px solid #E5E7EB', textAlign: 'center' }}>
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '8px', 
+              flexWrap: 'wrap',
+              fontSize: '13px'
+            }}
+          >
+            <span style={{ fontWeight: '700', color: '#111827', letterSpacing: '-0.01em' }}>
+              NEW TO UpShift?
+            </span>
+            <Link
+              to={fromLocation ? `/enroll?redirect=${encodeURIComponent(fromLocation)}` : '/enroll'}
+              state={location.state?.from ? { from: location.state.from } : undefined}
+              style={{
+                color: '#E31B23',
+                fontWeight: '700',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                transition: 'color 0.15s, transform 0.15s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#C9141B';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#E31B23';
+              }}
+            >
+              <span>GET STARTED →</span>
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -124,22 +124,22 @@ export default function LearnerDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Top Welcome Card */}
-      <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 sm:p-8 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-[#E5E7EB] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-[#E31B23] text-xs font-semibold mb-2">
               <Sparkles className="w-3.5 h-3.5" />
               <span>UpShift Applied Opportunities</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight m-0">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-[#111827] tracking-tight m-0">
               Commercial Opportunity Board
             </h1>
-            <p className="text-xs sm:text-sm text-[#6B7280] mt-1 max-w-2xl">
+            <p className="text-xs sm:text-sm text-[#6B7280] mt-1 max-w-2xl leading-relaxed">
               Explore and apply for vetted freelance, contract, and commercial briefs across UpShift specialization modules.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] self-start md:self-auto text-xs font-mono text-[#4B5563]">
+          <div className="flex items-center justify-center sm:justify-start gap-2 px-3.5 py-2 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB] w-full sm:w-auto text-xs font-mono text-[#4B5563]">
             <Briefcase className="w-4 h-4 text-[#E31B23]" />
             <span><strong>{totalGigs}</strong> Active {totalGigs === 1 ? 'Brief' : 'Briefs'}</span>
           </div>

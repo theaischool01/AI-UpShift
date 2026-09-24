@@ -258,9 +258,9 @@ export default function OpportunityFilters({
   return (
     <div ref={containerRef} className="w-full">
       {/* Search, Track Module Filter + Marketplace Sort */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 w-full">
         {/* Search Input */}
-        <div className="learner-search-wrap flex-1" style={{ position: 'relative', minWidth: '240px' }}>
+        <div className="learner-search-wrap flex-1" style={{ position: 'relative' }}>
           <Search className="learner-search-icon" />
           <input
             type="text"
@@ -295,9 +295,9 @@ export default function OpportunityFilters({
         </div>
 
         {/* Controls Group: Track Module Filter + Marketplace Sort */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           {/* Module Filter */}
-          <div className="flex-1 sm:flex-none sm:w-[185px]">
+          <div className="w-full sm:w-[185px]">
             <CustomDropdown
               id="track"
               value={activeSelectedTrack}
@@ -315,7 +315,7 @@ export default function OpportunityFilters({
           </div>
 
           {/* Marketplace Sort Selector */}
-          <div className="flex-1 sm:flex-none sm:w-[175px]">
+          <div className="w-full sm:w-[175px]">
             <CustomDropdown
               id="sort"
               value={sortBy}

@@ -8,7 +8,7 @@ export default function OpportunityCard({ gig }) {
   const track = gig.track;
 
   return (
-    <div className="learner-card group flex flex-col justify-between p-6 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">
+    <div className="learner-card group flex flex-col justify-between p-4 sm:p-6 bg-white border border-[#E5E7EB] rounded-xl sm:rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">
       <div>
         {/* Top: Track Code & Name Badge + Local Biz & Featured Indicators */}
         <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">

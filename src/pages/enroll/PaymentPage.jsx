@@ -207,7 +207,7 @@ export default function PaymentPage() {
           {/* Action CTA */}
           <div>
             <Link
-              to="/login"
+              to={learnerData.returnUrl ? `/login?redirect=${encodeURIComponent(learnerData.returnUrl)}` : '/login'}
               className="enroll-submit-btn"
               style={{ textDecoration: 'none' }}
             >

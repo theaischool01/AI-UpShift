@@ -19,14 +19,14 @@ export default function MockOpportunityCard({ item, type = 'local' }) {
   const avatarLetter = item.avatar || title.charAt(0).toUpperCase();
 
   return (
-    <div className="learner-card group flex flex-col justify-between p-6 bg-white border border-[#E5E7EB] rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">
+    <div className="learner-card group flex flex-col justify-between p-4 sm:p-6 bg-white border border-[#E5E7EB] rounded-xl sm:rounded-2xl shadow-xs hover:shadow-md transition-all duration-200">
       <div>
         {/* Top Header: Avatar + Business Name / Location + Category Badge */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-start justify-between gap-2.5 mb-3.5">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             {/* Elegant Initials Avatar */}
             <div 
-              className="w-11 h-11 rounded-xl flex items-center justify-center text-base font-black flex-shrink-0 shadow-2xs select-none border"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-sm sm:text-base font-black flex-shrink-0 shadow-2xs select-none border"
               style={{
                 backgroundColor: item.avatarBg || (isStartup ? '#EFF6FF' : '#FEF2F2'),
                 color: item.avatarColor || (isStartup ? '#2563EB' : '#DC2626'),
@@ -38,7 +38,7 @@ export default function MockOpportunityCard({ item, type = 'local' }) {
 
             {/* Business / Startup Identity */}
             <div className="min-w-0">
-              <h4 className="text-sm font-bold text-[#111827] truncate leading-tight group-hover:text-[#E31B23] transition-colors">
+              <h4 className="text-[13.5px] sm:text-sm font-bold text-[#111827] truncate leading-tight group-hover:text-[#E31B23] transition-colors">
                 <Link to={detailUrl}>
                   {title}
                 </Link>
