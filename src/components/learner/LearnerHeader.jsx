@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import UpShiftWordmark from '../common/UpShiftWordmark';
 
 export default function LearnerHeader() {
-  const { signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,6 +24,10 @@ export default function LearnerHeader() {
   const isGigsActive = pathname === '/learner/dashboard' || pathname.startsWith('/learner/gigs') || pathname === '/learner';
   const isLocalActive = pathname.startsWith('/local-businesses') || pathname.startsWith('/learner/local-businesses');
   const isStartupActive = pathname.startsWith('/startup-businesses') || pathname.startsWith('/learner/startup-businesses');
+
+  const fullName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Saheel Yadav';
+  const collegeName = profile?.college || user?.user_metadata?.college || 'DRK Institute Of Science And Technology';
+  const avatarLetter = (fullName.charAt(0) || 'S').toUpperCase();
 
   const navItems = [
     {
@@ -51,51 +55,83 @@ export default function LearnerHeader() {
 
   return (
     <header className="learner-header" aria-label="Learner Opportunity Workspace Header">
-      {/* 1. TOP ROW ON MOBILE / LEFT & RIGHT ON DESKTOP */}
-      <div className="learner-header-top-row">
-        {/* LEFT: UpShift Brand & Space Identifier */}
+      <div className="learner-header-inner">
+        {/* 1. LEFT: UpShift Brand Card */}
         <div className="learner-header-left">
           <Link 
             to="/learner/dashboard" 
-            className="flex items-center gap-2 sm:gap-3 no-underline select-none text-inherit hover:no-underline min-w-0"
+            className="flex items-center gap-2.5 px-2.5 py-1 rounded-lg border border-[#E5E7EB] bg-white shadow-2xs hover:border-gray-300 transition-all no-underline select-none text-inherit min-w-0"
           >
             {/* UpShift Mascot Avatar */}
             <div 
-              className="rounded-[9px] overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 shadow-2xs flex-shrink-0 select-none p-[1.5px]"
-              style={{ width: '32px', height: '32px', minWidth: '32px', minHeight: '32px' }}
+              className="rounded-[6px] overflow-hidden flex items-center justify-center bg-[#111111] border border-black/10 flex-shrink-0 select-none p-[1px]"
+              style={{ width: '28px', height: '28px', minWidth: '28px', minHeight: '28px' }}
             >
               <img 
                 src="/assets/mascot/mascot_avatar.jpg" 
                 alt="UpShift Mascot" 
-                className="w-full h-full object-cover rounded-[7px] select-none"
+                className="w-full h-full object-cover rounded-[5px] select-none"
               />
             </div>
-            <div className="flex flex-col justify-center min-w-0">
+            <div className="flex flex-col justify-center min-w-0 pr-1">
               <span 
-                className="text-[16px] sm:text-[18px] font-black tracking-[-0.03em] leading-none text-[#111111]"
+                className="text-[15px] sm:text-[16px] font-black tracking-[-0.03em] leading-none text-[#111111]"
                 style={{ fontWeight: 900 }}
               >
                 <UpShiftWordmark theme="light" style={{ fontWeight: 900 }} />
               </span>
-              <span className="text-[8.5px] sm:text-[9.5px] font-mono font-bold tracking-[0.12em] text-[#6B7280] uppercase mt-0.5 leading-none">
+              <span className="text-[8px] sm:text-[8.5px] font-mono font-bold tracking-[0.12em] text-[#6B7280] uppercase mt-0.5 leading-none">
                 OPPORTUNITIES
               </span>
             </div>
           </Link>
         </div>
 
-        {/* RIGHT: Home + Logout */}
+        {/* 2. CENTER: Segmented Opportunity Navigation Pill */}
+        <div className="learner-header-center">
+          <nav className="learner-header-nav" aria-label="Opportunity Workspace Navigation">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  to={item.to}
+                  className={`learner-header-tab ${item.isActive ? 'is-active' : ''}`}
+                >
+                  <Icon className="learner-header-tab-icon" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* 3. RIGHT: User Pill + Globe + Logout */}
         <div className="learner-header-right">
-          {/* Home Button */}
-          <Link
-            to="/"
+          {/* User Profile Pill */}
+          <div className="learner-user-pill hidden lg:flex items-center gap-2.5 pl-1.5 pr-3.5 py-1 rounded-full bg-[#F9FAFB] border border-[#E5E7EB] shadow-2xs select-none">
+            <div className="w-7 h-7 rounded-full bg-[#111827] text-white flex items-center justify-center text-xs font-black flex-shrink-0">
+              {avatarLetter}
+            </div>
+            <div className="flex flex-col text-left justify-center min-w-0">
+              <span className="text-[12.5px] font-bold text-[#111827] leading-tight truncate">
+                {fullName}
+              </span>
+              <span className="text-[9.5px] font-medium text-[#6B7280] leading-tight truncate mt-0.5 max-w-[210px]">
+                {collegeName}
+              </span>
+            </div>
+          </div>
+
+          {/* Globe Button */}
+          <button
+            type="button"
             className="learner-header-action-btn"
-            title="Home"
-            aria-label="Home"
+            title="Language / Region"
+            aria-label="Language / Region"
           >
-            <Globe className="w-4 h-4 text-[#4B5563]" />
-            <span className="hidden sm:inline text-xs font-semibold text-[#374151]">Home</span>
-          </Link>
+            <Globe className="w-4 h-4 text-[#374151]" />
+          </button>
 
           {/* Logout Button */}
           <button
@@ -104,29 +140,9 @@ export default function LearnerHeader() {
             title="Logout"
             aria-label="Logout"
           >
-            <LogOut className="w-4 h-4 text-[#4B5563]" />
-            <span className="hidden sm:inline text-xs font-semibold text-[#374151]">Logout</span>
+            <LogOut className="w-4 h-4 text-[#374151]" />
           </button>
         </div>
-      </div>
-
-      {/* 2. CENTER ON DESKTOP / ROW 2 ON MOBILE: Segmented Opportunity Navigation Pill */}
-      <div className="learner-header-center">
-        <nav className="learner-header-nav" aria-label="Opportunity Workspace Navigation">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.id}
-                to={item.to}
-                className={`learner-header-tab ${item.isActive ? 'is-active' : ''}`}
-              >
-                <Icon className="learner-header-tab-icon" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
       </div>
     </header>
   );

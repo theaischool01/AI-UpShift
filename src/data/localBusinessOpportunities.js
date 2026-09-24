@@ -1,668 +1,540 @@
 export const localBusinessOpportunities = [
+  // =========================================================================
+  // 1. RYTHUVET — M1: Telugu Content & Reels
+  // =========================================================================
   {
-    id: 'loc-001',
-    businessName: 'Sujata Tailors',
-    avatar: 'S',
-    avatarBg: '#FEF2F2',
-    avatarColor: '#DC2626',
-    location: 'Hyderabad',
-    ownerName: 'Sujata Reddy',
-    ownerRole: 'Founder & Master Stylist',
-    category: 'Digital Presence',
-    tags: ['Digital Presence', 'Local Business', 'Workflow Automation'],
-    opportunityTitle: 'Instagram & WhatsApp Business Setup',
-    shortDescription: 'Help modernize their customer acquisition workflow with a WhatsApp catalog and structured Instagram presence.',
-    about: 'Sujata Tailors has been a beloved bridal and festive tailoring boutique in Banjara Hills, Hyderabad for over 14 years. Known for handcrafted embroidery and custom designer blouses, the boutique serves high-end clientele across the city.',
-    currentDigitalPresence: 'Currently operating through personal WhatsApp chats and word-of-mouth with no central digital catalog or automated appointment system.',
-    founderBio: 'Sujata Reddy is an experienced couturier who started the boutique in 2010. She aims to streamline appointments and showcase festive collections online.',
+    id: 'rythuvet-m1',
+    businessId: 'rythuvet',
+    code: 'M1',
+    businessName: 'RythuVet',
+    logo: '/assets/rythvet.jpeg',
+    founder: 'Dr. Srinivas Reddy',
+    ownerName: 'Dr. Srinivas Reddy',
+    ownerRole: 'Founder & Chief Veterinary Officer',
+    founderBio: 'Dr. Srinivas Reddy is a distinguished veterinarian and livestock development specialist dedicated to empowering Indian farmers through actionable livestock healthcare, nutrition, and sustainable breeding knowledge.',
+    website: 'https://rythuvet.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Content & Digital Growth',
+    tags: ['Telugu Content', 'Farmer Education', 'Reels', 'Livestock'],
+    opportunityTitle: 'Telugu Content & Reels',
+    goal: 'Farmer education and digital content growth',
+    shortDescription: 'Help RythuVet create clear, practical Telugu content and short-form reels around livestock care, farmer education, and field knowledge.',
+    about: 'RythuVet is an innovative livestock and veterinary platform dedicated to farmer development and sustainable livestock health. Focus areas include Ram Lamb Fattening, Sheep & Goat management, and Dairy & Cattle development through farmer awareness seminars, Telugu-first livestock education, and field demonstrations in collaboration with FPOs and farmer groups.',
+    currentDigitalPresence: 'Active on ground with veterinary seminars and training programs. Building a digital-first Telugu content engine for farmers.',
     founderSocials: {
-      email: 'sujata.tailors@example.com',
-      instagram: 'https://instagram.com/sujatatailors_hyd',
-      whatsapp: '+91 98490 12345',
-      linkedin: 'https://linkedin.com/in/sujata-reddy-tailors'
+      website: 'https://rythuvet.com',
+      email: 'contact@rythuvet.com',
+      whatsapp: '+91 94401 23456'
     },
     scope: [
-      'Set up and verify a dedicated WhatsApp Business account with automated greeting, quick replies, and catalog listing.',
-      'Design an initial 12-post aesthetic Instagram grid showcasing bridal designs and fabric selections.',
-      'Create a digital Lookbook / PDF catalog for bridal blouse designs and pricing.',
-      'Integrate a simple Google Form / Calendly link for measuring and fitting appointment bookings.',
-      'Optimize Google Business Profile with verified store photos and location coordinates.'
+      'Produce clear, engaging Telugu educational scripts from approved RythuVet veterinary articles.',
+      'Design and edit high-impact short-form Reels and Shorts explaining sheep, goat, and cattle care.',
+      'Create simple, illustrative visual content concepts and carousels for WhatsApp and Instagram.',
+      'Structure weekly thematic content calendars covering seasonal care, deworming, and feed optimization.',
+      'Maintain strict editorial compliance: educational content only, with no medical diagnosis.'
     ],
     requirements: [
-      'Basic knowledge of Canva / Figma for social media assets',
-      'Familiarity with WhatsApp Business tools and product catalogs',
-      'Understanding of Instagram reels, grid planning, and local hashtag discovery',
-      'Strong communication skills in Telugu or English'
+      'Telugu content writing and translation',
+      'Social media content creation',
+      'Short-form video concepts & Reels editing',
+      'Basic graphic/video editing (Canva / Premiere / CapCut)',
+      'Strong communication skills',
+      'Interest in agriculture & livestock management'
     ],
-    earnings: '₹8,000 – ₹15,000',
-    minEarning: 8000,
-    maxEarning: 15000,
-    duration: '2–3 weeks',
-    workMode: 'Hybrid (Hyderabad)',
-    projectType: 'Project-based',
-    deliverables: [
-      'Configured WhatsApp Business with 20+ catalog items',
-      '12 published high-resolution Instagram posts & 3 Reel templates',
-      'Optimized Google Business Profile',
-      'Digital Lookbook PDF ready for client sharing'
-    ]
-  },
-  {
-    id: 'loc-002',
-    businessName: "Reddy's Fresh Mart",
-    avatar: 'R',
-    avatarBg: '#ECFDF5',
-    avatarColor: '#059669',
-    location: 'Karimnagar',
-    ownerName: 'Venkata Reddy',
-    ownerRole: 'Proprietor',
-    category: 'Local SEO',
-    tags: ['Local SEO', 'WhatsApp Workflow', 'Retail'],
-    opportunityTitle: 'Hyperlocal Delivery Ordering & Google Profile',
-    shortDescription: 'Set up an automated WhatsApp ordering system and optimize Google Maps profile for a premium organic grocery store.',
-    about: "Reddy's Fresh Mart is a neighborhood organic grocery and farm-fresh produce store in Karimnagar, sourcing directly from local agricultural collectives.",
-    currentDigitalPresence: 'Relies on paper ledgers and manual phone orders. Needs a streamlined WhatsApp ordering flow for regular subscribers.',
-    founderBio: 'Venkata Reddy is an agricultural entrepreneur aiming to bridge rural farmers directly with city households.',
-    founderSocials: {
-      email: 'reddysfresh@example.com',
-      instagram: 'https://instagram.com/reddysfreshmart',
-      whatsapp: '+91 94401 56789',
-      linkedin: 'https://linkedin.com/in/venkatareddy-fresh'
-    },
-    scope: [
-      'Configure WhatsApp catalog with recurring monthly vegetable & grocery bundles.',
-      'Create standard order receipt templates and payment QR integration.',
-      'Set up local Google My Business listing with daily fresh stock updates.',
-      'Design printed flyers with QR code for in-store customers to order via WhatsApp.'
-    ],
-    requirements: [
-      'Familiarity with WhatsApp Business tools',
-      'Google Maps SEO best practices',
-      'Simple graphic design for store QR standees'
-    ],
-    earnings: '₹10,000 – ₹16,000',
-    minEarning: 10000,
-    maxEarning: 16000,
-    duration: '3 weeks',
-    workMode: 'Hybrid (Karimnagar)',
-    projectType: 'Project-based',
-    deliverables: [
-      'WhatsApp catalog setup with 40+ products',
-      'Automated message responder for orders and delivery timings',
-      'Google Maps verification and 10 review outreach templates'
-    ]
-  },
-  {
-    id: 'loc-003',
-    businessName: 'Sri Lakshmi Sweets',
-    avatar: 'S',
-    avatarBg: '#FFFBEB',
-    avatarColor: '#D97706',
-    location: 'Vijayawada',
-    ownerName: 'P. Krishna Murthy',
-    ownerRole: 'Managing Partner',
-    category: 'Branding & Socials',
-    tags: ['Festive Marketing', 'Branding', 'Content Creation'],
-    opportunityTitle: 'Festive Season Campaign & Online Menu',
-    shortDescription: 'Build an eye-catching festive gifting digital catalog and run targeted local social promotions for upcoming wedding seasons.',
-    about: 'Sri Lakshmi Sweets is a 30-year-old traditional Andhra sweets and savories landmark on Governorpet, Vijayawada, famous for Pootharekulu and Kaja.',
-    currentDigitalPresence: 'Active foot traffic but zero structured presence for bulk corporate gifting and wedding orders.',
-    founderBio: 'Second-generation sweet maker seeking to expand corporate sweet box bookings across coastal Andhra.',
-    founderSocials: {
-      email: 'srilakshmisweets.vja@example.com',
-      instagram: 'https://instagram.com/srilakshmisweets_vja',
-      whatsapp: '+91 86624 33445',
-      linkedin: 'https://linkedin.com/in/krishnamurthy-sweets'
-    },
-    scope: [
-      'Photograph core sweets and design a high-end corporate gift hamper PDF.',
-      'Create 15 Instagram reels highlighting the traditional preparation and purity of ghee sweets.',
-      'Set up a WhatsApp automated inquiry intake for wedding sweet bulk orders.'
-    ],
-    requirements: [
-      'Smartphone photography / videography skills',
-      'Canva / CapCut editing capability',
-      'Understanding of festive marketing in Andhra Pradesh'
+    skills: [
+      'Telugu Content Writing',
+      'Social Media Content',
+      'Short-Form Video Concepts',
+      'Basic Graphic/Video Editing',
+      'Communication',
+      'Livestock & Agri Interest'
     ],
     earnings: '₹12,000 – ₹18,000',
     minEarning: 12000,
     maxEarning: 18000,
     duration: '3–4 weeks',
-    workMode: 'On-site / Hybrid (Vijayawada)',
-    projectType: 'Campaign-based',
+    workMode: 'Remote (Telugu-first)',
+    projectType: 'Direct Commercial Brief',
     deliverables: [
-      'Festive digital catalog with custom pricing tiers',
-      '15 short-form reels and 20 static social creatives',
-      'WhatsApp bulk inquiry automated intake pipeline'
-    ]
+      'Telugu social media posts',
+      'Short educational reels',
+      'Farmer-friendly educational scripts',
+      'Livestock awareness content',
+      'Content ideas based on approved RythuVet knowledge',
+      'Simple visual content concepts',
+      'Weekly content calendar'
+    ],
+    outcome: 'Build a consistent farmer-focused digital content presence while making livestock knowledge easier to understand.'
   },
+
+  // =========================================================================
+  // 2. ESVY LIFE SCIENCES — M1: Pharma Product Catalogue & B2B Enquiry
+  // =========================================================================
   {
-    id: 'loc-004',
-    businessName: 'Vijaya Home Decor',
-    avatar: 'V',
-    avatarBg: '#EFF6FF',
-    avatarColor: '#2563EB',
-    location: 'Warangal',
-    ownerName: 'Vijaya Bhaskar',
-    ownerRole: 'Founder',
-    category: 'Website Improvement',
-    tags: ['Web Landing Page', 'Portfolio Site', 'Home Decor'],
-    opportunityTitle: 'Minimalist Portfolio Landing Page',
-    shortDescription: 'Create a clean, responsive single-page showcase for residential interior decor and custom woodwork projects.',
-    about: 'Vijaya Home Decor provides turnkey interior designs, modular kitchens, and custom woodwork for modern apartments and villas in Warangal and Hanamkonda.',
-    currentDigitalPresence: 'Photos scattered across Google Drive and phone galleries with no central portfolio to show prospective homeowners.',
-    founderBio: 'Vijaya Bhaskar has executed over 80 residential projects and wants a professional website to share with real estate partners.',
+    id: 'esvy-m1',
+    businessId: 'esvy',
+    code: 'M1',
+    businessName: 'ESVY Life Sciences',
+    logo: '/assets/esvy-logo.png',
+    founder: 'Prabhu Bezawada',
+    ownerName: 'Prabhu Bezawada',
+    ownerRole: 'Founder & Managing Director',
+    founderBio: 'Prabhu Bezawada founded ESVY Life Sciences in 2019 to deliver research-driven, WHO-cGMP compliant pharmaceuticals combining clinician trust, strict quality assurance, and accessible healthcare across India.',
+    website: 'https://myesvy.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Product & Sales Enablement',
+    tags: ['Product Catalogue', 'B2B Enquiry', 'Pharma Sales'],
+    opportunityTitle: 'Pharma Product Catalogue & B2B Enquiry',
+    goal: 'Improve product discovery and B2B enquiry capture.',
+    shortDescription: 'Create a structured digital product catalogue that allows distributors, retailers, and business prospects to discover ESVY products and submit structured enquiries.',
+    about: 'ESVY Life Sciences (Efficacy • Safety • Vitality) is a research-driven Indian pharmaceutical enterprise established in 2019, adhering to stringent WHO-cGMP manufacturing standards. Operating dedicated specialized divisions including Esvy Life (Gastroenterology) and Esvy Purple (Gynecology), the company is grounded in ethics, quality, clinician trust, and accessible healthcare.',
+    currentDigitalPresence: 'Supplies clinical formulations across pharmacy networks and medical institutions. Building a digital B2B discovery and distributor inquiry hub.',
     founderSocials: {
-      email: 'vijayahomedecor@example.com',
-      instagram: 'https://instagram.com/vijayahomedecor_wgl',
-      whatsapp: '+91 87024 78901',
-      linkedin: 'https://linkedin.com/in/vijayabhaskar-decor'
+      website: 'https://myesvy.com',
+      email: 'info@myesvy.com',
+      whatsapp: '+91 98495 11223'
     },
     scope: [
-      'Design a modern, mobile-first one-page portfolio website using Next.js / HTML / Tailwind / Webflow.',
-      'Organize past project photos into categories: Living Rooms, Modular Kitchens, Bedrooms, Pooja Units.',
-      'Add a lead capture form connected to email and WhatsApp alerts.',
-      'Configure SEO metadata for Warangal interior designer search queries.'
+      'Build a digital product catalog organized by product families: Esvy Life (Gastroenterology) and Esvy Purple (Gynecology).',
+      'Design clean specification sheets showcasing approved product names, therapeutic indications, dosage forms, and packaging.',
+      'Implement a structured B2B inquiry form capturing pharmacy details, distributor license type, and requested volume.',
+      'Ensure strict compliance with pharmaceutical presentation norms, strictly avoiding unapproved medical claims.'
     ],
     requirements: [
-      'Front-end web development (HTML/CSS/JS or React)',
-      'Eye for minimalist, modern interior design layouts',
-      'Basic knowledge of contact form handling'
+      'Frontend / UI design',
+      'Catalogue structuring & taxonomy',
+      'B2B form design & validation',
+      'Data organization & formatting',
+      'Basic web development'
     ],
-    earnings: '₹14,000 – ₹22,000',
-    minEarning: 14000,
-    maxEarning: 22000,
-    duration: '2–3 weeks',
-    workMode: 'Remote / Hybrid',
-    projectType: 'Project-based',
-    deliverables: [
-      'Deployed responsive single-page website on custom domain',
-      'Interactive image gallery with lightbox preview',
-      'Integrated lead capture form with instant notification'
-    ]
-  },
-  {
-    id: 'loc-005',
-    businessName: 'Kiran Mobile Hub',
-    avatar: 'K',
-    avatarBg: '#FDF2F8',
-    avatarColor: '#DB2777',
-    location: 'Visakhapatnam',
-    ownerName: 'Kiran Kumar',
-    ownerRole: 'Store Owner',
-    category: 'Customer Communication',
-    tags: ['Customer Support', 'Repair Tracker', 'WhatsApp'],
-    opportunityTitle: 'Repair Status Tracker & WhatsApp Workflow',
-    shortDescription: 'Build a lightweight repair status tracking portal and automated WhatsApp notifications for smartphone repairs.',
-    about: 'Kiran Mobile Hub is a bustling gadget repair and mobile accessories center in Dwaraka Nagar, Vizag, fixing over 30 phones daily.',
-    currentDigitalPresence: 'Manual phone calls to customers when devices are ready; customers repeatedly call asking for repair updates.',
-    founderBio: 'Kiran Kumar has 10 years experience in electronics repair and wants to eliminate phone tag with customers through automation.',
-    founderSocials: {
-      email: 'kiranmobilehub@example.com',
-      instagram: 'https://instagram.com/kiranmobilevizag',
-      whatsapp: '+91 89125 67890',
-      linkedin: 'https://linkedin.com/in/kirankumar-mobiles'
-    },
-    scope: [
-      'Create a simple web form where technicians input Job Sheet ID, Customer Name, Phone, and Repair Status (Received, Diagnostic, In Progress, Ready for Pickup).',
-      'Set up automated WhatsApp alert trigger when status changes to "Ready for Pickup".',
-      'Provide a simple customer status check page with Job Sheet Number search.'
+    skills: [
+      'Frontend / UI Design',
+      'Catalogue Structuring',
+      'B2B Form Design',
+      'Data Organization',
+      'Web Development'
     ],
-    requirements: [
-      'JavaScript / React / Web API integration',
-      'Understanding of WhatsApp messaging webhooks / service providers',
-      'Clean mobile UI development'
-    ],
-    earnings: '₹12,000 – ₹20,000',
-    minEarning: 12000,
-    maxEarning: 20000,
-    duration: '2–3 weeks',
-    workMode: 'Remote',
-    projectType: 'Contract',
-    deliverables: [
-      'Web-based technician status update portal',
-      'Customer self-service tracking lookup page',
-      'Automated SMS / WhatsApp ready-for-pickup trigger'
-    ]
-  },
-  {
-    id: 'loc-006',
-    businessName: 'Anitha Beauty Studio',
-    avatar: 'A',
-    avatarBg: '#FAF5FF',
-    avatarColor: '#9333EA',
-    location: 'Nizamabad',
-    ownerName: 'Anitha Rao',
-    ownerRole: 'Creative Director',
-    category: 'Digital Presence',
-    tags: ['Salon Booking', 'Instagram Grid', 'Local Marketing'],
-    opportunityTitle: 'Bridal Makeover Lookbook & Booking System',
-    shortDescription: 'Design an interactive bridal portfolio and seamless appointment scheduling flow for an upscale bridal studio.',
-    about: 'Anitha Beauty Studio specializes in bridal makeup, HD airbrushing, and pre-wedding skin regimens in Nizamabad.',
-    currentDigitalPresence: 'Unorganized photos on personal Instagram; manual phone booking that frequently double-books peak wedding dates.',
-    founderBio: 'Certified celebrity makeup artist who relocated from Hyderabad to bring luxury bridal artistry to Nizamabad.',
-    founderSocials: {
-      email: 'anitha.studio@example.com',
-      instagram: 'https://instagram.com/anithabeautystudio_nzb',
-      whatsapp: '+91 84622 45678',
-      linkedin: 'https://linkedin.com/in/anitharao-makeup'
-    },
-    scope: [
-      'Set up a clean appointment calendar with slot booking and deposit receipt instructions.',
-      'Rebrand Instagram profile with highlight covers, bio copy, and a curated 9-grid aesthetic.',
-      'Create a downloadable bridal package comparison sheet with package inclusions.'
-    ],
-    requirements: [
-      'Canva or Adobe Express design skills',
-      'Calendar widget embedding and form integration',
-      'Social media copywriting for beauty industry'
-    ],
-    earnings: '₹9,000 – ₹15,000',
-    minEarning: 9000,
-    maxEarning: 15000,
-    duration: '2 weeks',
-    workMode: 'Hybrid (Nizamabad)',
-    projectType: 'Project-based',
-    deliverables: [
-      'Functional booking calendar page with WhatsApp confirmation',
-      'Rebranded Instagram assets & 10 branded story templates',
-      'Bridal price card PDF'
-    ]
-  },
-  {
-    id: 'loc-007',
-    businessName: 'Sai Krishna Hardware',
-    avatar: 'S',
-    avatarBg: '#FFF7ED',
-    avatarColor: '#EA580C',
-    location: 'Tirupati',
-    ownerName: 'S. Koteswara Rao',
-    ownerRole: 'Managing Director',
-    category: 'Digital Catalog',
-    tags: ['B2B Catalog', 'WhatsApp Business', 'Construction'],
-    opportunityTitle: 'Wholesale Plumbing & Electrical Digital Catalog',
-    shortDescription: 'Digitize 500+ SKU hardware catalog into an easy-to-search PDF and WhatsApp catalog for contractors and builders.',
-    about: 'Sai Krishna Hardware is a prominent supplier of sanitaryware, pipes, paints, and electrical fittings to contractors across the Rayalaseema region.',
-    currentDigitalPresence: 'Physical price books that become outdated every quarter, leading to price mismatches.',
-    founderBio: 'Veteran building materials merchant seeking to speed up contractor quotes and reduce phone inquiries on stock availability.',
-    founderSocials: {
-      email: 'saikrishnahardware@example.com',
-      instagram: 'https://instagram.com/saikrishnahardware_tpt',
-      whatsapp: '+91 87722 89012',
-      linkedin: 'https://linkedin.com/in/koteswararao-hardware'
-    },
-    scope: [
-      'Consolidate raw vendor price sheets into a structured digital inventory spreadsheet.',
-      'Generate a branded, interactive PDF catalog with quick category index bookmarks.',
-      'Create WhatsApp Business quick replies with updated brand price sheets.'
-    ],
-    requirements: [
-      'Spreadsheet / Excel data formatting skills',
-      'Clean PDF layout design',
-      'Attention to detail with technical SKU numbers'
-    ],
-    earnings: '₹10,000 – ₹18,000',
-    minEarning: 10000,
-    maxEarning: 18000,
-    duration: '3 weeks',
-    workMode: 'Remote',
-    projectType: 'Project-based',
-    deliverables: [
-      'Structured 500+ SKU master catalog spreadsheet',
-      'Interactive indexed PDF catalog for mobile & tablet',
-      'WhatsApp Business quick quote workflow'
-    ]
-  },
-  {
-    id: 'loc-008',
-    businessName: 'Lakshmi Tiffins',
-    avatar: 'L',
-    avatarBg: '#F0FDF4',
-    avatarColor: '#16A34A',
-    location: 'Guntur',
-    ownerName: 'L. Venkata Subbaiah',
-    ownerRole: 'Owner & Chef',
-    category: 'Local SEO',
-    tags: ['Google Maps SEO', 'Food Business', 'Reviews'],
-    opportunityTitle: 'Google Maps Optimization & QR Menu Setup',
-    shortDescription: 'Boost local search rankings for a famous breakfast spot and replace paper menus with dynamic contactless QR codes.',
-    about: 'Lakshmi Tiffins is famous across Guntur for steaming ghee idlis, crispy dosas, and authentic chutneys, serving hundreds of morning commuters daily.',
-    currentDigitalPresence: 'High customer footfall but unoptimized Google profile with old timings and incorrect address pin.',
-    founderBio: 'Culinary perfectionist who wants college students and travelers on NH16 to easily find the tiffin center.',
-    founderSocials: {
-      email: 'lakshmitiffins.gnt@example.com',
-      instagram: 'https://instagram.com/lakshmitiffins_guntur',
-      whatsapp: '+91 86322 34567',
-      linkedin: 'https://linkedin.com/in/lakshmitiffins'
-    },
-    scope: [
-      'Claim and fully optimize Google My Business profile with verified photos, menu items, and opening hours.',
-      'Design attractive acrylic table-top QR stands linking to a mobile-friendly menu.',
-      'Implement an automated review-generation SMS flow for happy customers.'
-    ],
-    requirements: [
-      'Google My Business management experience',
-      'Basic graphic design for QR tent cards',
-      'Understanding of food photography styling'
-    ],
-    earnings: '₹7,500 – ₹12,000',
-    minEarning: 7500,
-    maxEarning: 12000,
-    duration: '2 weeks',
-    workMode: 'Hybrid (Guntur)',
-    projectType: 'Project-based',
-    deliverables: [
-      'Ranked #1 on Google Local 3-pack for key breakfast terms in Guntur',
-      'Print-ready table QR code standee designs',
-      '50+ verified Google customer reviews campaign'
-    ]
-  },
-  {
-    id: 'loc-009',
-    businessName: 'Ramesh Electricals',
-    avatar: 'R',
-    avatarBg: '#FEF3C7',
-    avatarColor: '#B45309',
-    location: 'Nellore',
-    ownerName: 'Ramesh Naidu',
-    ownerRole: 'Proprietor',
-    category: 'AI-Assisted Marketing',
-    tags: ['Solar Energy', 'Lead Generation', 'AI Copywriting'],
-    opportunityTitle: 'Rooftop Solar Lead Generation Funnel',
-    shortDescription: 'Create an educational lead magnet and social campaign for domestic rooftop solar panel installations.',
-    about: 'Ramesh Electricals has expanded from commercial wiring to residential and agricultural solar panel turnkey installations in Nellore.',
-    currentDigitalPresence: 'Limited local awareness of solar subsidy schemes (PM Surya Ghar Muft Bijli Yojana).',
-    founderBio: 'Electrical engineer turned renewable energy advocate keen on helping homeowners transition to zero power bills.',
-    founderSocials: {
-      email: 'ramesh.solar@example.com',
-      instagram: 'https://instagram.com/rameshelectricals_nlr',
-      whatsapp: '+91 86123 78901',
-      linkedin: 'https://linkedin.com/in/rameshnaidu-solar'
-    },
-    scope: [
-      'Use AI tools to generate simple Telugu & English explainer guides on government solar subsidies.',
-      'Build a simple Solar Savings Calculator webpage where homeowners input average monthly bill to see estimated ROI.',
-      'Run targeted Meta lead generation ads within a 25km radius of Nellore.'
-    ],
-    requirements: [
-      'AI prompt engineering for regional content generation',
-      'Simple interactive JavaScript calculator development',
-      'Meta Ad Manager campaign setup basics'
-    ],
-    earnings: '₹14,000 – ₹24,000',
-    minEarning: 14000,
+    earnings: '₹16,000 – ₹24,000',
+    minEarning: 16000,
     maxEarning: 24000,
     duration: '3–4 weeks',
-    workMode: 'Remote / Hybrid',
-    projectType: 'Project-based',
+    workMode: 'Remote',
+    projectType: 'Direct Commercial Brief',
     deliverables: [
-      'Interactive Rooftop Solar Calculator landing page',
-      'Bilingual PDF subsidy handbook',
-      'Meta ad creatives generating verified homeowner inquiries'
-    ]
+      'Digital product catalogue',
+      'Category navigation',
+      'Structured product cards',
+      'Product information pages',
+      'B2B enquiry form',
+      'Distributor/retailer enquiry flow',
+      'Enquiry confirmation interface',
+      'Lead capture UI',
+      'Searchable product catalogue'
+    ],
+    outcome: 'Make ESVY’s portfolio easier for business prospects to discover and enquire about.'
   },
+
+  // =========================================================================
+  // 3. RYTHUVET — M2: AI Farmer Knowledge Assistant
+  // =========================================================================
   {
-    id: 'loc-010',
-    businessName: 'Venkateswara Furnitures',
-    avatar: 'V',
-    avatarBg: '#F1F5F9',
-    avatarColor: '#334155',
-    location: 'Secunderabad',
-    ownerName: 'V. Srinivas Rao',
-    ownerRole: 'Managing Partner',
-    category: 'Digital Catalog',
-    tags: ['E-Commerce Lite', 'Furniture', 'Product Showcase'],
-    opportunityTitle: 'Teakwood Living & Office Furniture Showcase',
-    shortDescription: 'Develop a responsive showcase website with clean multi-angle product views for premium handcrafted teak furniture.',
-    about: 'Venkateswara Furnitures has crafted heirloom-grade solid teak dining sets, recliners, and office suites on RP Road, Secunderabad since 1988.',
-    currentDigitalPresence: 'Large 4-story showroom with no digital presence for tech workers seeking home office furniture in Cyberabad.',
-    founderBio: 'Master craftsman focused on modernizing legacy retail through digital visibility.',
+    id: 'rythuvet-m2',
+    businessId: 'rythuvet',
+    code: 'M2',
+    businessName: 'RythuVet',
+    logo: '/assets/rythvet.jpeg',
+    founder: 'Dr. Srinivas Reddy',
+    ownerName: 'Dr. Srinivas Reddy',
+    ownerRole: 'Founder & Chief Veterinary Officer',
+    founderBio: 'Dr. Srinivas Reddy is a distinguished veterinarian and livestock development specialist dedicated to empowering Indian farmers through actionable livestock healthcare, nutrition, and sustainable breeding knowledge.',
+    website: 'https://rythuvet.com',
+    location: 'Karimnagar / Telangana',
+    category: 'AI & Digital Solutions',
+    tags: ['Telugu AI Assistant', 'Knowledge Discovery', 'Farmer Q&A'],
+    opportunityTitle: 'AI Farmer Knowledge Assistant',
+    goal: 'Make RythuVet’s farmer knowledge easier to discover and navigate.',
+    shortDescription: 'Build a Telugu-first AI knowledge assistant that helps farmers find relevant information from approved RythuVet educational content and directs users toward appropriate veterinary support.',
+    about: 'RythuVet is an innovative livestock and veterinary platform dedicated to farmer development and sustainable livestock health. Focus areas include Ram Lamb Fattening, Sheep & Goat management, and Dairy & Cattle development through farmer awareness seminars, Telugu-first livestock education, and field demonstrations in collaboration with FPOs and farmer groups.',
+    currentDigitalPresence: 'Possesses extensive validated veterinary knowledge across seminars and field guides. Needs an interactive Telugu assistant for rapid farmer discovery.',
     founderSocials: {
-      email: 'venkateswara.furniture@example.com',
-      instagram: 'https://instagram.com/venkateswarafurniture_hyd',
-      whatsapp: '+91 40 2780 1234',
-      linkedin: 'https://linkedin.com/in/srinivasrao-furniture'
+      website: 'https://rythuvet.com',
+      email: 'contact@rythuvet.com',
+      whatsapp: '+91 94401 23456'
     },
     scope: [
-      'Build a lightweight React / Vite static catalog website with filter by room type and price tier.',
-      'Implement "Inquire on WhatsApp with Product Code" button on every product modal.',
-      'Photograph top 25 bestselling furniture sets against clean studio backgrounds.'
+      'Design a clean, mobile-friendly conversational Q&A interface tailored for Telugu-speaking farmers.',
+      'Index verified RythuVet documents into searchable Q&A topics (nutrition, deworming calendars, seasonal care).',
+      'Implement strict safety boundaries: educational discovery only, with clear escalation guidance to contact a qualified veterinarian for medical emergencies.',
+      'Create conversational shortcuts for common topics like Ram Lamb Fattening and fodder management.'
     ],
     requirements: [
-      'React / Tailwind CSS frontend development',
-      'Product image retouching and clean cutout skills',
-      'WhatsApp direct message URL encoding'
+      'Familiarity with AI tools & prompt design',
+      'Knowledge organization & indexing',
+      'Conversational UI / chatbot flow design',
+      'Basic web development skills',
+      'Fluent Telugu communication'
     ],
-    earnings: '₹16,000 – ₹26,000',
-    minEarning: 16000,
-    maxEarning: 26000,
-    duration: '3–4 weeks',
-    workMode: 'Hybrid (Secunderabad)',
-    projectType: 'Project-based',
-    deliverables: [
-      'Live responsive product catalog website',
-      '25 curated high-res product photo showcases',
-      'Automated WhatsApp inquiry pre-fill links'
-    ]
-  },
-  {
-    id: 'loc-011',
-    businessName: 'Padmavati Handlooms',
-    avatar: 'P',
-    avatarBg: '#FDF4FF',
-    avatarColor: '#A21CAF',
-    location: 'Warangal',
-    ownerName: 'Padma Devi',
-    ownerRole: 'Founder & Master Weaver',
-    category: 'Branding & Content',
-    tags: ['Handloom', 'Storytelling', 'E-Commerce'],
-    opportunityTitle: 'Heritage Weaver Storytelling & Direct D2C Page',
-    shortDescription: 'Create an authentic brand story narrative and direct-to-consumer Instagram store for handwoven Pochampally & Gadwal sarees.',
-    about: 'Padmavati Handlooms supports a cooperative of 22 traditional weavers producing GI-tagged silk and cotton sarees.',
-    currentDigitalPresence: 'Middlemen take 60% margins; weavers want direct customer connections across pan-India metros.',
-    founderBio: 'National award-winning master weaver advocating for sustainable handloom artisan fair wages.',
-    founderSocials: {
-      email: 'padmavati.handlooms@example.com',
-      instagram: 'https://instagram.com/padmavatihandlooms',
-      whatsapp: '+91 87029 11223',
-      linkedin: 'https://linkedin.com/in/padmadevi-handlooms'
-    },
-    scope: [
-      'Shoot and edit 10 mini-documentary reels showcasing the loom weaving process and dye preparation.',
-      'Create an Instagram shop bio link and organized Story Highlights for saree varieties.',
-      'Establish standard packaging inserts telling the story of the artisan who wove each saree.'
-    ],
-    requirements: [
-      'Video editing (Reels, TikTok format, CapCut)',
-      'Brand storytelling and authentic copywriting',
-      'Basic packaging layout design'
-    ],
-    earnings: '₹11,000 – ₹17,000',
-    minEarning: 11000,
-    maxEarning: 17000,
-    duration: '2–3 weeks',
-    workMode: 'Hybrid (Warangal)',
-    projectType: 'Project-based',
-    deliverables: [
-      '10 viral-style artisan documentary Reels',
-      'Instagram shop link-in-bio architecture',
-      'Artisan authenticity certificate & story card design'
-    ]
-  },
-  {
-    id: 'loc-012',
-    businessName: 'Coastal Ayurveda Clinic',
-    avatar: 'C',
-    avatarBg: '#ECFDF5',
-    avatarColor: '#047857',
-    location: 'Visakhapatnam',
-    ownerName: 'Dr. S. N. Varma',
-    ownerRole: 'Chief Ayurvedic Physician',
-    category: 'Website Improvement',
-    tags: ['Healthcare', 'Teleconsultation', 'Landing Page'],
-    opportunityTitle: 'Panchakarma & Consultation Booking Portal',
-    shortDescription: 'Build a trustworthy clinic landing page with patient testimonials and online consultation slot booking.',
-    about: 'Coastal Ayurveda Clinic offers traditional Panchakarma therapies, holistic pain management, and herbal lifestyle remedies in Beach Road, Vizag.',
-    currentDigitalPresence: 'No website; patients rely on word of mouth and struggle to book specialized treatment slots in advance.',
-    founderBio: 'BAMS, MD (Ayurveda) with 20+ years of classical clinical practice.',
-    founderSocials: {
-      email: 'coastalayurveda@example.com',
-      instagram: 'https://instagram.com/coastalayurveda_vizag',
-      whatsapp: '+91 89127 89100',
-      linkedin: 'https://linkedin.com/in/dr-sn-varma-ayurveda'
-    },
-    scope: [
-      'Design an elegant, calming clinic website with medical services, doctor profile, and patient FAQs.',
-      'Integrate appointment scheduling widget with preliminary medical history questionnaire.',
-      'Set up Google Reviews integration and patient privacy disclaimer copy.'
-    ],
-    requirements: [
-      'Clean web development (HTML/Tailwind/React)',
-      'Healthcare UI/UX design sensibility',
-      'Form builder integration'
+    skills: [
+      'AI Tools',
+      'Prompt Design',
+      'Knowledge Organization',
+      'Conversational UI',
+      'Basic Web Development',
+      'Telugu Communication'
     ],
     earnings: '₹15,000 – ₹25,000',
     minEarning: 15000,
     maxEarning: 25000,
-    duration: '3 weeks',
-    workMode: 'Remote / Hybrid',
-    projectType: 'Project-based',
+    duration: '4 weeks',
+    workMode: 'Remote',
+    projectType: 'Direct Commercial Brief',
     deliverables: [
-      'Responsive clinic website with interactive appointment scheduler',
-      'Integrated patient testimonial carousel',
-      'Automated email confirmation template'
-    ]
+      'Telugu-first conversational interface',
+      'Structured knowledge base',
+      'Farmer-friendly question and answer flow',
+      'Retrieval/search over approved RythuVet content',
+      'Category-based knowledge discovery',
+      'Escalation guidance for questions requiring a veterinarian',
+      'Simple and accessible UI'
+    ],
+    outcome: 'Create a practical digital knowledge layer for RythuVet that improves access to farmer education.'
   },
+
+  // =========================================================================
+  // 4. MANAIR MEAT MART — M1: Social Media & Reels
+  // =========================================================================
   {
-    id: 'loc-013',
-    businessName: 'Balaji Seeds & Agro',
-    avatar: 'B',
-    avatarBg: '#FEF9C3',
-    avatarColor: '#CA8A04',
-    location: 'Karimnagar',
-    ownerName: 'B. Mohan Reddy',
-    ownerRole: 'Managing Director',
-    category: 'WhatsApp Workflow',
-    tags: ['AgriTech Lite', 'Farmer Support', 'WhatsApp'],
-    opportunityTitle: 'Regional Crop Advisory & Stock Alert System',
-    shortDescription: 'Build a WhatsApp-based crop advisory and fertilizer inventory broadcast system for local farming communities.',
-    about: 'Balaji Seeds & Agro supplies certified high-yield paddy seeds, bio-fertilizers, and drip irrigation accessories to over 1,200 farmers.',
-    currentDigitalPresence: 'Manual broadcasts from personal phone that get blocked; farmers miss crucial pest alert advisories.',
-    founderBio: 'Agricultural science graduate helping local farmers adopt precision nutrients and climate-resilient seeds.',
+    id: 'manair-m1',
+    businessId: 'manair',
+    code: 'M1',
+    businessName: 'Manair Meat Mart',
+    logo: '/assets/manairmeat.png',
+    founder: 'Deepak Boorla',
+    ownerName: 'Deepak Boorla',
+    ownerRole: 'Founder & Managing Director',
+    founderBio: 'Deepak Boorla leads Manair Meat Mart, a farmer-connected enterprise based in Karimnagar, setting new standards for hygienic meat processing, shepherd empowerment, and verified freshness.',
+    website: 'https://manairmeat.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Marketing & Content',
+    tags: ['Social Media', 'Reels', 'Local Branding', 'Fresh Meat'],
+    opportunityTitle: 'Social Media & Reels',
+    goal: 'Content and brand growth',
+    shortDescription: 'Help Manair Meat Mart create engaging local food-brand content that communicates freshness, hygiene, product quality, trust, and its farmer-connected identity.',
+    about: 'Manair Meat Mart (PURE MEAT • PURE TRUST) is a farmer-owned producer enterprise delivering fresh, hygienically processed sheep meat and customized mutton cuts in Karimnagar, Telangana. Built on ethical sourcing from local shepherds, accurate digital weighing, clean butchery cuts, and fresh packaging with home delivery and WhatsApp ordering.',
+    currentDigitalPresence: 'Established retail hub in Karimnagar with loyal footfall. Expanding digital presence and local social media brand recognition.',
     founderSocials: {
-      email: 'balajiagro@example.com',
-      instagram: 'https://instagram.com/balajiseeds_krm',
-      whatsapp: '+91 94900 33445',
-      linkedin: 'https://linkedin.com/in/mohanreddy-agro'
+      website: 'https://manairmeat.com',
+      email: 'orders@manairmeat.com',
+      whatsapp: '+91 98490 67890'
     },
     scope: [
-      'Structure farmer database into crop-type broadcast groups (Paddy, Cotton, Maize, Chilli).',
-      'Create bilingual Telugu/English weekly advisory templates with image diagrams.',
-      'Implement simple keyword-based auto-response for product pricing and seed availability.'
+      'Produce short, high-energy Instagram Reels highlighting pristine processing standards, clean cutting, and freshness.',
+      'Tell the authentic story of local Telangana shepherd partnerships that power Manair Meat Mart.',
+      'Create promotional creatives for weekend family packs, biryani special cuts, and festive mutton boxes.',
+      'Schedule a 30-day social media roadmap targeting families, foodies, and restaurants in Karimnagar.'
     ],
     requirements: [
-      'WhatsApp Business broadcast management',
-      'Telugu language content formulation',
-      'Excel contact segmentation'
+      'Social media management & scheduling',
+      'Reels / short video editing skills',
+      'Creative copy and content writing',
+      'Graphic design (Canva / Figma)',
+      'Local consumer marketing mindset',
+      'Visual storytelling'
     ],
-    earnings: '₹9,000 – ₹16,000',
-    minEarning: 9000,
-    maxEarning: 16000,
-    duration: '2–3 weeks',
-    workMode: 'Hybrid (Karimnagar)',
-    projectType: 'Project-based',
-    deliverables: [
-      'Segmented farmer broadcast list of 1,000+ verified contacts',
-      '12 weekly pest advisory visual templates',
-      'Configured automated stock inquiry bot'
-    ]
-  },
-  {
-    id: 'loc-014',
-    businessName: 'Surya Fitness Academy',
-    avatar: 'S',
-    avatarBg: '#EFF6FF',
-    avatarColor: '#1D4ED8',
-    location: 'Vijayawada',
-    ownerName: 'Surya Prakash',
-    ownerRole: 'Head Coach & Founder',
-    category: 'Content Creation',
-    tags: ['Fitness', 'Transformation Videos', 'Social Media'],
-    opportunityTitle: 'Fitness Transformation Video Production & Funnel',
-    shortDescription: 'Film, edit, and publish high-energy student transformation reels and launch a trial pass landing page.',
-    about: 'Surya Fitness Academy is a 6,000 sq.ft strength and conditioning gym in Benz Circle, Vijayawada, featuring imported Olympic lifting gear.',
-    currentDigitalPresence: 'Impressive in-gym results with zero video presence; losing new college enrollments to commercial chains.',
-    founderBio: 'Former state powerlifting champion passionate about youth fitness and functional nutrition.',
-    founderSocials: {
-      email: 'suryafitness@example.com',
-      instagram: 'https://instagram.com/suryafitness_vja',
-      whatsapp: '+91 86629 99000',
-      linkedin: 'https://linkedin.com/in/suryaprakash-fitness'
-    },
-    scope: [
-      'Produce 12 high-energy transformation short-form videos with client voiceovers.',
-      'Design a "3-Day Free Gym Pass" lead capture page with instant WhatsApp voucher generation.',
-      'Optimize gym Google Business listing with interior 360 photos.'
+    skills: [
+      'Social Media',
+      'Reels / Video Editing',
+      'Content Writing',
+      'Graphic Design',
+      'Local Marketing',
+      'Storytelling'
     ],
-    requirements: [
-      'Smartphone cinematography & dynamic video editing',
-      'Canva / Figma voucher design',
-      'Lead form integration'
-    ],
-    earnings: '₹10,000 – ₹18,000',
+    earnings: '₹10,000 – ₹15,000',
     minEarning: 10000,
-    maxEarning: 18000,
-    duration: '2–3 weeks',
-    workMode: 'On-site / Hybrid (Vijayawada)',
-    projectType: 'Project-based',
+    maxEarning: 15000,
+    duration: '3 weeks',
+    workMode: 'Hybrid (Karimnagar / Remote)',
+    projectType: 'Direct Commercial Brief',
     deliverables: [
-      '12 polished transformation reels with subtitles',
-      'Free Pass landing page with instant voucher generation',
-      'Updated Google Maps listing with 20+ interior photos'
-    ]
+      'Instagram reels',
+      'Facebook/social posts',
+      'Product-focused content',
+      'Freshness and hygiene content',
+      'Farmer-story content',
+      'Local audience campaigns',
+      'Short-form promotional videos',
+      'Monthly content calendar'
+    ],
+    outcome: 'Strengthen Manair Meat Mart’s digital presence and improve awareness among local customers.'
   },
+
+  // =========================================================================
+  // 5. ESVY LIFE SCIENCES — M2: Pharma Sales Lead & Follow-Up Automation
+  // =========================================================================
   {
-    id: 'loc-015',
-    businessName: 'Royal Sweets & Bakery',
-    avatar: 'R',
-    avatarBg: '#FEF2F2',
-    avatarColor: '#B91C1C',
-    location: 'Hyderabad',
-    ownerName: 'Mirza Baig',
-    ownerRole: 'Managing Director',
-    category: 'Digital Presence',
-    tags: ['Bakery', 'Custom Cakes', 'Instagram Orders'],
-    opportunityTitle: 'Custom Theme Cake Ordering & Instagram Showcase',
-    shortDescription: 'Build an intuitive interactive custom cake ordering workflow with flavor selector and delivery scheduler.',
-    about: 'Royal Sweets & Bakery in Mehdipatnam, Hyderabad is famous for Dum Ka Roat, designer birthday fondant cakes, and Iranian chai snacks.',
-    currentDigitalPresence: 'Hundreds of cake inquiries on Instagram DM get lost because of lack of a structured cake specification form.',
-    founderBio: 'Third-generation baker modernizing Hyderabad confectionery for Gen-Z and birthday party organizers.',
+    id: 'esvy-m2',
+    businessId: 'esvy',
+    code: 'M2',
+    businessName: 'ESVY Life Sciences',
+    logo: '/assets/esvy-logo.png',
+    founder: 'Prabhu Bezawada',
+    ownerName: 'Prabhu Bezawada',
+    ownerRole: 'Founder & Managing Director',
+    founderBio: 'Prabhu Bezawada founded ESVY Life Sciences in 2019 to deliver research-driven, WHO-cGMP compliant pharmaceuticals combining clinician trust, strict quality assurance, and accessible healthcare across India.',
+    website: 'https://myesvy.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Sales Automation',
+    tags: ['CRM Workflow', 'Lead Pipeline', 'Sales Operations'],
+    opportunityTitle: 'Pharma Sales Lead & Follow-Up Automation',
+    goal: 'Improve enquiry handling and sales follow-up.',
+    shortDescription: 'Build a workflow that captures incoming B2B enquiries, categorizes them, assigns follow-up status, and helps sales teams manage leads consistently.',
+    about: 'ESVY Life Sciences (Efficacy • Safety • Vitality) is a research-driven Indian pharmaceutical enterprise established in 2019, adhering to stringent WHO-cGMP manufacturing standards. Operating dedicated specialized divisions including Esvy Life (Gastroenterology) and Esvy Purple (Gynecology), the company is grounded in ethics, quality, clinician trust, and accessible healthcare.',
+    currentDigitalPresence: 'Manages distributor inquiries through manual email and phone logs. Needs a centralized pipeline to track inquiry statuses from first contact to fulfillment.',
     founderSocials: {
-      email: 'royalcakes.hyd@example.com',
-      instagram: 'https://instagram.com/royalsweets_hyd',
-      whatsapp: '+91 40 2351 9876',
-      linkedin: 'https://linkedin.com/in/mirzabaig-royal'
+      website: 'https://myesvy.com',
+      email: 'info@myesvy.com',
+      whatsapp: '+91 98495 11223'
     },
     scope: [
-      'Build a stepped Cake Builder form (Flavor, Weight, Design Photo Upload, Date, Delivery Area).',
-      'Auto-calculate base quote and forward complete structured order directly to bakery WhatsApp.',
-      'Curate Instagram Reels archive showcasing live fondant cake decorations.'
+      'Map the B2B distributor pipeline across stages: New, Contacted, Follow-up, Qualified, Converted, Closed.',
+      'Design an interactive sales status dashboard with priority tags (High, Medium, Normal) and follow-up alerts.',
+      'Implement lead assignment by territory (Hyderabad, Telangana, Andhra Pradesh, National Distributors).',
+      'Build activity tracking logs for documenting distributor meetings, sample dispatches, and commercial terms.'
     ],
     requirements: [
-      'Frontend React / Vanilla JS interactive stepped form building',
-      'File upload handling preview',
-      'WhatsApp API order string builder'
+      'CRM concepts & lead lifecycle understanding',
+      'Workflow automation design',
+      'Dashboard UI & status visualization',
+      'Data organization',
+      'Sales process design',
+      'Basic web development'
     ],
-    earnings: '₹12,000 – ₹20,000',
-    minEarning: 12000,
-    maxEarning: 20000,
-    duration: '2–3 weeks',
-    workMode: 'Hybrid (Hyderabad)',
-    projectType: 'Project-based',
+    skills: [
+      'CRM Concepts',
+      'Workflow Automation',
+      'Dashboard UI',
+      'Data Organization',
+      'Sales Process Design',
+      'Basic Web Development'
+    ],
+    earnings: '₹15,000 – ₹22,000',
+    minEarning: 15000,
+    maxEarning: 22000,
+    duration: '3–4 weeks',
+    workMode: 'Remote',
+    projectType: 'Direct Commercial Brief',
     deliverables: [
-      'Interactive Custom Cake Order Builder tool',
-      'Direct-to-WhatsApp order summary with photo attachment link',
-      '10 high-resolution bakery Instagram reels'
-    ]
+      'Enquiry capture',
+      'Lead categorization',
+      'Lead status tracking',
+      'Priority indication',
+      'Sales assignment',
+      'Follow-up reminders',
+      'Activity/history view',
+      'Conversion pipeline view',
+      'Simple sales dashboard'
+    ],
+    outcome: 'Create a more organized pipeline from incoming business enquiry to sales follow-up.'
+  },
+
+  // =========================================================================
+  // 6. RYTHUVET — M3: Farmer Q&A & Knowledge Management
+  // =========================================================================
+  {
+    id: 'rythuvet-m3',
+    businessId: 'rythuvet',
+    code: 'M3',
+    businessName: 'RythuVet',
+    logo: '/assets/rythvet.jpeg',
+    founder: 'Dr. Srinivas Reddy',
+    ownerName: 'Dr. Srinivas Reddy',
+    ownerRole: 'Founder & Chief Veterinary Officer',
+    founderBio: 'Dr. Srinivas Reddy is a distinguished veterinarian and livestock development specialist dedicated to empowering Indian farmers through actionable livestock healthcare, nutrition, and sustainable breeding knowledge.',
+    website: 'https://rythuvet.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Knowledge & Community',
+    tags: ['Knowledge Management', 'FAQ Pipeline', 'Community Research'],
+    opportunityTitle: 'Farmer Q&A & Knowledge Management',
+    goal: 'Turn recurring farmer questions into a structured knowledge system and content pipeline.',
+    shortDescription: 'Build a system/workflow to collect, categorize, organize, and transform farmer questions into reusable educational resources such as articles, FAQs, posts, and reels.',
+    about: 'RythuVet is an innovative livestock and veterinary platform dedicated to farmer development and sustainable livestock health. Focus areas include Ram Lamb Fattening, Sheep & Goat management, and Dairy & Cattle development through farmer awareness seminars, Telugu-first livestock education, and field demonstrations in collaboration with FPOs and farmer groups.',
+    currentDigitalPresence: 'Fields hundreds of recurring questions during farmer meetings. Needs a centralized system to capture, categorize, and convert them into reusable assets.',
+    founderSocials: {
+      website: 'https://rythuvet.com',
+      email: 'contact@rythuvet.com',
+      whatsapp: '+91 94401 23456'
+    },
+    scope: [
+      'Build a unified question intake repository for inquiries gathered from field training, seminars, and WhatsApp.',
+      'Tag queries by livestock category (Sheep/Goat, Dairy, Fattening), life stage, and care topic.',
+      'Group recurring questions into authoritative, verified FAQ libraries with simple Telugu explanations.',
+      'Develop a dashboard view highlighting high-demand topics to feed the social media and reels pipeline.'
+    ],
+    requirements: [
+      'Research & documentation proficiency',
+      'Content organization & taxonomy',
+      'Data categorization skills',
+      'Basic web development & forms',
+      'Experience with AI-assisted content workflows'
+    ],
+    skills: [
+      'Research',
+      'Content Organization',
+      'Data Categorization',
+      'Documentation',
+      'Basic Web Development',
+      'AI-Assisted Content Workflows'
+    ],
+    earnings: '₹10,000 – ₹16,000',
+    minEarning: 10000,
+    maxEarning: 16000,
+    duration: '3 weeks',
+    workMode: 'Remote',
+    projectType: 'Direct Commercial Brief',
+    deliverables: [
+      'Farmer question collection interface',
+      'Question categorization',
+      'Searchable knowledge library',
+      'Frequently asked question grouping',
+      'Unanswered-question tracking',
+      'Content opportunity identification',
+      'Conversion of recurring questions into educational content',
+      'Simple knowledge dashboard'
+    ],
+    outcome: 'Help RythuVet continuously learn from farmer questions and convert those questions into useful educational content.'
+  },
+
+  // =========================================================================
+  // 7. MANAIR MEAT MART — M2: WhatsApp Order Automation
+  // =========================================================================
+  {
+    id: 'manair-m2',
+    businessId: 'manair',
+    code: 'M2',
+    businessName: 'Manair Meat Mart',
+    logo: '/assets/manairmeat.png',
+    founder: 'Deepak Boorla',
+    ownerName: 'Deepak Boorla',
+    ownerRole: 'Founder & Managing Director',
+    founderBio: 'Deepak Boorla leads Manair Meat Mart, a farmer-connected enterprise based in Karimnagar, setting new standards for hygienic meat processing, shepherd empowerment, and verified freshness.',
+    website: 'https://manairmeat.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Automation & Customer Experience',
+    tags: ['WhatsApp Automation', 'Order Flow', 'Customer Experience'],
+    opportunityTitle: 'WhatsApp Order Automation',
+    goal: 'Customer enquiries and order conversion',
+    shortDescription: 'Build a WhatsApp-focused customer workflow that makes product enquiries, order collection, product selection, and customer follow-up easier.',
+    about: 'Manair Meat Mart (PURE MEAT • PURE TRUST) is a farmer-owned producer enterprise delivering fresh, hygienically processed sheep meat and customized mutton cuts in Karimnagar, Telangana. Built on ethical sourcing from local shepherds, accurate digital weighing, clean butchery cuts, and fresh packaging with home delivery and WhatsApp ordering.',
+    currentDigitalPresence: 'Receives high volume of WhatsApp chats and calls during peak hours. Needs structured conversational catalog and order capture.',
+    founderSocials: {
+      website: 'https://manairmeat.com',
+      email: 'orders@manairmeat.com',
+      whatsapp: '+91 98490 67890'
+    },
+    scope: [
+      'Design automated WhatsApp customer menu for cut selection: Boneless, Keema, Liver & Organs, Soup Bones.',
+      'Structure automatic order summary with selected cut, weight (500g, 1kg, 2kg+), delivery address, and time slot.',
+      'Configure automated FAQs for daily pricing, shop location, and home delivery coverage.',
+      'Integrate order dispatch notifications and instant human support handoff for custom requests.'
+    ],
+    requirements: [
+      'Automation tools & chatbot platforms',
+      'Conversational UI / flow design',
+      'Workflow & customer journey design',
+      'Customer experience optimization',
+      'Basic web development understanding',
+      'Familiarity with WhatsApp Business capabilities'
+    ],
+    skills: [
+      'Automation Tools',
+      'Conversational UI',
+      'Workflow Design',
+      'Customer Experience',
+      'Basic Web Development',
+      'WhatsApp Workflow Understanding'
+    ],
+    earnings: '₹14,000 – ₹20,000',
+    minEarning: 14000,
+    maxEarning: 20000,
+    duration: '3–4 weeks',
+    workMode: 'Remote / Hybrid',
+    projectType: 'Direct Commercial Brief',
+    deliverables: [
+      'WhatsApp enquiry flow',
+      'Product/category selection',
+      'Structured order capture',
+      'FAQ automation',
+      'Customer information collection',
+      'Order confirmation workflow',
+      'Follow-up reminders',
+      'Handoff to human support when required'
+    ],
+    outcome: 'Reduce friction between customer enquiry and order conversion.'
+  },
+
+  // =========================================================================
+  // 8. ESVY LIFE SCIENCES — M3: Medical Product Content & Digital Knowledge System
+  // =========================================================================
+  {
+    id: 'esvy-m3',
+    businessId: 'esvy',
+    code: 'M3',
+    businessName: 'ESVY Life Sciences',
+    logo: '/assets/esvy-logo.png',
+    founder: 'Prabhu Bezawada',
+    ownerName: 'Prabhu Bezawada',
+    ownerRole: 'Founder & Managing Director',
+    founderBio: 'Prabhu Bezawada founded ESVY Life Sciences in 2019 to deliver research-driven, WHO-cGMP compliant pharmaceuticals combining clinician trust, strict quality assurance, and accessible healthcare across India.',
+    website: 'https://myesvy.com',
+    location: 'Karimnagar / Telangana',
+    category: 'Content & Knowledge',
+    tags: ['Product Monograph', 'Medical Knowledge', 'WHO-cGMP'],
+    opportunityTitle: 'Medical Product Content & Digital Knowledge System',
+    goal: 'Create a structured digital knowledge layer for pharmaceutical product communication.',
+    shortDescription: 'Organize approved ESVY product information into a clean searchable content system designed for professional digital communication and easier product discovery.',
+    about: 'ESVY Life Sciences (Efficacy • Safety • Vitality) is a research-driven Indian pharmaceutical enterprise established in 2019, adhering to stringent WHO-cGMP manufacturing standards. Operating dedicated specialized divisions including Esvy Life (Gastroenterology) and Esvy Purple (Gynecology), the company is grounded in ethics, quality, clinician trust, and accessible healthcare.',
+    currentDigitalPresence: 'Produces physical medical product brochures. Needs a searchable, digital knowledge repository accessible to medical representatives and doctors.',
+    founderSocials: {
+      website: 'https://myesvy.com',
+      email: 'info@myesvy.com',
+      whatsapp: '+91 98495 11223'
+    },
+    scope: [
+      'Standardize digital formulation knowledge cards for Esvy Life and Esvy Purple portfolios.',
+      'Implement taxonomy search by therapeutic specialty, active ingredient, and dosage type.',
+      'Format downloadable product summaries for quick clinician and pharmacist reference.',
+      'Ensure strict alignment with WHO-cGMP verified documentation without generating medical advice.'
+    ],
+    requirements: [
+      'Medical & technical content organization',
+      'Technical documentation formatting',
+      'Information architecture & tagging',
+      'Search & taxonomy design',
+      'Content workflow management'
+    ],
+    skills: [
+      'Medical Content Organization',
+      'Technical Documentation',
+      'Information Architecture',
+      'Search & Taxonomy Design',
+      'Content Workflows'
+    ],
+    earnings: '₹12,000 – ₹18,000',
+    minEarning: 12000,
+    maxEarning: 18000,
+    duration: '3 weeks',
+    workMode: 'Remote',
+    projectType: 'Direct Commercial Brief',
+    deliverables: [
+      'Structured product knowledge pages',
+      'Searchable content',
+      'Product family navigation',
+      'Information hierarchy',
+      'Clinician-focused content structure',
+      'Downloadable/shareable information UI',
+      'FAQ structure based only on approved material',
+      'Content management workflow'
+    ],
+    outcome: 'Make ESVY’s product communication more structured, discoverable, and reusable across digital channels.'
   }
 ];

@@ -4,7 +4,6 @@ import {
   ArrowLeft, 
   ArrowRight,
   Store, 
-  MapPin, 
   CheckCircle2, 
   Share2, 
   ShieldCheck,
@@ -133,18 +132,27 @@ export default function LocalBusinessDetailPage() {
           </span>
         </div>
 
-        {/* Header Content with Business Avatar */}
+        {/* Header Content with Business Avatar / Logo */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 my-2">
-          <div 
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black flex-shrink-0 shadow-2xs border select-none"
-            style={{
-              backgroundColor: business.avatarBg || '#FEF2F2',
-              color: business.avatarColor || '#DC2626',
-              borderColor: `${business.avatarColor || '#DC2626'}22`
-            }}
-          >
-            {avatarLetter}
-          </div>
+          {business.logo ? (
+            <div className="opportunity-detail-business-avatar">
+              <img 
+                src={business.logo} 
+                alt={`${business.businessName} Logo`} 
+              />
+            </div>
+          ) : (
+            <div 
+              className="opportunity-detail-business-avatar text-2xl font-black select-none"
+              style={{
+                backgroundColor: business.avatarBg || '#FEF2F2',
+                color: business.avatarColor || '#DC2626',
+                borderColor: `${business.avatarColor || '#DC2626'}22`
+              }}
+            >
+              {avatarLetter}
+            </div>
+          )}
 
           <div>
             <h1 className="learner-detail-title mb-1">
@@ -153,10 +161,23 @@ export default function LocalBusinessDetailPage() {
             <div className="text-sm font-bold text-[#374151] flex items-center gap-2 flex-wrap">
               <span>{business.businessName}</span>
               <span className="text-gray-300">·</span>
-              <span className="text-xs text-[#6B7280] font-normal flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                <span>{business.location}</span>
+              <span className="text-xs text-[#6B7280] font-normal">
+                {business.location}
               </span>
+              {business.website && (
+                <>
+                  <span className="text-gray-300">·</span>
+                  <a
+                    href={business.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#E31B23] hover:underline inline-flex items-center gap-1 font-medium"
+                  >
+                    <span>{business.website.replace(/^https?:\/\//, '')}</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -256,6 +277,17 @@ export default function LocalBusinessDetailPage() {
                     title="LinkedIn"
                   >
                     <LinkedinIcon />
+                  </a>
+                )}
+                {(business.founderSocials?.website || business.website) && (
+                  <a
+                    href={business.founderSocials?.website || business.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-white border border-[#E5E7EB] text-[#4B5563] hover:text-[#E31B23] hover:border-red-200 transition-all shadow-2xs"
+                    title="Visit Official Website"
+                  >
+                    <Globe className="w-4 h-4" />
                   </a>
                 )}
                 {business.founderSocials?.whatsapp && (
