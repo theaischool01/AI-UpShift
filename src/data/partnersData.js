@@ -100,11 +100,11 @@ export const GOVERNMENT_PARTNERS = [
     alt: 'AI Alliance Network',
   },
   {
-    id: 'moscow',
-    name: 'Moscow',
-    fullName: 'Moscow Partner Initiative',
-    logo: '/partners/Govt/moscow.png',
-    alt: 'Moscow',
+    id: 'cce-telangana',
+    name: 'CCE Telangana',
+    fullName: 'Commissionerate of Collegiate Education, Government of Telangana',
+    logo: '/partners/Govt/telangana-cce.png',
+    alt: 'Commissionerate of Collegiate Education, Government of Telangana',
   },
   {
     id: 'tnaim',
